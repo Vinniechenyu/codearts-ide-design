@@ -88,16 +88,15 @@
   .hero{margin-bottom:4px}
   .hero h1{margin:0;font-size:clamp(32px,5.4vw,52px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
   .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66;max-width:64em}
-  /* animated UX DESIGN wordmark — per-letter shine wave (dousanmiao-style) */
-  .ux{display:inline-flex}
-  .ux .uxl{display:inline-block;white-space:pre;color:var(--ink);
-    animation:shine 3.4s var(--ease) infinite;animation-delay:var(--d,0s)}
-  @keyframes shine{
-    0%,72%,100%{color:var(--ink);transform:translateY(0)}
-    12%{color:var(--shine);transform:translateY(-3px)}
-    24%{color:var(--ink);transform:translateY(0)}
-  }
-  @media(prefers-reduced-motion:reduce){.ux .uxl{animation:none}}
+  /* UX DESIGN wordmark — flowing purple gradient */
+  .ux{display:inline-block;
+    background:linear-gradient(96deg,var(--ink) 0%,#3B2E8C 26%,#6E4CF0 44%,#A98BFF 56%,#6E4CF0 70%,#3B2E8C 84%,var(--ink) 100%);
+    background-size:230% 100%;background-position:0% 0;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:uxflow 7s linear infinite}
+  @keyframes uxflow{to{background-position:-130% 0}}
+  .ux .uxl{display:inline-block;white-space:pre}
+  @media(prefers-reduced-motion:reduce){.ux{animation:none}}
 
   /* ---- two-column ---- */
   .layout{display:grid;grid-template-columns:212px 1fr;gap:36px;align-items:start;margin-top:34px}
