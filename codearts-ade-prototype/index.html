@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeArts ADE · IDE 工作台原型(PTO Design System)</title>
+<!-- PTO Design System (vendored, consumed not forked) -->
+<link rel="stylesheet" href="vendor/pto-design-system/tokens/foundation.css">
+<link rel="stylesheet" href="vendor/pto-design-system/tokens/semantic.css">
+<link rel="stylesheet" href="vendor/pto-design-system/tokens/components.css">
+<link rel="stylesheet" href="vendor/pto-design-system/css/style.css">
+<link rel="stylesheet" href="vendor/pto-design-system/patterns/workbench-shell/pattern.css">
+<link rel="stylesheet" href="vendor/pto-design-system/patterns/floating-playback-control/pattern.css">
+<link rel="stylesheet" href="vendor/pto-design-system/patterns/ide-frame/pattern.css">
+<link rel="stylesheet" href="vendor/pto-design-system/patterns/ide-frame/vscode.css">
+<style>
+  /* ===== full-viewport override: open = usable tool, no page margins/chrome ===== */
+  html,body{margin:0;height:100%}
+  body.pto-ide-frame-preview-page{min-height:100vh;background:var(--ide-frame-bg);overflow:hidden}
+  .pto-ide-frame-preview{width:100%;max-width:none;margin:0;padding:0;gap:0;height:100vh}
+  .pto-ide-frame{width:100%;height:100vh;max-width:none;aspect-ratio:auto;border-radius:0;border:0;box-shadow:none}
+
+  /* ===== module-local layout only — colors/space/radius via PTO tokens ===== */
+  .ade-icon{width:15px;height:15px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ade-icon.sm{width:13px;height:13px}
+  .ade-icon.lg{width:18px;height:18px}
+
+  /* status pill — .badge missing in DS; PTO-retrofit pill (pill radius + surface-3 + semantic text). FLAGGED. */
+  .ade-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:var(--radius-pill);background:var(--surface-3);color:var(--foreground-secondary);font:var(--text-body-sm);font-weight:600;white-space:nowrap}
+  .ade-badge.is-warning{color:var(--warning)} .ade-badge.is-danger{color:var(--danger)} .ade-badge.is-success{color:var(--success)} .ade-badge.is-info{color:var(--primary)}
+  .ade-dot{width:8px;height:8px;border-radius:var(--radius-pill);flex-shrink:0}
+  .ade-dot.idle{background:var(--foreground-disabled)} .ade-dot.run{background:var(--success)} .ade-dot.wait{background:var(--warning)} .ade-dot.done{background:var(--foreground-muted)}
+  .ade-dot.run{animation:adePulse 1.4s infinite}
+  @keyframes adePulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes adeSpin{to{transform:rotate(360deg)}}
+
+  /* explorer task tree */
+  .ade-tree{padding:var(--space-2)}
+  .ade-tgroup{margin-bottom:var(--space-2)}
+  .ade-tgh{display:flex;align-items:center;gap:8px;padding:6px 8px;color:var(--foreground-secondary);font:var(--text-label);letter-spacing:var(--letter-spacing-label);text-transform:uppercase;cursor:default}
+  .ade-tgh .cnt{margin-left:auto;color:var(--foreground-muted);font-family:var(--font-mono)}
+  .ade-tgroup.hot .ade-tgh{color:var(--warning)}
+  .ade-titem{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:var(--radius-md);color:var(--foreground-secondary);font:var(--text-body-sm);cursor:pointer;border:1px solid transparent}
+  .ade-titem:hover{background:var(--state-hover);color:var(--foreground)}
+  .ade-titem.is-selected{background:var(--surface-4);color:var(--foreground);border-color:var(--border-subtle)}
+  .ade-titem .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ade-titem .meta{margin-left:auto;color:var(--foreground-muted);font-family:var(--font-mono);font-size:10.5px;flex-shrink:0}
+  .ade-titem.clickable .meta.go{color:var(--primary)}
+
+  /* generic section (inspector / panels) */
+  .ade-sec{padding:var(--space-4)}
+  .ade-sec + .ade-sec{border-top:1px solid var(--border-subtle)}
+  .ade-sec-h{display:flex;align-items:center;gap:8px;margin-bottom:var(--space-3);color:var(--foreground-secondary);font:var(--text-label);letter-spacing:var(--letter-spacing-label);text-transform:uppercase}
+  .ade-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;font:var(--text-body-sm);color:var(--foreground-secondary)}
+  .ade-row b{color:var(--foreground);font-weight:600}
+  .ade-row .v.mono{font-family:var(--font-mono)}
+
+  /* pipeline steps */
+  .ade-step{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:var(--radius-md);font:var(--text-body-sm);color:var(--foreground-secondary)}
+  .ade-step .sd{width:20px;height:20px;border-radius:var(--radius-pill);border:1.6px solid var(--border-strong);display:grid;place-items:center;flex-shrink:0;color:var(--foreground-muted)}
+  .ade-step .sd .ade-icon{width:11px;height:11px}
+  .ade-step.ok .sd{background:var(--success);border-color:var(--success);color:var(--background)}
+  .ade-step.warn .sd{background:color-mix(in srgb,var(--warning) 20%,transparent);border-color:var(--warning);color:var(--warning)}
+  .ade-step.cur{background:color-mix(in srgb,var(--primary) 10%,transparent);color:var(--foreground);font-weight:600}
+  .ade-step.cur .sd{background:var(--primary);border-color:var(--primary);color:#fff;animation:adeSpin 1.4s linear infinite}
+  .ade-step .mn{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:var(--foreground-muted)}
+  .ade-step.ok .mn{color:var(--success)} .ade-step.warn .mn{color:var(--warning);font-weight:600}
+
+  .ade-softcard{margin-top:var(--space-3);padding:var(--space-3);border-radius:var(--radius-lg);background:var(--surface-2)}
+  .ade-softcard.is-info{background:color-mix(in srgb,var(--primary) 12%,var(--surface-2))}
+  .ade-softcard.is-success{background:color-mix(in srgb,var(--success) 12%,var(--surface-2))}
+  .ade-softcard .h{display:flex;align-items:center;gap:7px;font:var(--text-body-sm);font-weight:700;color:var(--foreground)}
+  .ade-softcard .sug{margin-top:8px;background:var(--background);border-radius:var(--radius-md);padding:9px 11px;font-family:var(--font-mono);font-size:11.5px;color:var(--foreground-secondary);white-space:pre-wrap}
+
+  /* review report */
+  .ade-rephead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .ade-rephead h2{font:var(--text-title-1);color:var(--foreground)}
+  .ade-repsub{font:var(--text-body-sm);color:var(--foreground-secondary);margin-bottom:var(--space-4);line-height:1.6;max-width:760px}
+  .ade-repsub b{color:var(--foreground)}
+  .ade-jitem{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--surface-1);margin-bottom:10px;overflow:hidden}
+  .ade-jitem.open{border-color:var(--border-strong)}
+  .ade-jitem.resolved{opacity:.9}
+  .ade-jhead{display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer;user-select:none}
+  .ade-sev{width:8px;height:8px;border-radius:var(--radius-pill);flex-shrink:0;background:var(--foreground-muted)}
+  .ade-sev.block{background:var(--warning)}
+  .ade-jitem.resolved .ade-sev{background:var(--success)!important}
+  .ade-jtitle{font:var(--text-body-md);font-weight:600;color:var(--foreground);min-width:0}
+  .ade-jtitle .tag{display:inline-block;font-family:var(--font-mono);font-size:10px;color:var(--warning);background:color-mix(in srgb,var(--warning) 16%,transparent);border-radius:var(--radius-sm);padding:1px 6px;margin-left:7px}
+  .ade-chev{margin-left:auto;color:var(--foreground-muted);transition:transform .25s}
+  .ade-jitem.open .ade-chev{transform:rotate(180deg)}
+  .ade-jdetail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s var(--easing-default,ease)}
+  .ade-jitem.open .ade-jdetail{grid-template-rows:1fr}
+  .ade-jdin{overflow:hidden;min-height:0}
+  .ade-jbody{padding:2px 14px 14px;border-top:1px solid var(--border-subtle)}
+  .ade-jdesc{font:var(--text-body-sm);color:var(--foreground-secondary);margin:12px 0;line-height:1.65}
+  .ade-jdesc b{color:var(--foreground)}
+
+  /* code / diff (data-viz-ish; add/del via success/danger tints) */
+  .ade-code{background:var(--background);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;font-family:var(--font-mono);font-size:12px}
+  .ade-cfile{display:flex;align-items:center;gap:8px;padding:7px 12px;color:var(--foreground-muted);border-bottom:1px solid var(--border-subtle);font-size:11px;background:var(--surface-1)}
+  .ade-cfile .gd{margin-left:auto;display:flex;gap:9px}
+  .ade-addc{color:var(--success)} .ade-delc{color:var(--danger)}
+  .ade-cl{display:grid;grid-template-columns:34px 18px 1fr;line-height:1.7;color:var(--foreground-secondary)}
+  .ade-cl .ln{text-align:right;padding-right:8px;color:var(--foreground-disabled);user-select:none}
+  .ade-cl .sg{text-align:center;user-select:none}
+  .ade-cl code{white-space:pre-wrap;word-break:break-word;padding-right:10px}
+  .ade-cl.add{background:color-mix(in srgb,var(--success) 14%,transparent)} .ade-cl.add .sg{color:var(--success)}
+  .ade-cl.del{background:color-mix(in srgb,var(--danger) 13%,transparent)} .ade-cl.del .sg{color:var(--danger)}
+  .ade-cl.flag{background:color-mix(in srgb,var(--warning) 15%,transparent);box-shadow:inset 3px 0 0 var(--warning)}
+  .ade-cl.flag .sg{color:var(--warning)}
+  .ade-flagtag{display:inline-block;font-size:9.5px;color:var(--background);background:var(--warning);border-radius:var(--radius-sm);padding:0 5px;margin-left:7px;font-weight:700}
+  .tkw{color:#ff8f8f} .tfn{color:#c9a6ff} .tnu{color:#7fb0ff} .tcm{color:var(--foreground-muted)}
+
+  .ade-evrow{margin:13px 0 8px;color:var(--foreground-muted);font:var(--text-label);letter-spacing:var(--letter-spacing-label);text-transform:uppercase}
+  .ade-ev{display:flex;flex-wrap:wrap;gap:7px}
+  .ade-acts{display:flex;gap:8px;margin-top:14px}
+  .ade-acts .btn{flex:1}
+  .ade-resnote{display:flex;align-items:center;gap:8px;font:var(--text-body-sm);color:var(--success);padding:10px 0 2px}
+  .ade-resnote .reason{color:var(--foreground-muted);font-style:italic}
+  .ade-worknote{display:flex;align-items:center;gap:9px;font:var(--text-body-sm);color:var(--primary);padding:8px 0}
+  .ade-spinner{width:14px;height:14px;border:2px solid color-mix(in srgb,var(--primary) 30%,transparent);border-top-color:var(--primary);border-radius:50%;animation:adeSpin .8s linear infinite}
+
+  /* editor mode: file tree strip + code */
+  .ade-editor-wrap{display:grid;grid-template-columns:186px 1fr;height:100%;min-height:0}
+  .ade-ftree{border-right:1px solid var(--border-subtle);padding:var(--space-2);overflow:auto}
+  .ade-fpane{display:flex;flex-direction:column;min-width:0}
+  .ade-ftabs{display:flex;gap:2px;padding:5px 8px 0;border-bottom:1px solid var(--border-subtle);background:var(--surface-1)}
+  .ade-ftab{font-family:var(--font-mono);font-size:11px;color:var(--foreground-muted);padding:7px 11px;border-bottom:2px solid transparent}
+  .ade-ftab.on{color:var(--foreground);border-color:var(--primary)}
+  .ade-editor{flex:1;overflow:auto;padding:12px 0;font-family:var(--font-mono);font-size:12px}
+  .ade-el{display:grid;grid-template-columns:42px 1fr;line-height:1.85;color:var(--foreground-secondary)}
+  .ade-el .n{text-align:right;padding-right:12px;color:var(--foreground-disabled);user-select:none}
+  .ade-el.hl{background:color-mix(in srgb,var(--primary) 8%,transparent)}
+  .ade-ghost{color:var(--foreground-muted);background:color-mix(in srgb,var(--primary) 10%,transparent);border:1px dashed color-mix(in srgb,var(--primary) 45%,transparent);border-radius:4px;padding:0 4px}
+  .ade-tabhint{margin-left:7px;font-size:9.5px;color:var(--foreground-muted);border:1px solid var(--border-default);border-radius:4px;padding:0 5px}
+  .ade-ask{border-top:1px solid var(--border-subtle);background:var(--surface-1);padding:10px 13px;display:flex;align-items:center;gap:10px}
+  .ade-ask .lab{font:var(--text-body-sm);font-weight:700;color:var(--foreground);display:inline-flex;align-items:center;gap:6px}
+  .ade-ask .box{flex:1;background:var(--background);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:7px 11px;font-family:var(--font-mono);font-size:11px;color:var(--foreground-muted)}
+
+  /* watch mode: plan */
+  .ade-watch{padding:var(--space-5) var(--space-6);max-width:820px}
+  .ade-wh{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .ade-wh h3{font:var(--text-title-2);color:var(--foreground)}
+  .ade-wsub{font:var(--text-body-sm);color:var(--foreground-secondary);margin-bottom:var(--space-4);line-height:1.6}
+  .ade-plan{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--surface-1);overflow:hidden}
+  .ade-ph{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border-subtle);font:var(--text-body-sm);font-weight:700;color:var(--foreground)}
+  .ade-ps{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border-subtle);position:relative}
+  .ade-ps:last-child{border-bottom:none}
+  .ade-pd{width:20px;height:20px;border-radius:var(--radius-pill);border:1.6px solid var(--border-strong);display:grid;place-items:center;flex-shrink:0;color:var(--foreground-muted);background:var(--surface-1);z-index:1;font-size:10px}
+  .ade-ps.done .ade-pd{background:var(--success);border-color:var(--success);color:var(--background)}
+  .ade-ps.cur .ade-pd{background:var(--primary);border-color:var(--primary);color:#fff;animation:adeSpin 1.4s linear infinite}
+  .ade-ps::before{content:"";position:absolute;left:23.5px;top:32px;bottom:-1px;width:1.5px;background:var(--border-subtle)}
+  .ade-ps:last-child::before{display:none}
+  .ade-pt{font:var(--text-body-sm);font-weight:600;color:var(--foreground)}
+  .ade-pm{font-size:11.5px;color:var(--foreground-secondary);margin-top:3px;line-height:1.5}
+  .ade-think{margin-top:9px;background:var(--background);border-radius:var(--radius-md);padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--foreground-muted);line-height:1.7}
+  .ade-think .hl{color:var(--primary)}
+  .ade-cursor{display:inline-block;width:6px;height:12px;background:var(--primary);vertical-align:-1px;margin-left:2px;animation:adePulse 1s steps(1) infinite}
+  .ade-wacts{display:flex;gap:8px;margin-top:var(--space-4)}
+
+  /* trace tab */
+  .ade-trace{padding:var(--space-5) var(--space-6);overflow:auto;height:100%}
+  .ade-trhero{display:flex;gap:11px;margin-bottom:var(--space-2)}
+  .ade-trhero .ico{width:38px;height:38px;border-radius:var(--radius-lg);background:color-mix(in srgb,var(--primary) 16%,var(--surface-2));color:var(--primary);display:grid;place-items:center;flex-shrink:0}
+  .ade-trhero h2{font:var(--text-title-1);color:var(--foreground)}
+  .ade-trhero .sub{font:var(--text-body-sm);color:var(--foreground-secondary);margin-top:3px;line-height:1.55;max-width:820px}
+  .ade-trhero .sub b{color:var(--foreground)}
+  .ade-trsec{display:flex;align-items:center;gap:10px;margin:var(--space-5) 0 var(--space-3);color:var(--foreground-muted);font:var(--text-label);letter-spacing:var(--letter-spacing-label);text-transform:uppercase}
+  .ade-trsec .ln{flex:1;height:1px;background:var(--border-subtle)}
+  .ade-chain{display:flex;align-items:stretch;overflow-x:auto;padding:2px 0 12px}
+  .ade-node{min-width:152px;flex-shrink:0;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--surface-1);padding:12px 13px;cursor:pointer;transition:border-color .18s,transform .18s}
+  .ade-node:hover{transform:translateY(-2px);border-color:var(--primary)}
+  .ade-nk{display:flex;align-items:center;gap:6px;color:var(--foreground-muted);font:var(--text-label);letter-spacing:var(--letter-spacing-label);text-transform:uppercase}
+  .ade-nv{font:var(--text-body-md);font-weight:700;color:var(--foreground);margin-top:7px;line-height:1.3}
+  .ade-nm{font-family:var(--font-mono);font-size:11px;color:var(--foreground-secondary);margin-top:5px;line-height:1.5}
+  .ade-node.dec{border-color:color-mix(in srgb,var(--success) 45%,transparent);background:color-mix(in srgb,var(--success) 8%,var(--surface-1))}
+  .ade-node.dec .ade-nk{color:var(--success)}
+  .ade-node.model{border-color:color-mix(in srgb,var(--primary) 40%,transparent)} .ade-node.model .ade-nk{color:var(--primary)}
+  .ade-arr{flex-shrink:0;width:30px;display:grid;place-items:center;color:var(--foreground-disabled)}
+  .ade-vcards{display:flex;flex-direction:column;gap:10px}
+  .ade-vcard{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--surface-1);padding:14px 15px}
+  .ade-vcard.cur{border-color:color-mix(in srgb,var(--success) 42%,transparent)}
+  .ade-vtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ade-vver{font-family:var(--font-mono);font-size:12.5px;font-weight:800;color:var(--foreground);background:var(--surface-3);border-radius:var(--radius-md);padding:3px 9px}
+  .ade-vcard.cur .ade-vver{background:color-mix(in srgb,var(--success) 18%,transparent);color:var(--success)}
+  .ade-vtime{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--foreground-muted)}
+  .ade-vbody{font:var(--text-body-sm);color:var(--foreground-secondary);margin-top:9px;line-height:1.6}
+  .ade-vbody b{color:var(--foreground)}
+  .ade-delta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .ade-dchip{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11px;border-radius:var(--radius-sm);padding:3px 8px;background:var(--surface-3);color:var(--foreground-secondary)}
+  .ade-dchip.pr{color:var(--primary)} .ade-dchip.ctx{color:var(--warning)}
+  .ade-vacts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .ade-audit{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+  .ade-arow{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border-subtle);font:var(--text-body-sm)}
+  .ade-arow:last-child{border-bottom:none}
+  .ade-arow .ak{color:var(--foreground-muted);display:flex;align-items:center;gap:7px}
+  .ade-arow .av{color:var(--foreground-secondary)} .ade-arow .av b{color:var(--foreground);font-family:var(--font-mono)}
+  .ade-arow .av .em{color:var(--success);font-weight:600}
+
+  /* center = single reliable scroll container (no nested split, no bottom panel) */
+  #centerBody{display:flex;flex-direction:column;overflow:hidden;min-height:0;flex:1 1 auto}
+  #centerBody > .ade-panel.on{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+  #centerBody > .ade-panel.on > *{flex:1 1 auto;min-height:0;overflow-y:auto}
+  /* panel visibility (inspector panels flow normally; inspector pane-body scrolls) */
+  .ade-panel{display:none}
+  .ade-panel.on{display:block}
+  .ade-scroll{}
+
+  /* bottom panel */
+  .ade-bottom-body{padding:var(--space-3) var(--space-4);overflow:auto;height:100%}
+  .ade-log{position:relative}
+  .ade-logitem{display:grid;grid-template-columns:16px 1fr;gap:9px;padding:0 0 13px;position:relative}
+  .ade-logitem::before{content:"";position:absolute;left:6px;top:14px;bottom:-2px;width:1.5px;background:var(--border-subtle)}
+  .ade-logitem:last-child::before{display:none}
+  .ade-logdot{width:13px;height:13px;border-radius:var(--radius-pill);border:2px solid var(--border-strong);background:var(--surface-1);margin-top:1px;z-index:1}
+  .ade-logdot.g{background:var(--success);border-color:var(--success)} .ade-logdot.b{background:var(--primary);border-color:var(--primary)} .ade-logdot.a{background:var(--warning);border-color:var(--warning)} .ade-logdot.r{background:var(--danger);border-color:var(--danger)}
+  .ade-logt{font:var(--text-body-sm);color:var(--foreground-secondary);font-weight:600;line-height:1.4}
+  .ade-logm{font-family:var(--font-mono);font-size:10.5px;color:var(--foreground-muted);margin-top:2px}
+
+  /* modal / drawer / toast / overlay (module-local, token-based) */
+  .ade-scrim{position:fixed;inset:0;background:color-mix(in srgb,var(--background) 55%,transparent);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:400;padding:20px}
+  .ade-scrim.on{display:flex}
+  .ade-modal{width:min(480px,100%);max-height:88vh;overflow:auto}
+  .ade-modal .mh{padding:16px 18px 0;display:flex;align-items:center;gap:10px;font:var(--text-title-2);color:var(--foreground)}
+  .ade-modal .mh .mi{width:30px;height:30px;border-radius:var(--radius-md);display:grid;place-items:center;flex-shrink:0}
+  .ade-modal .mi.warn{background:color-mix(in srgb,var(--warning) 18%,transparent);color:var(--warning)}
+  .ade-modal .mi.info{background:color-mix(in srgb,var(--primary) 18%,transparent);color:var(--primary)}
+  .ade-modal .mi.danger{background:color-mix(in srgb,var(--danger) 18%,transparent);color:var(--danger)}
+  .ade-modal .mi.success{background:color-mix(in srgb,var(--success) 18%,transparent);color:var(--success)}
+  .ade-modal .md{padding:9px 18px 14px;font:var(--text-body-sm);color:var(--foreground-secondary);line-height:1.6}
+  .ade-modal .md b{color:var(--foreground)}
+  .ade-modal .quick{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 4px}
+  .ade-modal .quick span{font:var(--text-body-sm);color:var(--foreground-secondary);border:1px solid var(--border-default);border-radius:var(--radius-pill);padding:4px 10px;cursor:pointer}
+  .ade-modal .quick span:hover{border-color:var(--primary);color:var(--foreground)}
+  .ade-modal textarea,.ade-modal .inp{width:calc(100% - 36px);margin:8px 18px 0;border:1px solid var(--border-default);border-radius:var(--radius-md);padding:10px 12px;font-family:inherit;font:var(--text-body-sm);color:var(--foreground);background:var(--background);resize:vertical}
+  .ade-modal textarea{min-height:80px}
+  .ade-modal textarea:focus,.ade-modal .inp:focus{outline:none;border-color:var(--primary)}
+  .ade-modal .pick{padding:6px 18px 0;display:flex;flex-direction:column;gap:8px}
+  .ade-modal .opt{display:flex;align-items:center;gap:11px;border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:11px 12px;cursor:pointer}
+  .ade-modal .opt:hover{border-color:var(--primary)}
+  .ade-modal .opt.sel{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,transparent)}
+  .ade-modal .opt .oi{width:30px;height:30px;border-radius:var(--radius-md);background:var(--surface-2);display:grid;place-items:center;color:var(--foreground-secondary);flex-shrink:0}
+  .ade-modal .opt .ot{font:var(--text-body-sm);font-weight:600;color:var(--foreground)}
+  .ade-modal .opt .om{font-size:11px;color:var(--foreground-muted);margin-top:2px}
+  .ade-modal .mf{display:flex;justify-content:flex-end;gap:9px;padding:16px 18px}
+  .ade-drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);background:var(--surface-2);border-left:1px solid var(--border-default);box-shadow:-14px 0 44px rgba(0,0,0,.4);z-index:420;transform:translateX(102%);transition:transform .28s var(--easing-default,ease);display:flex;flex-direction:column}
+  .ade-drawer.on{transform:none}
+  .ade-drawer .dh{display:flex;align-items:center;gap:10px;padding:15px 16px;border-bottom:1px solid var(--border-subtle)}
+  .ade-drawer .dt{font:var(--text-title-2);color:var(--foreground)}
+  .ade-drawer .dc{padding:16px;overflow:auto;font:var(--text-body-sm);color:var(--foreground-secondary);line-height:1.7}
+  .ade-drawer .dc .kv{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--border-subtle)}
+  .ade-drawer .dc .kv span:first-child{color:var(--foreground-muted)} .ade-drawer .dc .kv b{font-family:var(--font-mono);color:var(--foreground);text-align:right}
+  .ade-drawer .dc .blk{margin-top:12px;background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:11px;font-size:12px}
+  .ade-drawer .dc .blk code{font-family:var(--font-mono);background:var(--surface-3);border-radius:4px;padding:1px 4px}
+  .ade-toasts{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;gap:9px;align-items:center;pointer-events:none}
+  .ade-toast{display:flex;align-items:center;gap:9px;background:var(--surface-4);border:1px solid var(--border-default);color:var(--foreground);font:var(--text-body-sm);font-weight:600;padding:10px 14px;border-radius:var(--radius-lg);box-shadow:0 10px 30px rgba(0,0,0,.4);transform:translateY(14px);opacity:0;transition:.28s;max-width:90vw}
+  .ade-toast.on{transform:none;opacity:1}
+  .ade-toast.g{color:var(--success)} .ade-toast.b{color:var(--primary)} .ade-toast.a{color:var(--warning)} .ade-toast.r{color:var(--danger)}
+  .ade-ov{position:fixed;inset:0;z-index:410;background:color-mix(in srgb,var(--background) 62%,transparent);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:24px}
+  .ade-ov.on{display:flex}
+  .ade-ovcard{width:min(430px,100%);text-align:center;padding:30px 28px}
+  .ade-ovcard .big{width:60px;height:60px;border-radius:var(--radius-pill);display:grid;place-items:center;margin:0 auto 16px}
+  .ade-ovcard .big.g{background:color-mix(in srgb,var(--success) 16%,transparent);color:var(--success)}
+  .ade-ovcard .big.a{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
+  .ade-ovcard .big.p{background:color-mix(in srgb,var(--primary) 16%,transparent);color:var(--primary)}
+  .ade-ovcard h3{font:var(--text-title-1);color:var(--foreground)}
+  .ade-ovcard p{font:var(--text-body-sm);color:var(--foreground-secondary);margin-top:9px;line-height:1.6}
+  .ade-ovcard p b{color:var(--foreground)}
+  .ade-ovcard .b2{margin-top:20px;display:flex;gap:9px;justify-content:center}
+  .ade-hide{display:none!important}
+
+  .ade-domain-note{font:var(--text-body-sm);color:var(--foreground-muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ade-domain-note b{color:var(--foreground-secondary)}
+</style>
+</head>
+<body class="pto-ide-frame-preview-page">
+
+<main class="pto-ide-frame-preview">
+  <section class="pto-ide-frame" data-ide-frame data-host="standalone" aria-label="CodeArts ADE IDE">
+
+    <!-- top chrome -->
+    <header class="pto-ide-frame__topbar pto-ide-frame__standalone-chrome">
+      <div class="pto-ide-frame__topbar-left">
+        <div class="pto-ide-frame__host-chip">
+          <svg class="pto-ide-frame__host-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="m7 9 3 3-3 3"></path><path d="M12 15h5"></path></svg>
+          <span style="font-weight:700">码 CodeArts ADE</span>
+        </div>
+        <div class="pto-ide-frame__workspace"><span>项目 · 收银台 ▾</span></div>
+      </div>
+      <div class="pto-ide-frame__topbar-center">
+        <div class="pto-ide-frame__search"><svg class="pto-ide-frame__search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>搜索任务 / 需求 / 分支…</div>
+      </div>
+      <div class="pto-ide-frame__topbar-right">
+        <div class="pto-ide-frame__window-actions">
+          <button class="pto-ide-frame__window-action" type="button" aria-label="重置原型" id="resetBtn" title="重置原型"><svg class="pto-ide-frame__window-icon" viewBox="0 0 24 24"><path d="M4 12a8 8 0 018-8 8 8 0 016 3M20 4v5h-5"/><path d="M20 12a8 8 0 01-8 8 8 8 0 01-6-3M4 20v-5h5"/></svg></button>
+          <span class="pto-ide-frame__window-separator"></span>
+          <button class="pto-ide-frame__window-action" type="button" aria-label="Back"><svg class="pto-ide-frame__window-icon" viewBox="0 0 24 24"><path d="M15 18 9 12l6-6"/></svg></button>
+          <button class="pto-ide-frame__window-action" type="button" aria-label="Forward"><svg class="pto-ide-frame__window-icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+          <span class="pto-ide-frame__window-separator"></span>
+          <button class="pto-ide-frame__window-action" type="button" aria-label="Toggle right dock" id="toggleInspector"><svg class="pto-ide-frame__window-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg></button>
+          <button class="pto-ide-frame__window-action" type="button" aria-label="Settings"><svg class="pto-ide-frame__window-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+          <button class="pto-ide-frame__window-action pto-ide-frame__window-action--danger" type="button" aria-label="Close"><svg class="pto-ide-frame__window-icon" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="pto-ide-frame__body">
+      <!-- activity rail -->
+      <nav class="pto-ide-frame__activity-rail pto-ide-frame__standalone-chrome" aria-label="Activity rail">
+        <button class="btn btn-icon btn-ghost pto-ide-frame__rail-button is-selected" type="button" data-ide-toggle="explorer" aria-controls="ade-explorer" aria-expanded="true" aria-pressed="true" title="任务">
+          <svg class="pto-ide-frame__rail-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button class="btn btn-icon btn-ghost pto-ide-frame__rail-button" type="button" title="需求"><svg class="pto-ide-frame__rail-icon" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg></button>
+        <button class="btn btn-icon btn-ghost pto-ide-frame__rail-button" type="button" title="代码库"><svg class="pto-ide-frame__rail-icon" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></button>
+        <button class="btn btn-icon btn-ghost pto-ide-frame__rail-button" type="button" title="流水线"><svg class="pto-ide-frame__rail-icon" viewBox="0 0 24 24"><path d="M5 12h4l3 8 4-16 3 8h0"/></svg></button>
+        <button class="btn btn-icon btn-ghost pto-ide-frame__rail-button" type="button" title="全链路可追溯" data-tab="trace"><svg class="pto-ide-frame__rail-icon" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></button>
+        <button class="btn btn-icon btn-ghost pto-ide-frame__rail-button" type="button" title="团队"><svg class="pto-ide-frame__rail-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M16 6a3 3 0 010 6M21 20a6 6 0 00-4-5.6"/></svg></button>
+      </nav>
+
+      <div class="pto-ide-frame__workarea">
+        <div class="pto-ide-frame__split" data-ide-split="standalone-main" data-split-direction="horizontal" data-sizes="21,52,27" data-pixel-sizes="290" data-min-size="230,420,260">
+
+          <!-- EXPLORER: task tree -->
+          <aside class="pto-ide-frame__pane pto-ide-frame__explorer" data-ide-pane="explorer" id="ade-explorer">
+            <header class="pto-ide-frame__pane-header">
+              <span class="pto-ide-frame__pane-title">任务</span>
+              <button class="btn btn-ghost btn-icon btn-sm" id="dispatchBtn" title="从需求派发"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+            </header>
+            <div class="pto-ide-frame__pane-body">
+              <div class="ade-tree" id="taskTree">
+                <div class="ade-tgroup">
+                  <div class="ade-tgh">待派发 <span class="cnt">2</span></div>
+                  <div class="ade-titem"><span class="ade-dot idle"></span><span class="nm">接入新支付渠道</span><span class="meta">#142</span></div>
+                  <div class="ade-titem"><span class="ade-dot idle"></span><span class="nm">订单批量导出</span><span class="meta">#145</span></div>
+                </div>
+                <div class="ade-tgroup" id="grpRun">
+                  <div class="ade-tgh">运行中 <span class="cnt" id="cntRun">3</span></div>
+                  <div class="ade-titem clickable" data-open="login" data-mode="watch"><span class="ade-dot run"></span><span class="nm">登录方式改造</span><span class="meta">feat/login</span></div>
+                  <div class="ade-titem clickable" data-open="cache" data-mode="watch"><span class="ade-dot run"></span><span class="nm">缓存击穿修复</span><span class="meta">fix/cache</span></div>
+                  <div class="ade-titem clickable" data-open="dep" data-mode="code"><span class="ade-dot run"></span><span class="nm">依赖批量升级</span><span class="meta">chore/dep</span></div>
+                </div>
+                <div class="ade-tgroup hot">
+                  <div class="ade-tgh">待验收 <span class="cnt" id="cntReview">2</span></div>
+                  <div class="ade-titem clickable is-selected" id="task138" data-open="138" data-mode="review"><span class="ade-dot wait"></span><span class="nm">支付金额边界校验</span><span class="meta go">进入 →</span></div>
+                  <div class="ade-titem clickable" data-open="refund" data-mode="review"><span class="ade-dot wait"></span><span class="nm">退款幂等处理</span><span class="meta go">进入 →</span></div>
+                </div>
+                <div class="ade-tgroup">
+                  <div class="ade-tgh">已合并 <span class="cnt" id="cntMerged">2</span></div>
+                  <div class="ade-titem" id="colMerged"><span class="ade-dot done"></span><span class="nm">优惠券叠加规则</span><span class="meta">merged</span></div>
+                  <div class="ade-titem"><span class="ade-dot done"></span><span class="nm">收银台埋点补全</span><span class="meta">merged</span></div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- CENTER: editor region (tabs + 三态 toolbar + nested vertical split) -->
+          <section class="pto-ide-frame__pane" data-ide-pane="editor-region">
+            <div class="pto-ide-frame__tabstrip">
+              <div class="tab-control" role="tablist">
+                <button class="tab-control-item is-selected" data-tab="task" role="tab">支付金额边界校验<span class="pto-ide-frame__tab-close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
+                <button class="tab-control-item" data-tab="trace" role="tab">全链路可追溯</button>
+              </div>
+            </div>
+            <div class="pto-ide-frame__domain-toolbar" id="domainToolbar">
+              <div class="pto-ide-frame__toolbar-group">
+                <div class="segmented-control" id="modeSwitch">
+                  <button class="btn btn-sm" data-mode="code"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 20h9M16 3l5 5L8 21l-5 1 1-5z"/></svg>亲手写</button>
+                  <button class="btn btn-sm" data-mode="watch"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>盯过程</button>
+                  <button class="btn btn-sm is-selected" data-mode="review"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>发包验收</button>
+                </div>
+                <span class="ade-domain-note" id="modeNote">同一任务三视图 · 共享 worktree <b>feat/pay</b> · 切换不丢状态</span>
+              </div>
+              <div class="pto-ide-frame__toolbar-group">
+                <button class="btn btn-solid btn-sm" id="mergeBtn" disabled><svg class="ade-icon sm" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>通过并合并</button>
+              </div>
+            </div>
+
+            <div class="pto-ide-frame__pane-body" id="centerBody">
+
+                  <!-- 亲手写 -->
+                  <div class="ade-panel" id="paneCode">
+                    <div class="ade-editor-wrap">
+                      <div class="ade-ftree">
+                        <div class="ade-tgh" style="padding:2px 6px 8px">worktree · feat/pay</div>
+                        <div class="ade-titem"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v9a2 2 0 01-2 2H3z"/></svg><span class="nm">payment</span></div>
+                        <div class="ade-titem is-selected" style="margin-left:12px"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg><span class="nm">checkout.ts</span><span class="meta" style="color:var(--success)">+6</span></div>
+                        <div class="ade-titem" style="margin-left:12px"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg><span class="nm">types.ts</span><span class="meta" style="color:var(--success)">+2</span></div>
+                        <div class="ade-titem" style="margin-left:12px"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg><span class="nm">gateway.ts</span></div>
+                      </div>
+                      <div class="ade-fpane">
+                        <div class="ade-ftabs"><span class="ade-ftab on">checkout.ts</span><span class="ade-ftab">types.ts</span></div>
+                        <div class="ade-editor">
+                          <div class="ade-el"><span class="n">38</span><code><span class="tkw">const</span> rate = <span class="tnu">1.0</span>;</code></div>
+                          <div class="ade-el"><span class="n">39</span><code></code></div>
+                          <div class="ade-el hl"><span class="n">40</span><code><span class="tkw">function</span> <span class="tfn">charge</span>(amount: <span class="tnu">number</span>) {</code></div>
+                          <div class="ade-el"><span class="n">41</span><code>  <span class="tkw">const</span> total = amount * rate;<span class="ade-ghost">  if (amount &lt;= 0 || amount &gt; MAX_AMOUNT) throw…</span><span class="ade-tabhint">Tab ⇥</span></code></div>
+                          <div class="ade-el"><span class="n">42</span><code>  <span class="tkw">return</span> gateway.<span class="tfn">capture</span>(total);</code></div>
+                          <div class="ade-el"><span class="n">43</span><code>}</code></div>
+                          <div class="ade-el"><span class="n">44</span><code></code></div>
+                          <div class="ade-el"><span class="n">45</span><code><span class="tkw">function</span> <span class="tfn">refund</span>(order) {</code></div>
+                          <div class="ade-el"><span class="n">46</span><code>  <span class="tkw">return</span> gateway.<span class="tfn">reverse</span>(order.txId);</code></div>
+                          <div class="ade-el"><span class="n">47</span><code>}</code></div>
+                        </div>
+                        <div class="ade-ask">
+                          <span class="lab"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>AI 答疑</span>
+                          <div class="box">问 AI:这里的 amount 需要做哪些边界校验? ⏎</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 盯过程 -->
+                  <div class="ade-panel ade-scroll" id="paneWatch">
+                    <div class="ade-watch">
+                      <div class="ade-wh"><h3>Agent 执行计划</h3><span class="ade-badge is-info"><span class="ade-dot run" style="background:var(--primary)"></span>运行中</span></div>
+                      <div class="ade-wsub">你从「写」退到「盯」—— 看 Agent 怎么想、怎么拆,随时可 <b>打断纠偏</b>,不必逐行敲键盘。</div>
+                      <div class="ade-plan">
+                        <div class="ade-ph"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>计划 · 支付金额边界校验(需求#138)</div>
+                        <div class="ade-ps done"><span class="ade-pd"><svg class="ade-icon" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M5 12l4 4 10-10"/></svg></span><div><div class="ade-pt">① 读取需求 #138 与受影响模块</div><div class="ade-pm">拉取 Linear 需求、定位 charge/refund</div></div></div>
+                        <div class="ade-ps done"><span class="ade-pd"><svg class="ade-icon" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M5 12l4 4 10-10"/></svg></span><div><div class="ade-pt">② 在 worktree feat/pay 修改 charge()</div><div class="ade-pm">加入 amount 非负 / 上界校验 · +6 −1</div></div></div>
+                        <div class="ade-ps cur"><span class="ade-pd"></span><div><div class="ade-pt">③ 补充单元测试并复跑覆盖率</div><div class="ade-pm">正在为 charge 超大额分支补断言…</div><div class="ade-think">refund() 退款分支尚未被任何用例覆盖,先补正常扣款与零额拦截,再评估是否需要 <span class="hl">MAX_AMOUNT</span> 上界用例<span class="ade-cursor"></span></div></div></div>
+                        <div class="ade-ps"><span class="ade-pd">4</span><div><div class="ade-pt">④ 触发自动验收流水线</div><div class="ade-pm">代码检查 · 安全扫描 · 测试 · 质量门禁</div></div></div>
+                      </div>
+                      <div class="ade-wacts">
+                        <button class="btn btn-sm" id="btnInterrupt"><svg class="ade-icon sm" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>打断纠偏</button>
+                        <button class="btn btn-sm" data-mode="code"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 20h9M16 3l5 5L8 21l-5 1 1-5z"/></svg>接手亲手改</button>
+                        <button class="btn btn-solid btn-sm" data-mode="review"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>去发包验收</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 发包验收 (验收中心) -->
+                  <div class="ade-panel ade-scroll on" id="paneReview">
+                    <div style="padding:var(--space-5) var(--space-6);max-width:840px">
+                      <div class="ade-rephead"><h2>验收报告</h2><span class="ade-badge is-warning" id="repCnt">需要你判断 · 3 处</span></div>
+                      <div class="ade-repsub">机器已过 <b>4/5</b> 项,仅把「门禁阻断 + 需人判断」的少数高风险点推给你。逐条<b>展开看证据 → 决策</b>。ADE 给你看 diff;CodeArts 给你看<b>「该不该信这个 diff」的证据</b>。</div>
+
+                      <article class="ade-jitem" id="it1" data-kind="block">
+                        <div class="ade-jhead" data-toggle><span class="ade-sev block"></span><span class="ade-jtitle">门禁阻断:支付金额未做边界校验<span class="tag">PAY-013</span></span><span class="ade-badge is-warning" data-badge>待处理</span><svg class="ade-icon ade-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+                        <div class="ade-jdetail"><div class="ade-jdin"><div class="ade-jbody">
+                          <p class="ade-jdesc">新增的 <b>charge()</b> 直接用入参 <b>amount</b> 参与计算,<b>缺少上界/非负校验</b>,极端值可能导致整数溢出或非预期扣款。质量门禁规则 <b>PAY-013</b> 判定为<b>阻断</b>。</p>
+                          <div class="ade-code">
+                            <div class="ade-cfile"><span>payment/checkout.ts</span><span class="gd"><span class="ade-addc">+6</span><span class="ade-delc">−1</span></span></div>
+                            <div class="ade-cl"><span class="ln">40</span><span class="sg"> </span><code><span class="tkw">function</span> <span class="tfn">charge</span>(amount: <span class="tnu">number</span>) {</code></div>
+                            <div class="ade-cl del"><span class="ln">41</span><span class="sg">-</span><code>  <span class="tkw">const</span> total = amount * rate;</code></div>
+                            <div class="ade-cl add flag"><span class="ln">41</span><span class="sg">+</span><code>  <span class="tkw">const</span> total = amount * rate; <span class="ade-flagtag">未校验 amount</span></code></div>
+                            <div class="ade-cl add"><span class="ln">42</span><span class="sg">+</span><code>  <span class="tkw">return</span> gateway.<span class="tfn">capture</span>(total);</code></div>
+                            <div class="ade-cl"><span class="ln">43</span><span class="sg"> </span><code>}</code></div>
+                          </div>
+                          <div class="ade-evrow">证据可溯</div>
+                          <div class="ade-ev">
+                            <button class="btn btn-sm" data-ev="gate"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z"/></svg>门禁规则 PAY-013</button>
+                            <button class="btn btn-sm" data-ev="scan"><svg class="ade-icon sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>扫描详情</button>
+                            <button class="btn btn-sm" data-ev="test"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/></svg>相关测试</button>
+                          </div>
+                          <div class="ade-softcard is-success">
+                            <div class="h"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>AI 建议 · 加入边界校验</div>
+                            <div class="sug"><span class="ade-addc">+  if (amount &lt;= 0 || amount &gt; MAX_AMOUNT)</span>
+<span class="ade-addc">+    throw new PaymentError('amount out of range');</span></div>
+                          </div>
+                          <div class="ade-acts">
+                            <button class="btn btn-solid btn-sm" data-act="pass" data-item="it1"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>通过(需豁免)</button>
+                            <button class="btn btn-sm" data-act="edit" data-item="it1"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 20h9M16 3l5 5L8 21l-5 1 1-5z"/></svg>要求修改</button>
+                            <button class="btn btn-sm" data-act="reject" data-item="it1"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M9 14l6-6M9 8l6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>打回重做</button>
+                          </div>
+                        </div></div></div>
+                      </article>
+
+                      <article class="ade-jitem" id="it2" data-kind="risk">
+                        <div class="ade-jhead" data-toggle><span class="ade-sev"></span><span class="ade-jtitle">改动触及核心模块 payment/*</span><span class="ade-badge" data-badge>需确认</span><svg class="ade-icon ade-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+                        <div class="ade-jdetail"><div class="ade-jdin"><div class="ade-jbody">
+                          <p class="ade-jdesc">本次改动落在受保护目录 <b>payment/*</b>(近 90 天有 3 起回滚)。非阻断,但建议你确认改动范围与影响面。</p>
+                          <div class="ade-code">
+                            <div class="ade-cfile"><span>变更文件 · 2</span></div>
+                            <div class="ade-cl"><span class="ln"> </span><span class="sg"> </span><code><span class="tcm">payment/checkout.ts</span>  <span class="ade-addc">+6</span> <span class="ade-delc">−1</span></code></div>
+                            <div class="ade-cl"><span class="ln"> </span><span class="sg"> </span><code><span class="tcm">payment/types.ts</span>     <span class="ade-addc">+2</span></code></div>
+                          </div>
+                          <div class="ade-evrow">证据可溯</div>
+                          <div class="ade-ev">
+                            <button class="btn btn-sm" data-ev="impact"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>影响分析</button>
+                            <button class="btn btn-sm" data-ev="owner"><svg class="ade-icon sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0116 0"/></svg>模块 Owner</button>
+                          </div>
+                          <div class="ade-acts">
+                            <button class="btn btn-solid btn-sm" data-act="pass" data-item="it2"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>确认通过</button>
+                            <button class="btn btn-sm" data-act="edit" data-item="it2"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 20h9M16 3l5 5L8 21l-5 1 1-5z"/></svg>要求修改</button>
+                          </div>
+                        </div></div></div>
+                      </article>
+
+                      <article class="ade-jitem" id="it3" data-kind="risk">
+                        <div class="ade-jhead" data-toggle><span class="ade-sev"></span><span class="ade-jtitle">测试覆盖缺口:退款分支未覆盖</span><span class="ade-badge" data-badge>需确认</span><svg class="ade-icon ade-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+                        <div class="ade-jdetail"><div class="ade-jdin"><div class="ade-jbody">
+                          <p class="ade-jdesc">整体覆盖率 92%,但 <b>refund() 退款分支</b> 新增逻辑未被测试覆盖。建议补一条用例,或确认可接受。</p>
+                          <div class="ade-code">
+                            <div class="ade-cfile"><span>覆盖率 · payment/checkout.ts</span><span class="gd"><span class="ade-delc">refund() 0%</span></span></div>
+                            <div class="ade-cl"><span class="ln">58</span><span class="sg"> </span><code><span class="tkw">function</span> <span class="tfn">refund</span>(order) {  <span class="tcm">// 未覆盖</span></code></div>
+                          </div>
+                          <div class="ade-evrow">证据可溯</div>
+                          <div class="ade-ev"><button class="btn btn-sm" data-ev="cov"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></svg>覆盖率报告</button></div>
+                          <div class="ade-softcard is-success"><div class="h"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>AI 建议 · 让 Agent 补一条退款用例</div></div>
+                          <div class="ade-acts">
+                            <button class="btn btn-solid btn-sm" data-act="pass" data-item="it3"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>确认通过</button>
+                            <button class="btn btn-sm" data-act="edit" data-item="it3"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 20h9M16 3l5 5L8 21l-5 1 1-5z"/></svg>补测试(回 Agent)</button>
+                          </div>
+                        </div></div></div>
+                      </article>
+                    </div>
+                  </div>
+
+                  <!-- 全链路可追溯 -->
+                  <div class="ade-panel ade-scroll" id="paneTrace">
+                    <div class="ade-trace">
+                      <div class="ade-trhero">
+                        <div class="ico"><svg class="ade-icon lg" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div>
+                        <div><h2>全链路可追溯</h2><div class="sub">ADE 用 git worktree 做到<b>代码级</b>版本控制,但 AI 工程要管的不止代码 —— <b>意图与生成过程</b>同样被版本化。每次合并都能回答:是哪条 <b>prompt</b>、哪个<b>模型</b>、哪份<b>上下文</b>生成的,谁验收、为何放行或豁免。</div></div>
+                      </div>
+                      <div class="ade-trsec">溯源链 · 需求 → 产物 → 验收决策<span class="ln"></span></div>
+                      <div class="ade-chain">
+                        <div class="ade-node" data-tr="req"><div class="ade-nk">需求</div><div class="ade-nv">需求#138</div><div class="ade-nm">支付金额边界校验<br>来源 Linear</div></div>
+                        <div class="ade-arr"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+                        <div class="ade-node" data-tr="prompt"><div class="ade-nk">Prompt</div><div class="ade-nv">Prompt v3</div><div class="ade-nm">派发指令+约束<br>hash a1f9c2</div></div>
+                        <div class="ade-arr"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+                        <div class="ade-node model" data-tr="model"><div class="ade-nk">模型 / Agent</div><div class="ade-nv">Sonnet · v2.1</div><div class="ade-nm">temp 0.2<br>ADE 编排 runtime</div></div>
+                        <div class="ade-arr"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+                        <div class="ade-node" data-tr="ctx"><div class="ade-nk">上下文快照</div><div class="ade-nv">RAG snapshot</div><div class="ade-nm">12 文件·3 PR<br>规范 v6</div></div>
+                        <div class="ade-arr"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+                        <div class="ade-node" data-tr="artifact"><div class="ade-nk">产物</div><div class="ade-nv">+218 / −101</div><div class="ade-nm">3 文件·feat/pay<br>commit e7b1a9</div></div>
+                        <div class="ade-arr"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+                        <div class="ade-node dec" data-tr="decision"><div class="ade-nk">验收决策</div><div class="ade-nv">待验收</div><div class="ade-nm">3 处需人判断<br>记入审计</div></div>
+                      </div>
+                      <div class="ade-trsec">版本时间线 · 意图 + 过程 + 产物<span class="ln"></span></div>
+                      <div class="ade-vcards">
+                        <div class="ade-vcard"><div class="ade-vtop"><span class="ade-vver">v1</span><span class="ade-badge is-danger">验收打回</span><span class="ade-vtime">07-06 09:12</span></div><div class="ade-vbody">首版按需求直接改 charge(),<b>未挂载企业编码规范</b>。人工验收判定方案方向偏差,打回重做。</div><div class="ade-delta"><span class="ade-dchip pr">Prompt v1</span><span class="ade-dchip">Sonnet</span></div></div>
+                        <div class="ade-vcard"><div class="ade-vtop"><span class="ade-vver">v2</span><span class="ade-badge is-warning">门禁阻断</span><span class="ade-vtime">07-06 10:34</span></div><div class="ade-vbody">补挂 <b>RAG 企业规范</b> 后重跑;加了非负校验但<b>漏了上界</b>。质量门禁 PAY-013 阻断。</div><div class="ade-delta"><span class="ade-dchip pr">Prompt v2</span><span class="ade-dchip ctx">+ RAG 规范 v6</span></div></div>
+                        <div class="ade-vcard cur"><div class="ade-vtop"><span class="ade-vver">v3</span><span class="ade-badge is-success">当前 · 待验收</span><span class="ade-vtime">07-06 11:20</span></div><div class="ade-vbody">细化 prompt 明确<b>「非负 + 上界」双校验</b>并升级 Agent runtime。产物进入验收中心,仅 3 处需人判断。</div><div class="ade-delta"><span class="ade-dchip pr">Prompt v3</span><span class="ade-dchip">Agent v2.0→v2.1</span></div>
+                          <div class="ade-vacts">
+                            <button class="btn btn-sm" id="btnReplay"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9z"/></svg>回放生成过程</button>
+                            <button class="btn btn-sm" id="btnRerun"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M4 12a8 8 0 018-8 8 8 0 016 3M20 4v5h-5"/></svg>按原始意图重跑</button>
+                            <button class="btn btn-sm" id="btnRollback"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M9 14l-4-4 4-4M5 10h9a5 5 0 010 10h-3"/></svg>回滚到某版本</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ade-trsec">审计记录 · 谁验收 · 为何放行<span class="ln"></span></div>
+                      <div class="ade-audit">
+                        <div class="ade-arow"><div class="ak">验收人</div><div class="av"><b>@余</b> · 收银台团队</div></div>
+                        <div class="ade-arow"><div class="ak">决策状态</div><div class="av" id="auditState">待验收 · 3 处需人判断尚未处理</div></div>
+                        <div class="ade-arow"><div class="ak">门禁 PAY-013</div><div class="av">阻断项 —— 若豁免,<span class="em">理由强制记入审计,可追溯</span></div></div>
+                        <div class="ade-arow"><div class="ak">可复现凭证</div><div class="av">需求#138 + Prompt <b>a1f9c2</b> + 模型 <b>Sonnet</b> + 快照 <b>snap-0711</b></div></div>
+                      </div>
+                    </div>
+                  </div>
+
+            </div>
+          </section>
+
+          <!-- INSPECTOR -->
+          <aside class="pto-ide-frame__pane" data-ide-pane="inspector" id="inspectorPane">
+            <header class="pto-ide-frame__pane-header">
+              <span class="pto-ide-frame__pane-title" id="inspTitle">验收 · 流水线与证据</span>
+              <span class="pto-ide-frame__pane-meta">#138</span>
+            </header>
+            <div class="pto-ide-frame__pane-body">
+              <!-- review inspector -->
+              <div class="ade-panel on" id="inspReview">
+                <div class="ade-sec">
+                  <div class="ade-sec-h">验收流水线</div>
+                  <div class="ade-step ok"><span class="sd"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>代码检查<span class="mn">0 issue</span></div>
+                  <div class="ade-step ok"><span class="sd"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>安全扫描<span class="mn">pass</span></div>
+                  <div class="ade-step ok"><span class="sd"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>单元测试<span class="mn">92%</span></div>
+                  <div class="ade-step warn" id="stepGate"><span class="sd" id="gateSd">!</span>质量门禁<span class="mn" id="gateMn">1 阻断</span></div>
+                  <div class="ade-step cur" id="stepReview"><span class="sd"></span>人工复核<span class="mn" id="reviewMn">0/3</span></div>
+                  <div class="ade-softcard"><div class="ade-row" style="padding:2px 0">机器结论<b>4 / 5 通过</b></div><div class="ade-row" style="padding:2px 0">推送人工<b>3 处</b></div></div>
+                </div>
+                <div class="ade-sec">
+                  <div class="ade-sec-h">总览</div>
+                  <div class="ade-row">改动规模<span class="v mono">+218 / −101</span></div>
+                  <div class="ade-row">触及文件<span class="v mono">3 个</span></div>
+                  <div class="ade-row">阻断项<span class="v mono" id="ovBlock" style="color:var(--warning);font-weight:700">1</span></div>
+                  <div class="ade-row">待判断<span class="v mono" id="ovPending" style="color:var(--warning);font-weight:700">3</span></div>
+                  <button class="btn btn-sm" style="width:100%;margin-top:10px" data-tab="trace"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>看这份 diff 的全链路来历</button>
+                </div>
+                <div class="ade-sec">
+                  <div class="ade-sec-h">活动流</div>
+                  <div class="ade-log" id="actLog">
+                    <div class="ade-logitem"><div class="ade-logdot g"></div><div><div class="ade-logt">自动验收流水线完成</div><div class="ade-logm">4/5 通过 · 刚刚</div></div></div>
+                    <div class="ade-logitem"><div class="ade-logdot a"></div><div><div class="ade-logt">质量门禁拦下 1 处,转人工</div><div class="ade-logm">PAY-013 · 刚刚</div></div></div>
+                  </div>
+                </div>
+              </div>
+              <!-- trace inspector -->
+              <div class="ade-panel" id="inspTrace">
+                <div class="ade-sec">
+                  <div class="ade-sec-h">当前版本</div>
+                  <div class="ade-row">版本<b>v3 · 待验收</b></div>
+                  <div class="ade-row">Prompt<span class="v mono">a1f9c2</span></div>
+                  <div class="ade-row">模型<b>Sonnet · v2.1</b></div>
+                  <div class="ade-row">上下文快照<span class="v mono">snap-0711</span></div>
+                </div>
+                <div class="ade-sec">
+                  <div class="ade-sec-h">审计</div>
+                  <div class="ade-row">验收人<b>@余</b></div>
+                  <div class="ade-row">历史版本<b>v1 打回 · v2 阻断</b></div>
+                  <div class="ade-softcard is-info" style="margin-top:12px"><div class="h">💡 可复现</div><div style="font:var(--text-body-sm);color:var(--foreground-secondary);margin-top:6px;line-height:1.6">需求#138 + Prompt a1f9c2 + Sonnet + 快照 snap-0711 可原样重跑,产物可比对。</div></div>
+                </div>
+              </div>
+              <!-- context inspector (code/watch) -->
+              <div class="ade-panel" id="inspContext">
+                <div class="ade-sec">
+                  <div class="ade-sec-h">共享上下文</div>
+                  <div class="ade-row">worktree<b>feat/pay</b></div>
+                  <div class="ade-row">Agent<b>Sonnet</b></div>
+                  <div class="ade-row">上下文快照<b>12 文件</b></div>
+                  <div class="ade-row">RAG · 企业规范<b>已挂载</b></div>
+                </div>
+                <div class="ade-sec">
+                  <div class="ade-sec-h">关联</div>
+                  <div class="ade-row">需求<b>#138</b></div>
+                  <div class="ade-row">Owner<b>@li.wei</b></div>
+                  <div class="ade-softcard is-info" style="margin-top:12px"><div class="h">💡 提示</div><div style="font:var(--text-body-sm);color:var(--foreground-secondary);margin-top:6px;line-height:1.6">三态共享同一 worktree 与上下文,切换不丢状态。改动清晰后可切到「发包验收」。</div></div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+
+        <footer class="pto-ide-frame__status-strip pto-ide-frame__standalone-chrome">
+          <div style="display:inline-flex;align-items:center;gap:14px">
+            <span style="display:inline-flex;align-items:center;gap:6px"><svg class="ade-icon sm" viewBox="0 0 24 24" style="opacity:.6"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M6 8.5v7M8.3 12h7.2"/></svg>feat/pay</span>
+            <span>Agent · Sonnet</span>
+            <span id="stGate" style="color:var(--warning)">● 门禁 1 阻断</span>
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:14px">
+            <span id="stProg">人工复核 0 / 3</span>
+            <span id="stStatus" class="ade-badge is-warning">待验收</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- shared overlays -->
+<div class="ade-scrim" id="scrim"><div class="ade-modal panel-shell" id="modal"></div></div>
+<div class="ade-drawer" id="drawer">
+  <div class="dh"><span class="dt" id="drawerTitle">证据</span><button class="btn btn-ghost btn-icon btn-sm" id="drawerX" style="margin-left:auto"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dc" id="drawerBody"></div>
+</div>
+<div class="ade-ov" id="ovMerge"><div class="ade-ovcard panel-shell"><div class="big g"><svg class="ade-icon lg" viewBox="0 0 24 24" style="width:30px;height:30px"><path d="M5 13l4 4 10-11"/></svg></div><h3>已合并到 main</h3><p>3 处「需人判断」全部解决,质量门禁通过。任务 #138 已关闭,worktree 已回收。<b>本次验收决策已写入全链路可追溯。</b></p><div class="b2"><button class="btn btn-solid" id="ovMergeClose">完成</button></div></div></div>
+<div class="ade-ov" id="ovReject"><div class="ade-ovcard panel-shell"><div class="big a"><svg class="ade-icon lg" viewBox="0 0 24 24" style="width:30px;height:30px"><path d="M12 8v4m0 4h.01M3 12a9 9 0 1018 0 9 9 0 00-18 0z"/></svg></div><h3>任务已打回 · 退回「运行中」</h3><p id="ovRejectMsg">已把原因回传给 Agent,任务回到运行中状态重新承接。</p><div class="b2"><button class="btn btn-solid" id="ovRejectClose">知道了</button></div></div></div>
+<div class="ade-ov" id="ovRollback"><div class="ade-ovcard panel-shell"><div class="big p"><svg class="ade-icon lg" viewBox="0 0 24 24" style="width:30px;height:30px"><path d="M9 14l-4-4 4-4M5 10h9a5 5 0 010 10h-3"/></svg></div><h3>已回滚并可诊断</h3><p>任务已回滚到 <b>v2</b>。系统定位到本次差异来自 <b>上下文变更(挂载 RAG 规范)</b> —— 把「AI 改坏了」变成可诊断、可回滚。</p><div class="b2"><button class="btn btn-solid" id="ovRollbackClose">知道了</button></div></div></div>
+<div class="ade-toasts" id="toasts"></div>
+
+<!-- PTO patterns runtime -->
+<script src="vendor/pto-design-system/patterns/workbench-shell/pattern.js"></script>
+<script src="vendor/pto-design-system/patterns/floating-playback-control/pattern.js"></script>
+<script src="vendor/pto-design-system/patterns/ide-frame/pattern.js"></script>
+<!-- product logic -->
+<script>
+(function(){
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const TOTAL=3;
+  let items=freshItems();
+  let curTab='task', curMode='review';
+  function freshItems(){return {it1:{kind:'block',status:'pending'},it2:{kind:'risk',status:'pending'},it3:{kind:'risk',status:'pending'}};}
+
+  /* toast / log */
+  function toast(msg,kind){kind=kind||'g';const t=document.createElement('div');t.className='ade-toast '+kind;
+    const ic={g:'M5 12l4 4 10-10',b:'M12 16v-5M12 8h.01',a:'M12 9v4m0 4h.01',r:'M6 6l12 12M18 6L6 18',p:'M12 3l8 4v5c0 4.5-3 7.5-8 9-5-1.5-8-4.5-8-9V7z'}[kind]||'M5 12l4 4 10-10';
+    t.innerHTML='<svg class="ade-icon sm" viewBox="0 0 24 24">'+(kind==='b'?'<circle cx="12" cy="12" r="9"/>':'')+'<path d="'+ic+'"/></svg>'+msg;
+    $('#toasts').appendChild(t);requestAnimationFrame(()=>t.classList.add('on'));
+    setTimeout(()=>{t.classList.remove('on');setTimeout(()=>t.remove(),320);},2600);}
+  function log(text,meta,dot){dot=dot||'g';const el=document.createElement('div');el.className='ade-logitem';
+    el.innerHTML='<div class="ade-logdot '+dot+'"></div><div><div class="ade-logt">'+text+'</div><div class="ade-logm">'+meta+'</div></div>';
+    $('#actLog').appendChild(el);}
+
+  /* tab switch (task | trace) */
+  function setTab(tab){
+    curTab=tab;
+    $$('.tab-control-item[data-tab]').forEach(t=>t.classList.toggle('is-selected',t.dataset.tab===tab));
+    const isTrace=tab==='trace';
+    $('#paneTrace').classList.toggle('on',isTrace);
+    $('#domainToolbar').classList.toggle('ade-hide',isTrace);
+    if(isTrace){['paneCode','paneWatch','paneReview'].forEach(id=>$('#'+id).classList.remove('on'));
+      $('#inspReview').classList.remove('on');$('#inspContext').classList.remove('on');$('#inspTrace').classList.add('on');
+      $('#inspTitle').textContent='可追溯 · 版本与审计';
+    }else{$('#inspTrace').classList.remove('on');setMode(curMode,true);}
+  }
+
+  /* mode switch (三态) */
+  const NOTE={code:'适用<b>核心逻辑</b> · 你自己写,AI 补全/答疑',watch:'适用<b>中等任务</b> · 你看 plan,随时打断纠偏',review:'适用<b>边界清晰</b> · 只看输入与产物,做验收决策'};
+  function setMode(m,silent){
+    if(curTab==='trace')setTab('task');
+    const prev=curMode;curMode=m;
+    $$('#modeSwitch .btn').forEach(b=>b.classList.toggle('is-selected',b.dataset.mode===m));
+    ['paneCode','paneWatch','paneReview'].forEach(id=>$('#'+id).classList.toggle('on',id==='pane'+cap(m)));
+    $('#paneTrace').classList.remove('on');
+    $('#domainToolbar').classList.remove('ade-hide');
+    const isRev=m==='review';
+    $('#inspTrace').classList.remove('on');
+    $('#inspReview').classList.toggle('on',isRev);
+    $('#inspContext').classList.toggle('on',!isRev);
+    $('#inspTitle').textContent=isRev?'验收 · 流水线与证据':'任务 · 上下文';
+    $('#modeNote').innerHTML=NOTE[m]+' · 共享 worktree <b>feat/pay</b>';
+    $('#mergeBtn').style.display=isRev?'':'none';
+    if(isRev)refresh();
+    if(!silent&&prev&&prev!==m)toast('已切到「'+({code:'亲手写',watch:'盯过程',review:'发包验收'})[m]+'」· 同一 worktree,状态已保留','g');
+  }
+  function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+  /* review state */
+  function resolvedCount(){return Object.values(items).filter(i=>i.status==='passed'||i.status==='waived'||i.status==='reworked').length;}
+  function refresh(){
+    const n=resolvedCount(),left=TOTAL-n;
+    $('#ovPending').textContent=left;$('#reviewMn').textContent=n+'/'+TOTAL;$('#stProg').textContent='人工复核 '+n+' / '+TOTAL;
+    const cnt=$('#repCnt');
+    if(n>=TOTAL){cnt.textContent='全部已处理 · '+TOTAL+'/'+TOTAL;cnt.className='ade-badge is-success';}
+    else{cnt.textContent='需要你判断 · 剩 '+left+' 处';cnt.className='ade-badge is-warning';}
+    if(items.it1.status==='waived'||items.it1.status==='reworked'){
+      const g=$('#stepGate');g.className='ade-step ok';$('#gateSd').innerHTML='<svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>';
+      $('#gateMn').textContent='pass';$('#ovBlock').textContent='0';$('#ovBlock').style.color='var(--success)';
+      $('#stGate').innerHTML='● 门禁 通过';$('#stGate').style.color='var(--success)';
+    }
+    if(n>=TOTAL){
+      const mb=$('#mergeBtn');mb.disabled=false;
+      const rv=$('#stepReview');rv.className='ade-step ok';rv.querySelector('.sd').innerHTML='<svg class="ade-icon" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>';
+      $('#stStatus').textContent='可合并';$('#stStatus').className='ade-badge is-success';
+      $('#auditState').innerHTML='<span class="em">全部处理完毕,待合并</span>';
+    }
+  }
+  function toggle(item,force){const open=force!==undefined?force:!item.classList.contains('open');
+    if(open)$$('.ade-jitem.open').forEach(j=>{if(j!==item)j.classList.remove('open');});item.classList.toggle('open',open);}
+  function setBadge(item,cls,txt){const b=item.querySelector('[data-badge]');b.className='ade-badge '+cls;b.textContent=txt;}
+  function showRes(item,html){const a=item.querySelector('.ade-acts');if(a)a.remove();const d=document.createElement('div');d.innerHTML=html;item.querySelector('.ade-jbody').appendChild(d.firstElementChild);}
+  function resolve(id,how){const item=$('#'+id),data=items[id];
+    data.status=how==='waive'?'waived':'passed';setBadge(item,'is-success',(how==='waive'?'✓ 已豁免':'✓ 已通过'));item.classList.add('resolved');
+    showRes(item,how==='waive'?'<div class="ade-resnote"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>已豁免放行 · <span class="reason">理由已记入审计</span></div>':'<div class="ade-resnote"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>已确认通过</div>');
+    log(how==='waive'?'豁免放行:门禁阻断':'确认通过风险项',(how==='waive'?'PAY-013 已豁免':'风险已确认')+' · 刚刚','g');
+    toast(how==='waive'?'已豁免并放行,理由记入审计':'已确认通过','g');setTimeout(()=>toggle(item,false),450);refresh();}
+  function requestChange(id){const item=$('#'+id),data=items[id];data.status='changes';setBadge(item,'is-info','● 修改中');
+    const a=item.querySelector('.ade-acts');if(a)a.remove();
+    const note=document.createElement('div');note.className='ade-worknote';note.innerHTML='<span class="ade-spinner"></span>已回传 Agent,正在按评论修改并复跑门禁…';item.querySelector('.ade-jbody').appendChild(note);
+    log('要求修改:'+(id==='it3'?'补测试用例':'加入边界校验'),'评论已回传 Agent · 刚刚','b');toast('评论已回传 Agent,正在修改…','b');
+    setTimeout(()=>{data.status='reworked';setBadge(item,'is-success','✓ 已修复');item.classList.add('resolved');
+      note.outerHTML='<div class="ade-resnote"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>Agent 已按评论修改 · 门禁复跑 <b style="color:var(--success)">通过</b></div>';
+      log('Agent 已修改并复跑门禁通过','刚刚','g');toast('Agent 已修复,门禁复跑通过','g');setTimeout(()=>toggle($('#'+id),false),500);refresh();},2100);}
+  function rejectTask(id,reason){const item=$('#'+id);items[id].status='rejected';setBadge(item,'is-danger','⤺ 已打回');
+    item.querySelectorAll('.ade-acts .btn').forEach(b=>b.disabled=true);
+    $('#ovRejectMsg').textContent='已把原因「'+(reason||'未达验收标准')+'」回传给 Agent,任务 #138 退回运行中重新承接。';
+    log('打回重做','任务退回运行中 · 刚刚','r');$('#ovReject').classList.add('on');}
+
+  /* modal */
+  function openModal(html){$('#modal').innerHTML=html;$('#scrim').classList.add('on');}
+  function closeModal(){$('#scrim').classList.remove('on');}
+  function wireTa(){const ta=$('#ta'),ok=$('#ok');ta.addEventListener('input',()=>ok.disabled=ta.value.trim().length<2);
+    $$('#quick span').forEach(s=>s.onclick=()=>{ta.value=ta.value?ta.value+' / '+s.textContent:s.textContent;ta.dispatchEvent(new Event('input'));ta.focus();});setTimeout(()=>ta.focus(),80);}
+  function modalWaive(id){openModal('<div class="mh"><span class="mi warn"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4m0 3h.01"/></svg></span>豁免门禁阻断</div><div class="md">门禁规则 <b>PAY-013</b> 判定为阻断。若你判断风险可接受,请填写<b>豁免理由</b>(记入审计,可追溯)。</div><div class="quick" id="quick"><span>历史数据上界可控</span><span>已在网关层兜底</span><span>本期临时放行</span></div><textarea id="ta" placeholder="填写豁免理由…"></textarea><div class="mf"><button class="btn btn-sm" data-close>取消</button><button class="btn btn-solid btn-sm" id="ok" disabled>确认豁免并通过</button></div>');wireTa();$('#ok').onclick=()=>{closeModal();resolve(id,'waive');};}
+  function modalChange(id){const t=id==='it3';openModal('<div class="mh"><span class="mi info"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M12 20h9M16 3l5 5L8 21l-5 1 1-5z"/></svg></span>'+(t?'让 Agent 补测试':'要求修改')+'</div><div class="md">写下要 Agent 怎么改,'+(t?'它会补用例并复跑覆盖率':'它会按评论修改并复跑门禁')+',无需打回整单。</div><div class="quick" id="quick">'+(t?'<span>补退款成功用例</span><span>补退款失败回滚用例</span>':'<span>采纳 AI 建议加边界校验</span><span>上界用 MAX_AMOUNT</span>')+'</div><textarea id="ta" placeholder="例如:'+(t?'为 refund() 增加成功/失败两条用例':'在 charge() 入口加入 amount 边界校验')+'"></textarea><div class="mf"><button class="btn btn-sm" data-close>取消</button><button class="btn btn-solid btn-sm" id="ok" disabled>回传 Agent</button></div>');wireTa();$('#ok').onclick=()=>{closeModal();requestChange(id);};}
+  function modalReject(id){openModal('<div class="mh"><span class="mi danger"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0zM9 9l6 6M15 9l-6 6"/></svg></span>打回重做</div><div class="md">打回会让<b>整个任务</b>退回「运行中」,由 Agent 重新承接。请说明原因。</div><div class="quick" id="quick"><span>方案方向错误</span><span>风险过高,需重做</span><span>未达验收标准</span></div><textarea id="ta" placeholder="填写打回原因…"></textarea><div class="mf"><button class="btn btn-sm" data-close>取消</button><button class="btn btn-solid btn-sm" id="ok" disabled>确认打回</button></div>');wireTa();$('#ok').onclick=()=>{const v=$('#ta').value;closeModal();rejectTask(id,v);};}
+  function modalDispatch(){openModal('<div class="mh"><span class="mi success"><svg class="ade-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>从需求派发任务</div><div class="md">把需求项直接变成任务 —— 自动建 <b>git worktree</b>、分配 <b>Agent</b>、挂载企业上下文。人从「写代码的人」变成「发包并验收的人」。</div><div class="pick" id="pick"><div class="opt" data-req="接入新支付渠道"><span class="oi"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><div><div class="ot">接入新支付渠道</div><div class="om">需求#142 · 收银台</div></div></div><div class="opt" data-req="订单批量导出"><span class="oi"><svg class="ade-icon sm" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><div><div class="ot">订单批量导出</div><div class="om">需求#145 · 订单</div></div></div></div><input class="inp" id="reqExtra" placeholder="或粘贴需求链接 / 描述…"><div class="mf"><button class="btn btn-sm" data-close>取消</button><button class="btn btn-solid btn-sm" id="ok" disabled>派发并建 worktree</button></div>');
+    let chosen='';$$('#pick .opt').forEach(o=>o.onclick=()=>{$$('#pick .opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');chosen=o.dataset.req;$('#ok').disabled=false;});
+    $('#reqExtra').addEventListener('input',e=>{if(e.target.value.trim().length>2){chosen=e.target.value.trim();$('#ok').disabled=false;}});
+    $('#ok').onclick=()=>{closeModal();dispatchTask(chosen);};}
+  function dispatchTask(name){const row=document.createElement('div');row.className='ade-titem clickable';
+    row.innerHTML='<span class="ade-dot run"></span><span class="nm">'+name+'</span><span class="meta">新 worktree</span>';
+    $('#grpRun').appendChild(row);$('#cntRun').textContent=String(parseInt($('#cntRun').textContent,10)+1);
+    toast('已派发「'+name+'」· 自动建 worktree、分配 Agent','g');}
+
+  /* evidence drawer */
+  const EV={
+    gate:{t:'门禁规则 · PAY-013',html:'<div class="kv"><span>规则编号</span><b>PAY-013</b></div><div class="kv"><span>级别</span><b style="color:var(--warning)">阻断</b></div><div class="kv"><span>分类</span><b>资金安全</b></div><div class="blk"><b>规则描述</b><br>所有进入支付/扣款链路的金额参数,必须在使用前完成「非负 + 上界」校验。命中:<code>charge(amount)</code> 直接参与乘法运算,未见校验。</div>'},
+    scan:{t:'安全扫描详情',html:'<div class="kv"><span>扫描器</span><b>CodeArts SecCheck</b></div><div class="kv"><span>高危</span><b style="color:var(--success)">0</b></div><div class="kv"><span>中危</span><b>1</b></div><div class="blk">checkout.ts:41 — <code>amount * rate</code> 未做范围约束,极端入参存在整数溢出可能。</div>'},
+    test:{t:'相关测试',html:'<div class="kv"><span>用例总数</span><b>128</b></div><div class="kv"><span>本次新增</span><b>+6</b></div><div class="kv"><span>charge() 覆盖</span><b style="color:var(--success)">88%</b></div><div class="blk">已覆盖:正常扣款、零额拦截。<br>缺口:超大额分支无断言。</div>'},
+    impact:{t:'影响分析',html:'<div class="kv"><span>触及目录</span><b>payment/*</b></div><div class="kv"><span>近 90 天回滚</span><b style="color:var(--warning)">3 起</b></div><div class="kv"><span>下游依赖</span><b>order, ledger</b></div><div class="blk">charge/refund 被 4 个上游调用,改动需关注金额精度与回滚一致性。</div>'},
+    owner:{t:'模块 Owner',html:'<div class="kv"><span>模块</span><b>payment</b></div><div class="kv"><span>Owner</span><b>@li.wei</b></div><div class="kv"><span>评审策略</span><b>核心改动需 1 人复核</b></div><div class="blk">触及受保护目录时,验收中心会自动提示。</div>'},
+    cov:{t:'覆盖率报告',html:'<div class="kv"><span>总覆盖率</span><b>92%</b></div><div class="kv"><span>checkout.ts</span><b>86%</b></div><div class="kv"><span>refund() 分支</span><b style="color:var(--danger)">0%</b></div><div class="blk">退款分支为本次新增逻辑,尚无任何用例进入。</div>'},
+    req:{t:'需求 · #138',html:'<div class="kv"><span>标题</span><b>支付金额边界校验</b></div><div class="kv"><span>来源</span><b>Linear</b></div><div class="kv"><span>负责人</span><b>@余</b></div><div class="blk">需求项是溯源链的<b>起点</b>,合并时可回指到它。</div>'},
+    prompt:{t:'Prompt · v3',html:'<div class="kv"><span>版本</span><b>v3</b></div><div class="kv"><span>hash</span><b>a1f9c2</b></div><div class="kv"><span>约束</span><b>非负+上界双校验</b></div><div class="blk"><b>派发指令(节选)</b><br>「为 charge() 补充 amount 边界校验:非负且不超过 MAX_AMOUNT;遵循企业编码规范 v6;补齐单测。」prompt 被<b>版本化</b>纳管。</div>'},
+    model:{t:'模型 / Agent',html:'<div class="kv"><span>模型</span><b>Claude Sonnet</b></div><div class="kv"><span>Agent 版本</span><b>v2.1</b></div><div class="kv"><span>temperature</span><b>0.2</b></div><div class="blk">模型与 Agent 版本纳入版本管理:出问题可定位「是模型变了还是 Agent 变了」。</div>'},
+    ctx:{t:'上下文快照 · RAG',html:'<div class="kv"><span>快照号</span><b>snap-0711</b></div><div class="kv"><span>代码文件</span><b>12</b></div><div class="kv"><span>历史 PR</span><b>3</b></div><div class="kv"><span>企业规范</span><b>v6</b></div><div class="blk">私有代码库/内部 API/历史 PR/编码规范做成 RAG,快照可<b>复现</b>。</div>'},
+    artifact:{t:'产物 · diff',html:'<div class="kv"><span>分支</span><b>feat/pay</b></div><div class="kv"><span>commit</span><b>e7b1a9</b></div><div class="kv"><span>改动</span><b>+218 / −101</b></div><div class="blk">产物是 worktree 隔离的改动;CodeArts 还给你看它的<b>全链路来历</b>。</div>'},
+    decision:{t:'验收决策',html:'<div class="kv"><span>当前状态</span><b style="color:var(--warning)">待验收</b></div><div class="kv"><span>需人判断</span><b>3 处</b></div><div class="kv"><span>验收人</span><b>@余</b></div><div class="blk">每次合并都能回答:谁验收、为何放行或豁免。是溯源链的<b>终点</b>。</div>'}
+  };
+  function openDrawer(k){const d=EV[k];if(!d)return;$('#drawerTitle').textContent=d.t;$('#drawerBody').innerHTML=d.html;$('#drawer').classList.add('on');}
+
+  /* merge + replay */
+  function doMerge(){if($('#mergeBtn').disabled)return;$('#ovMerge').classList.add('on');log('通过并合并到 main','任务 #138 关闭 · 刚刚','g');}
+  function mergeToTree(){const t=$('#task138');if(!t)return;t.className='ade-titem';t.removeAttribute('data-open');
+    t.innerHTML='<span class="ade-dot done"></span><span class="nm">支付金额边界校验</span><span class="meta">merged</span>';
+    $('#colMerged').parentElement.appendChild(t);$('#cntReview').textContent='1';$('#cntMerged').textContent='3';}
+  let rt=null;
+  function startReplay(){toast('回放中… 读取需求→Prompt→模型→上下文→产物→验收','b');
+    const stg=[['读取需求#138 + Prompt v3'],['挂载上下文快照 snap-0711'],['Sonnet·v2.1 生成边界校验'],['补单测·复跑覆盖率 92%'],['自动验收流水线'],['产物落地 feat/pay']];
+    let i=0;clearInterval(rt);rt=setInterval(()=>{if(i>=stg.length){clearInterval(rt);toast('回放完成 · 生成过程可复现','g');return;}toast('▶ '+stg[i][0],'b');i++;},900);}
+
+  /* delegation */
+  document.addEventListener('click',e=>{
+    const open=e.target.closest('[data-open]');if(open){openTask(open);return;}
+    const tabEl=e.target.closest('[data-tab]');if(tabEl){setTab(tabEl.dataset.tab);return;}
+    const rail=e.target.closest('.pto-ide-frame__rail-button');if(rail&&!rail.dataset.tab&&!rail.hasAttribute('data-ide-toggle')){toast('原型聚焦「验收主线」,「'+(rail.title||'该入口')+'」暂未展开','b');return;}
+    const md=e.target.closest('#modeSwitch .btn[data-mode], .btn[data-mode]');if(md){setMode(md.dataset.mode);return;}
+    if(e.target.closest('#btnInterrupt')){toast('已打断,Agent 暂停等待你的纠偏指令','a');return;}
+    const tog=e.target.closest('[data-toggle]');if(tog&&!e.target.closest('[data-act]')&&!e.target.closest('[data-ev]')){toggle(tog.closest('.ade-jitem'));return;}
+    const ev=e.target.closest('[data-ev]');if(ev){openDrawer(ev.dataset.ev);return;}
+    const tr=e.target.closest('[data-tr]');if(tr){openDrawer(tr.dataset.tr);return;}
+    const act=e.target.closest('[data-act]');if(act){const id=act.dataset.item,a=act.dataset.act,kind=items[id].kind;
+      if(a==='pass')kind==='block'?modalWaive(id):resolve(id,'pass');else if(a==='edit')modalChange(id);else if(a==='reject')modalReject(id);return;}
+    if(e.target.closest('#mergeBtn')){doMerge();return;}
+    if(e.target.closest('#dispatchBtn')){modalDispatch();return;}
+    if(e.target.closest('#btnReplay')){startReplay();return;}
+    if(e.target.closest('#btnRerun')){toast('已按原始意图(需求#138 + Prompt a1f9c2 + snap-0711)重跑,产物可比对','g');return;}
+    if(e.target.closest('#btnRollback')){$('#ovRollback').classList.add('on');return;}
+    if(e.target.closest('#toggleInspector')){$('#inspectorPane').classList.toggle('ade-hide');return;}
+    if(e.target.closest('[data-close]')||e.target===$('#scrim'))closeModal();
+  });
+  function openTask(el){
+    if(el.dataset.open!=='138'){toast('本原型串通的是「支付金额边界校验」(#138),点它体验完整流程','b');return;}
+    $$('.ade-titem').forEach(t=>t.classList.remove('is-selected'));
+    el.classList.add('is-selected');
+    setTab('task');setMode(el.dataset.mode||'review');
+  }
+  $('#drawerX').onclick=()=>$('#drawer').classList.remove('on');
+  $('#ovMergeClose').onclick=()=>{$('#ovMerge').classList.remove('on');mergeToTree();toast('任务 #138 已合并,决策写入可追溯','g');};
+  $('#ovRejectClose').onclick=()=>$('#ovReject').classList.remove('on');
+  $('#ovRollbackClose').onclick=()=>$('#ovRollback').classList.remove('on');
+  $('#resetBtn').onclick=()=>location.reload();
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();$('#drawer').classList.remove('on');}});
+
+  // initial
+  setMode('review',true);refresh();
+})();
+</script>
+</body>
+</html>

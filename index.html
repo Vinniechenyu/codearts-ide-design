@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CodeArts IDE Design</title>
+<title>CodeArts IDE UX Design</title>
 <link rel="icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,9 @@
     --ink:#111214;--ink2:#5E6167;--ink3:#9A9DA3;
     --line:#E4E4E7;--hair:rgba(17,18,20,.07);
     --shadow:0 18px 40px -22px rgba(17,18,20,.22);
+    --glass-bg:rgba(255,255,255,.55);--glass-brd:rgba(255,255,255,.7);
+    --glass-hi:rgba(255,255,255,.9);--glass-sh:0 8px 24px -10px rgba(17,18,20,.2);
+    --shine:#7C5CFC;
   }
   /* dark — near-black, dousanmiao-style */
   :root[data-theme="dark"]{
@@ -30,6 +33,9 @@
     --ink:#F4F5F6;--ink2:#9EA2A9;--ink3:#63666D;
     --line:#212328;--hair:rgba(255,255,255,.08);
     --shadow:0 22px 48px -22px rgba(0,0,0,.8);
+    --glass-bg:rgba(38,40,46,.5);--glass-brd:rgba(255,255,255,.14);
+    --glass-hi:rgba(255,255,255,.22);--glass-sh:0 8px 26px -12px rgba(0,0,0,.7);
+    --shine:#B8A6FF;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -41,15 +47,32 @@
   .wrap{max-width:1360px;margin:0 auto;padding:44px 40px 96px}
   @media(max-width:640px){.wrap{padding:28px 20px 72px}}
 
+  /* ---- liquid-glass helper ---- */
+  .glass{background:var(--glass-bg);border:1px solid var(--glass-brd);
+    backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);
+    box-shadow:var(--glass-sh),inset 0 1px 0 var(--glass-hi),inset 0 -8px 20px -14px rgba(0,0,0,.25)}
+
+  /* ---- liquid-glass cursor ---- */
+  .cursor{position:fixed;top:0;left:0;width:26px;height:26px;border-radius:50%;pointer-events:none;
+    z-index:9999;transform:translate(-50%,-50%);opacity:0;
+    background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.5),rgba(255,255,255,.06) 60%);
+    border:1px solid var(--glass-brd);backdrop-filter:blur(3px) saturate(1.6);-webkit-backdrop-filter:blur(3px) saturate(1.6);
+    box-shadow:inset 0 1px 4px rgba(255,255,255,.5),0 6px 18px -6px rgba(0,0,0,.25);
+    transition:width .22s var(--ease),height .22s var(--ease),opacity .3s,background .3s}
+  .cursor.on{opacity:1}
+  .cursor.hot{width:52px;height:52px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.42),rgba(124,92,252,.12) 62%)}
+  @media(hover:none),(pointer:coarse){.cursor{display:none}}
+  @media(prefers-reduced-motion:reduce){.cursor{display:none}}
+
   /* ---- topbar ---- */
   .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
   .brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;font-weight:600;
     letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
   .brand .mk{width:22px;height:22px;border-radius:5px;object-fit:contain;display:block}
 
-  /* sliding sun/moon toggle (dousanmiao) */
-  .toggle{position:relative;width:60px;height:30px;border-radius:999px;border:1px solid var(--line);
-    background:var(--panel);padding:0;transition:background .3s var(--ease),border-color .3s var(--ease)}
+  /* sliding sun/moon toggle (liquid glass) */
+  .toggle{position:relative;width:60px;height:30px;border-radius:999px;padding:0;
+    transition:background .3s var(--ease),border-color .3s var(--ease)}
   .toggle .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--ink);
     display:grid;place-items:center;transition:transform .34s cubic-bezier(.34,1.4,.5,1)}
   :root[data-theme="dark"] .toggle .knob{transform:translateX(30px)}
@@ -63,8 +86,18 @@
 
   /* ---- hero ---- */
   .hero{margin-bottom:4px}
-  .hero h1{margin:0;font-size:clamp(32px,5.4vw,50px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
+  .hero h1{margin:0;font-size:clamp(32px,5.4vw,52px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
   .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66;max-width:64em}
+  /* animated UX DESIGN wordmark — per-letter shine wave (dousanmiao-style) */
+  .ux{display:inline-flex}
+  .ux .uxl{display:inline-block;white-space:pre;color:var(--ink);
+    animation:shine 3.4s var(--ease) infinite;animation-delay:var(--d,0s)}
+  @keyframes shine{
+    0%,72%,100%{color:var(--ink);transform:translateY(0)}
+    12%{color:var(--shine);transform:translateY(-3px)}
+    24%{color:var(--ink);transform:translateY(0)}
+  }
+  @media(prefers-reduced-motion:reduce){.ux .uxl{animation:none}}
 
   /* ---- two-column ---- */
   .layout{display:grid;grid-template-columns:212px 1fr;gap:36px;align-items:start;margin-top:34px}
@@ -108,9 +141,10 @@
   .card:hover .shot img{transform:scale(1.04)}
   .pill{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:6px;
     font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.02em;color:#fff;
-    background:rgba(10,11,13,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;
-    padding:4px 10px 4px 8px;backdrop-filter:blur(6px)}
-  .pill .d{width:6px;height:6px;border-radius:50%;background:var(--sd)}
+    background:rgba(10,11,13,.4);border:1px solid rgba(255,255,255,.24);border-radius:999px;
+    padding:4px 10px 4px 8px;backdrop-filter:blur(10px) saturate(1.5);-webkit-backdrop-filter:blur(10px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px -8px rgba(0,0,0,.4)}
+  .pill .d{width:6px;height:6px;border-radius:50%;background:var(--sd);box-shadow:0 0 8px var(--sd)}
 
   .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
   .clab{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:600;
@@ -127,8 +161,7 @@
     border:1px dashed var(--line);border-radius:18px}
   .empty.show{display:block}
   .empty h3{margin:0 0 6px;color:var(--ink2);font-size:15px;font-family:var(--mono);letter-spacing:.04em}
-  .clear{margin-top:16px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);
-    font-size:12.5px;font-weight:600}
+  .clear{margin-top:16px;padding:9px 18px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink)}
 
   footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--ink3);
     font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;display:flex;justify-content:space-between;
@@ -136,10 +169,11 @@
 </style>
 </head>
 <body>
+<div class="cursor" id="cursor"></div>
 <div class="wrap">
   <div class="topbar">
     <div class="brand"><img class="mk" src="assets/logo.png" alt="">CodeArts IDE Design</div>
-    <button class="toggle" id="themeBtn" aria-label="切换深浅模式">
+    <button class="toggle glass" id="themeBtn" aria-label="切换深浅模式">
       <svg class="ico s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v1.6M12 19.4V21M4.6 4.6l1.1 1.1M18.3 18.3l1.1 1.1M3 12h1.6M19.4 12H21M4.6 19.4l1.1-1.1M18.3 5.7l1.1-1.1"/></svg>
       <svg class="ico m" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
       <span class="knob">
@@ -150,7 +184,7 @@
   </div>
 
   <header class="hero">
-    <h1>CodeArts IDE DESIGN</h1>
+    <h1>CodeArts IDE <span class="ux" id="uxword">UX DESIGN</span></h1>
     <p class="lead">CodeArts IDE / 码道代码智能体的体验设计材料集——专项分析、业界洞察与竞品、交互原型与组件规范,一处托管,持续更新。</p>
   </header>
 
@@ -170,7 +204,7 @@
       <div class="empty" id="empty">
         <h3 id="emptyTitle">NO MATCH</h3>
         <div id="emptyDesc">换个关键词,或查看全部材料。</div>
-        <button class="clear" id="clear">查看全部</button>
+        <button class="clear glass" id="clear">查看全部</button>
       </div>
     </main>
   </div>
@@ -182,7 +216,6 @@
 </div>
 
 <script>
-// status: label + dot color
 const STATUS = {
   live:    { label:"可体验",   dot:"#3FB950" },
   proto:   { label:"可交互",   dot:"#4C8DFF" },
@@ -205,7 +238,7 @@ const ITEMS = [
     cat: "专项", status: "live",
     desc: "把用户一句“感觉慢”拆成可证明的证据链:五款产品同题实测、码道输出结构拆解、根因机制归因,最终落到五阶段主干 + 异常旁路 + 状态动效的设计方案。",
     preview: "assets/preview-madao-response-deck.png",
-    tags: ["五产品实测", "根因拆解", "40 页"],
+    tags: ["五产品实测", "根因拆解", "设计方案"],
     href: "madao-response-deck/"
   },
   {
@@ -215,6 +248,14 @@ const ITEMS = [
     preview: "assets/preview-codearts-ade-vision.png",
     tags: ["ADE 拆解", "设计主张", "验收中心"],
     href: "codearts-ade-vision/"
+  },
+  {
+    title: "CodeArts ADE · IDE 工作台交互原型",
+    cat: "原型", status: "proto",
+    desc: "把设计主张落成可点的高保真原型:任务网格 + 三种工作姿态(亲手写 / 盯过程 / 发包验收)+ 验收中心(流水线 · 证据 · 门禁),用 PTO Design System 搭在 IDE 框架上。",
+    preview: "assets/preview-codearts-ade-prototype.png",
+    tags: ["高保真", "验收中心", "三态切换"],
+    href: "codearts-ade-prototype/"
   },
   {
     title: "当 IDE 遇见 Agent,体验如何被重新定义",
@@ -259,11 +300,38 @@ const emptyDesc = document.getElementById('emptyDesc');
 const countEl = document.getElementById('count');
 const state = { cat:'all', q:'' };
 
+// split UX DESIGN into per-letter animated spans (staggered shine wave)
+(function(){
+  const w = document.getElementById('uxword');
+  const txt = w.textContent; w.textContent = '';
+  [...txt].forEach((ch, i) => {
+    const s = document.createElement('span');
+    s.className = 'uxl'; s.textContent = ch;
+    s.style.setProperty('--d', (i * 0.09) + 's');
+    w.appendChild(s);
+  });
+})();
+
 document.getElementById('themeBtn').onclick = () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   try{ localStorage.setItem('ide-theme', next); }catch(e){}
 };
+
+// liquid-glass cursor follower
+(function(){
+  const cur = document.getElementById('cursor');
+  let x = innerWidth/2, y = innerHeight/2, tx = x, ty = y, shown = false;
+  addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY;
+    if(!shown){ shown = true; cur.classList.add('on'); } });
+  addEventListener('mouseleave', () => { cur.classList.remove('on'); shown = false; });
+  addEventListener('mouseover', e => {
+    cur.classList.toggle('hot', !!e.target.closest('a,button,input'));
+  });
+  (function loop(){ x += (tx-x)*.22; y += (ty-y)*.22;
+    cur.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
+    requestAnimationFrame(loop); })();
+})();
 
 CATEGORIES.forEach(c => {
   const n = c.id === 'all' ? ITEMS.length : ITEMS.filter(i => i.cat === c.id).length;
