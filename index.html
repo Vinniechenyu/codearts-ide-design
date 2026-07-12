@@ -154,11 +154,13 @@
     padding:4px 10px 4px 8px;backdrop-filter:blur(10px) saturate(1.5);-webkit-backdrop-filter:blur(10px) saturate(1.5);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px -8px rgba(0,0,0,.4)}
   .pill .d{width:6px;height:6px;border-radius:50%;background:var(--sd);box-shadow:0 0 8px var(--sd)}
-  /* 置顶徽标(所有人可见) */
+  /* 置顶徽标(所有人可见)—— 与状态胶囊同款玻璃质感,紫色图钉点缀 */
   .badge-top{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:5px;
-    font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:#fff;
-    background:linear-gradient(96deg,#6E4CF0,#A98BFF);border:1px solid rgba(255,255,255,.3);
-    border-radius:999px;padding:4px 10px;box-shadow:0 6px 16px -8px rgba(110,76,240,.85)}
+    font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.02em;color:#fff;
+    background:rgba(10,11,13,.42);border:1px solid rgba(255,255,255,.22);border-radius:999px;
+    padding:4px 10px 4px 8px;backdrop-filter:blur(10px) saturate(1.5);-webkit-backdrop-filter:blur(10px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 6px 16px -8px rgba(0,0,0,.45)}
+  .badge-top svg{width:11px;height:11px;fill:#B8A6FF;display:block}
   /* 编辑模式:置顶控件(仅你可见) */
   .pinctl{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;z-index:5}
   .pinctl button{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);cursor:pointer;
@@ -435,7 +437,7 @@ function render(){
     const tags = (it.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
     const thumb = it.preview ? `<img src="${it.preview}" alt="${it.title}" loading="lazy">` : '';
     const pinned = isPinned(it.href);
-    const badge = pinned ? `<span class="badge-top">📌 置顶</span>` : '';
+    const badge = pinned ? `<span class="badge-top"><svg viewBox="0 0 24 24"><path d="M15.6 3.5a1 1 0 0 0-1.7-.7L9.3 7.4l-3.4.5a1 1 0 0 0-.55 1.7l2.5 2.5-4.2 4.2a.8.8 0 0 0 1.1 1.1l4.2-4.2 2.5 2.5a1 1 0 0 0 1.7-.55l.5-3.4 4.6-4.6a1 1 0 0 0-.7-1.7l-2.9-.4-.4-2.9Z"/></svg>置顶</span>` : '';
     const ctl = editMode ? `<div class="pinctl" data-href="${it.href}">
         <button data-act="toggle" class="${pinned?'act':''}">${pinned?'取消置顶':'置顶'}</button>
         ${pinned?`<button data-act="up" class="mini" title="上移">↑</button><button data-act="down" class="mini" title="下移">↓</button>`:''}
