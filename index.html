@@ -3,46 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CodeArts IDE Design · 材料中心</title>
+<title>CodeArts IDE Design · 材料启动台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B5BD6'/%3E%3Cpath d='M20 44V20h9c6 0 10 5 10 12s-4 12-10 12h-9Zm6-6h3c2 0 4-2 4-6s-2-6-4-6h-3v12Z' fill='%23fff'/%3E%3C/svg%3E">
 <style>
-  :root{--bg:#F3F5F8;--card:#fff;--line:#E2E6EC;--ink:#16191E;--ink2:#5A626E;--ink3:#8B929A;--accent:#5B5BD6;--accent2:#7C3AED}
-  @media (prefers-color-scheme:dark){:root{--bg:#0B0C10;--card:#15171C;--line:#262A32;--ink:#ECEEF2;--ink2:#A7ADB8;--ink3:#6E7580}}
+  :root{
+    --bg:#F4F6F9;--panel:#FFFFFF;--card:#FFFFFF;--line:#E4E8EF;--line2:#EEF1F6;
+    --ink:#161A20;--ink2:#565E6B;--ink3:#8992A0;
+    --accent:#5B5BD6;--accent2:#7C3AED;--accent-soft:#ECECFB;
+    --live:#16A34A;--live-soft:rgba(22,163,74,.12);
+    --proto:#B45309;--proto-soft:rgba(245,158,11,.14);
+    --doc:#4F6BED;--doc-soft:rgba(79,107,237,.12);
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 12px 32px -20px rgba(30,40,70,.22);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0A0B0F;--panel:#111318;--card:#15171D;--line:#262A33;--line2:#1D2027;
+      --ink:#ECEEF2;--ink2:#A4ABB6;--ink3:#6C7480;--accent-soft:rgba(91,91,214,.16);
+      --live-soft:rgba(22,163,74,.18);--proto-soft:rgba(245,158,11,.16);--doc-soft:rgba(79,107,237,.2);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px -24px rgba(0,0,0,.7);}
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
-  .wrap{max-width:880px;margin:0 auto;padding:64px 24px 80px}
-  .brand{font-size:13px;font-weight:800;letter-spacing:.02em;color:var(--ink3)}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;line-height:1.6;
+    background-image:
+      radial-gradient(circle at 12% 4%,rgba(124,58,237,.10),transparent 32%),
+      radial-gradient(circle at 92% 2%,rgba(79,172,254,.10),transparent 30%);
+    background-attachment:fixed;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:1120px;margin:0 auto;padding:56px 28px 80px}
+
+  .brand{font:800 12.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--ink3);text-transform:uppercase}
   .brand b{color:var(--accent)}
-  h1{margin:14px 0 8px;font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:-.01em}
-  h1 span{background:linear-gradient(105deg,var(--ink),var(--accent) 70%,var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .lead{color:var(--ink2);font-size:15px;max-width:38em;margin:0 0 40px}
-  .grid{display:grid;gap:16px}
-  a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;text-decoration:none;color:inherit;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
-  a.card:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 14px 38px -22px rgba(91,91,214,.4)}
-  .tag{display:inline-block;font:700 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--accent);background:rgba(91,91,214,.1);border-radius:999px;padding:5px 10px;margin-bottom:10px}
-  .card h2{margin:0 0 6px;font-size:19px;font-weight:800}
-  .card p{margin:0;color:var(--ink2);font-size:14px}
-  .card .meta{margin-top:12px;font:12px ui-monospace,Menlo,monospace;color:var(--ink3);display:flex;gap:14px;flex-wrap:wrap}
-  .arrow{float:right;color:var(--ink3);font-size:18px;transition:transform .15s}
-  a.card:hover .arrow{transform:translateX(4px);color:var(--accent)}
-  footer{margin-top:56px;color:var(--ink3);font-size:12px;font-family:ui-monospace,Menlo,monospace}
+  h1{margin:16px 0 10px;font-size:clamp(28px,4.4vw,42px);font-weight:900;letter-spacing:-.015em}
+  h1 span{background:linear-gradient(102deg,var(--ink) 8%,var(--accent) 66%,var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lead{color:var(--ink2);font-size:15.5px;max-width:40em;margin:0}
+
+  .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:34px 0 22px}
+  .search{position:relative;flex:1;min-width:220px}
+  .search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);border-radius:11px;
+    background:var(--panel);color:var(--ink);font-size:14px;outline:none;transition:border-color .15s,box-shadow .15s}
+  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--ink3);fill:none;stroke-width:2}
+  .cats{display:flex;gap:8px;flex-wrap:wrap}
+  .cat{padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink2);font-size:13px;font-weight:600;transition:all .15s}
+  .cat:hover{border-color:#CFD5DF;color:var(--ink)}
+  .cat.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+  .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;box-shadow:var(--shadow);transition:transform .16s ease,box-shadow .16s ease,border-color .16s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 20px 46px -22px rgba(91,91,214,.42)}
+  .thumb{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#EEF0FB,#E4ECFB);overflow:hidden;border-bottom:1px solid var(--line2)}
+  .thumb img{width:100%;height:100%;object-fit:cover;object-position:top center}
+  .badge{position:absolute;top:11px;left:11px;display:inline-flex;align-items:center;gap:5px;
+    padding:4px 10px;border-radius:999px;font:700 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.02em}
+  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .badge.live{color:var(--live);background:var(--live-soft)}
+  .badge.proto{color:var(--proto);background:var(--proto-soft)}
+  .badge.doc{color:var(--doc);background:var(--doc-soft)}
+  .body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+  .body h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .body .sub{font:600 12px/1.3 ui-monospace,Menlo,monospace;color:var(--ink3);margin-top:4px}
+  .body p{margin:10px 0 0;color:var(--ink2);font-size:13.5px;flex:1}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .tag{font:600 11px/1 ui-monospace,Menlo,monospace;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:5px 8px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--line2)}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:700;transition:all .15s}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{background:#4A4AC4}
+  .btn.ghost{border:1px solid var(--line);color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .btn .ar{transition:transform .15s}
+  .btn:hover .ar{transform:translateX(3px)}
+
+  .empty{display:none;text-align:center;padding:70px 20px;color:var(--ink3)}
+  .empty.show{display:block}
+  .empty h3{margin:0 0 6px;color:var(--ink2);font-size:16px}
+  .clear{margin-top:14px;padding:8px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink2);font-size:13px}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--ink3);font:12px/1.7 ui-monospace,Menlo,monospace;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand">CodeArts <b>IDE DESIGN</b> · UCD</div>
-  <h1><span>设计材料中心</span></h1>
-  <p class="lead">CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管:汇报 deck、原型、评测证据等,点击卡片进入。</p>
-  <div class="grid">
-    <a class="card" href="madao-response-deck/">
-      <span class="arrow">→</span>
-      <span class="tag">汇报 DECK · 40 页</span>
-      <h2>码道 · 生成响应体验优化专项</h2>
-      <p>把"感觉慢"拆成可证明的证据链:五产品同题实测、码道输出结构拆解、根因机制与设计方案(五阶段主干 + 异常旁路 + 状态动效原则)。</p>
-      <div class="meta"><span>2026.07</span><span>滚动 / PageDown 翻页</span><span>点击截图可放大</span></div>
-    </a>
-    <!-- 新材料模板:复制上面的 <a class="card"> 改 href/标题/描述 即可 -->
+  <header>
+    <div class="brand">CodeArts <b>IDE Design</b> · UCD Center</div>
+    <h1><span>设计材料启动台</span></h1>
+    <p class="lead">CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管——汇报 deck、可交互原型、评测证据与文档。点击卡片进入,新材料持续更新。</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="搜索材料 / 标签 / 关键词…" autocomplete="off">
+    </div>
+    <div class="cats" id="cats"></div>
   </div>
-  <footer>© 2026 UCD CENTER · 内容仅用于设计交流</footer>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">
+    <h3>没有匹配的材料</h3>
+    <div>换个关键词,或清空筛选试试。</div>
+    <button class="clear" id="clear">清空筛选</button>
+  </div>
+
+  <footer>
+    <span>© 2026 UCD CENTER · 内容仅用于设计交流</span>
+    <span id="count"></span>
+  </footer>
 </div>
+
+<script>
+const STATUS = {
+  "live": { label: "可体验", cls: "live" },
+  "proto": { label: "原型", cls: "proto" },
+  "doc": { label: "文档", cls: "doc" }
+};
+
+// ★ 添加新材料:在这里复制一个对象,填 folder / 标题 / 描述即可
+const ITEMS = [
+  {
+    title: "码道 · 生成响应体验优化专项",
+    sub: "CodeArts Agent · Response Experience",
+    group: "汇报 Deck",
+    status: "live",
+    desc: "把“感觉慢”拆成可证明的证据链:五产品同题实测、码道输出结构拆解、根因机制(执行编排×信息呈现×环境)与设计方案——五阶段主干 + 异常旁路 + 状态动效原则。",
+    preview: "assets/preview-madao-response-deck.png",
+    tags: ["评测", "响应体验", "40 页", "GLM-5.1 对照"],
+    actions: [
+      { label: "打开 Deck", href: "madao-response-deck/", primary: true }
+    ]
+  }
+];
+
+const grid = document.getElementById('grid');
+const catsEl = document.getElementById('cats');
+const qEl = document.getElementById('q');
+const emptyEl = document.getElementById('empty');
+const countEl = document.getElementById('count');
+const state = { cat: 'all', q: '' };
+
+const groups = ['all', ...[...new Set(ITEMS.map(i => i.group))]];
+groups.forEach(g => {
+  const b = document.createElement('button');
+  b.className = 'cat' + (g === 'all' ? ' on' : '');
+  b.textContent = g === 'all' ? '全部' : g;
+  b.onclick = () => { state.cat = g; [...catsEl.children].forEach(c => c.classList.toggle('on', c === b)); render(); };
+  catsEl.appendChild(b);
+});
+
+function match(it) {
+  if (state.cat !== 'all' && it.group !== state.cat) return false;
+  const q = state.q.trim().toLowerCase();
+  if (!q) return true;
+  return (it.title + ' ' + (it.sub||'') + ' ' + it.desc + ' ' + (it.tags||[]).join(' ') + ' ' + it.group).toLowerCase().includes(q);
+}
+
+function render() {
+  const list = ITEMS.filter(match);
+  grid.innerHTML = list.map(it => {
+    const s = STATUS[it.status] || { label: it.status, cls: '' };
+    const tags = (it.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
+    const acts = (it.actions||[]).map(a =>
+      `<a class="btn ${a.primary ? 'primary' : 'ghost'}" href="${a.href}">${a.label}<span class="ar">→</span></a>`
+    ).join('');
+    const thumb = it.preview ? `<img src="${it.preview}" alt="${it.title}" loading="lazy">` : '';
+    return `<article class="card">
+      <div class="thumb">${thumb}<span class="badge ${s.cls}">${s.label}</span></div>
+      <div class="body">
+        <h2>${it.title}</h2>
+        ${it.sub ? `<div class="sub">${it.sub}</div>` : ''}
+        <p>${it.desc}</p>
+        <div class="tags">${tags}</div>
+        <div class="actions">${acts}</div>
+      </div>
+    </article>`;
+  }).join('');
+  emptyEl.classList.toggle('show', list.length === 0);
+  countEl.textContent = list.length + ' / ' + ITEMS.length + ' 份材料';
+}
+
+qEl.oninput = () => { state.q = qEl.value; render(); };
+document.getElementById('clear').onclick = () => { state.cat = 'all'; state.q = ''; qEl.value = ''; [...catsEl.children].forEach((c,i) => c.classList.toggle('on', i === 0)); render(); };
+render();
+</script>
 </body>
 </html>
