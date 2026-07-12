@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeArts IDE Design</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23111'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@
   .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
   .brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;font-weight:600;
     letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
-  .brand .mk{width:18px;height:18px;border-radius:5px;background:var(--ink)}
+  .brand .mk{width:22px;height:22px;border-radius:5px;object-fit:contain;display:block}
 
   /* sliding sun/moon toggle (dousanmiao) */
   .toggle{position:relative;width:60px;height:30px;border-radius:999px;border:1px solid var(--line);
@@ -62,9 +62,9 @@
   .toggle .ico.s{left:9px}.toggle .ico.m{right:9px}
 
   /* ---- hero ---- */
-  .hero{margin-bottom:4px;max-width:52em}
+  .hero{margin-bottom:4px}
   .hero h1{margin:0;font-size:clamp(32px,5.4vw,50px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
-  .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66}
+  .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66;max-width:64em}
 
   /* ---- two-column ---- */
   .layout{display:grid;grid-template-columns:212px 1fr;gap:36px;align-items:start;margin-top:34px}
@@ -138,7 +138,7 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><span class="mk"></span>CodeArts IDE Design</div>
+    <div class="brand"><img class="mk" src="assets/logo.png" alt="">CodeArts IDE Design</div>
     <button class="toggle" id="themeBtn" aria-label="切换深浅模式">
       <svg class="ico s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v1.6M12 19.4V21M4.6 4.6l1.1 1.1M18.3 18.3l1.1 1.1M3 12h1.6M19.4 12H21M4.6 19.4l1.1-1.1M18.3 5.7l1.1-1.1"/></svg>
       <svg class="ico m" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
@@ -210,7 +210,7 @@ const ITEMS = [
   },
   {
     title: "拆透 ADE,重构 AI 时代的开发工作流",
-    cat: "洞察", status: "concept",
+    cat: "洞察", status: "doc",
     desc: "AI 时代的开发工作流,什么该变、什么该留?从 ADE 逐层拆解到竞品横比,提出把“验收”做成新流程心脏的设计主张,并给出可落地的演进路线。",
     preview: "assets/preview-codearts-ade-vision.png",
     tags: ["ADE 拆解", "设计主张", "验收中心"],
