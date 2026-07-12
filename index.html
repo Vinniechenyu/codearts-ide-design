@@ -4,78 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeArts IDE Design</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1C1E'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%237C5CFC'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23111'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script>
-  // apply theme before paint to avoid flash
   (function(){try{var t=localStorage.getItem('ide-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
 <style>
   :root{
     --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
     --sans:"Inter","PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;
-    --accent:#7C5CFC;
+    --ease:cubic-bezier(.22,.8,.28,1);
   }
-  /* cool-gray light theme */
+  /* light — near-white cool gray, dousanmiao-style monochrome */
   :root[data-theme="light"]{
-    --bg:#E7E9EC;--card:#FFFFFF;--panel:#F1F2F4;
-    --ink:#1A1C1F;--ink2:#565B61;--ink3:#8A8F96;
-    --line:#DBDEE2;--line2:#E7E9EC;
-    --glow1:rgba(124,92,252,.10);--glow2:rgba(23,163,152,.09);
-    --shadow:0 16px 36px -16px rgba(26,28,31,.24);
+    --bg:#EFEFF1;--card:#FFFFFF;--panel:#F2F2F4;
+    --ink:#111214;--ink2:#5E6167;--ink3:#9A9DA3;
+    --line:#E4E4E7;--hair:rgba(17,18,20,.07);
+    --shadow:0 18px 40px -22px rgba(17,18,20,.22);
   }
-  /* cool-gray dark theme */
+  /* dark — near-black, dousanmiao-style */
   :root[data-theme="dark"]{
-    --bg:#111318;--card:#1A1D23;--panel:#22262D;
-    --ink:#ECEEF1;--ink2:#A4A9B2;--ink3:#6E747D;
-    --line:#2A2F37;--line2:#20242B;
-    --glow1:rgba(124,92,252,.18);--glow2:rgba(23,163,152,.14);
-    --shadow:0 20px 44px -20px rgba(0,0,0,.7);
+    --bg:#050506;--card:#111214;--panel:#17181B;
+    --ink:#F4F5F6;--ink2:#9EA2A9;--ink3:#63666D;
+    --line:#212328;--hair:rgba(255,255,255,.08);
+    --shadow:0 22px 48px -22px rgba(0,0,0,.8);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
-    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;position:relative;
-    transition:background .35s ease,color .35s ease}
-  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:
-      radial-gradient(680px 480px at 82% -6%,var(--glow1),transparent 62%),
-      radial-gradient(620px 520px at -8% 108%,var(--glow2),transparent 60%);}
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    transition:background .4s var(--ease),color .4s var(--ease)}
   a{color:inherit;text-decoration:none}
   button{font:inherit;cursor:pointer;color:inherit}
   .wrap{max-width:1360px;margin:0 auto;padding:44px 40px 96px}
   @media(max-width:640px){.wrap{padding:28px 20px 72px}}
 
   /* ---- topbar ---- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
   .brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;font-weight:600;
-    letter-spacing:.14em;color:var(--ink3);text-transform:uppercase}
-  .brand .mk{width:20px;height:20px;border-radius:6px;
-    background:linear-gradient(135deg,var(--accent),#38C9D7);box-shadow:0 4px 14px -4px var(--accent)}
-  .theme-toggle{display:inline-flex;align-items:center;gap:8px;padding:7px 13px 7px 10px;border-radius:999px;
-    border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:600;color:var(--ink2);
-    transition:.16s ease}
-  .theme-toggle:hover{border-color:var(--accent);color:var(--ink)}
-  .theme-toggle svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-  .theme-toggle .ti-sun{display:none}.theme-toggle .ti-moon{display:block}
-  :root[data-theme="dark"] .theme-toggle .ti-sun{display:block}
-  :root[data-theme="dark"] .theme-toggle .ti-moon{display:none}
-  .theme-toggle .tl-l{display:none}.theme-toggle .tl-d{display:inline}
-  :root[data-theme="dark"] .theme-toggle .tl-l{display:inline}
-  :root[data-theme="dark"] .theme-toggle .tl-d{display:none}
+    letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
+  .brand .mk{width:18px;height:18px;border-radius:5px;background:var(--ink)}
+
+  /* sliding sun/moon toggle (dousanmiao) */
+  .toggle{position:relative;width:60px;height:30px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);padding:0;transition:background .3s var(--ease),border-color .3s var(--ease)}
+  .toggle .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--ink);
+    display:grid;place-items:center;transition:transform .34s cubic-bezier(.34,1.4,.5,1)}
+  :root[data-theme="dark"] .toggle .knob{transform:translateX(30px)}
+  .toggle .knob svg{width:13px;height:13px;stroke:var(--card);fill:none;stroke-width:2;stroke-linecap:round}
+  .toggle .knob .k-sun{display:block}.toggle .knob .k-moon{display:none}
+  :root[data-theme="dark"] .toggle .knob .k-sun{display:none}
+  :root[data-theme="dark"] .toggle .knob .k-moon{display:block}
+  .toggle .ico{position:absolute;top:50%;transform:translateY(-50%);width:13px;height:13px;
+    stroke:var(--ink3);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+  .toggle .ico.s{left:9px}.toggle .ico.m{right:9px}
 
   /* ---- hero ---- */
-  .hero{margin-bottom:6px}
-  .hero .eyebrow{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--accent);margin-bottom:14px}
-  .hero h1{margin:0;font-size:clamp(32px,5.4vw,50px);font-weight:900;letter-spacing:-.035em;line-height:1.02}
-  .hero h1 .g{background:linear-gradient(100deg,var(--accent) 10%,#38C9D7 90%);-webkit-background-clip:text;
-    background-clip:text;color:transparent}
-  .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;max-width:47em}
+  .hero{margin-bottom:4px;max-width:52em}
+  .hero h1{margin:0;font-size:clamp(32px,5.4vw,50px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
+  .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66}
 
-  /* ---- two-column: sidebar + main ---- */
+  /* ---- two-column ---- */
   .layout{display:grid;grid-template-columns:212px 1fr;gap:36px;align-items:start;margin-top:34px}
   @media(max-width:820px){.layout{grid-template-columns:1fr;gap:22px}}
 
@@ -85,78 +76,55 @@
     color:var(--ink3);padding:0 4px 12px;border-bottom:1px solid var(--line);margin-bottom:8px}
   .navlist{display:flex;flex-direction:column;gap:2px}
   .navitem{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
-    padding:9px 12px;border:0;border-radius:9px;background:transparent;text-align:left;
-    font-size:13.5px;font-weight:600;color:var(--ink2);transition:.14s ease}
+    padding:9px 12px;border:0;border-radius:10px;background:transparent;text-align:left;
+    font-size:13.5px;font-weight:600;color:var(--ink2);transition:background .18s var(--ease),color .18s var(--ease)}
   .navitem:hover{background:var(--panel);color:var(--ink)}
   .navitem.on{background:var(--ink);color:var(--bg)}
   .navitem .lab{display:inline-flex;align-items:center;gap:8px}
-  .navitem .dot{width:8px;height:8px;border-radius:50%;background:var(--ac);flex:none;
-    box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 18%,transparent)}
-  .navitem.on .dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 45%,transparent)}
+  .navitem .dot{width:7px;height:7px;border-radius:50%;background:var(--ac);flex:none}
   .navitem .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3);flex:none}
-  .navitem.on .n{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+  .navitem.on .n{color:color-mix(in srgb,var(--bg) 65%,transparent)}
   .side .hint{font-family:var(--mono);font-size:10.5px;line-height:1.7;color:var(--ink3);padding:16px 4px 0}
 
-  /* ---- main: search + grid ---- */
+  /* ---- main ---- */
   .search{position:relative;margin-bottom:24px;max-width:340px}
   .search input{width:100%;padding:10px 14px 10px 38px;border-radius:999px;border:1px solid var(--line);
-    background:var(--card);color:var(--ink);font-family:var(--sans);font-size:13.5px;outline:none;transition:.14s}
-  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent)}
+    background:var(--card);color:var(--ink);font-family:var(--sans);font-size:13.5px;outline:none;transition:.18s var(--ease)}
+  .search input:focus{border-color:var(--ink3)}
   .search input::placeholder{color:var(--ink3)}
   .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;
     stroke:var(--ink3);fill:none;stroke-width:2}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:26px 24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
 
-  .card{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);
-    border-radius:16px;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
-    box-shadow:0 1px 2px rgba(0,0,0,.04);opacity:0;transform:translateY(14px);
-    animation:cardin .5s cubic-bezier(.2,.7,.2,1) forwards}
+  .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--hair);
+    border-radius:18px;overflow:hidden;transition:transform .34s var(--ease),box-shadow .34s var(--ease),border-color .34s var(--ease);
+    opacity:0;transform:translateY(12px);animation:cardin .55s var(--ease) forwards}
   @keyframes cardin{to{opacity:1;transform:none}}
   @media(prefers-reduced-motion:reduce){.card{animation:none;opacity:1;transform:none}}
-  .card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
-    background:linear-gradient(90deg,var(--ac),color-mix(in srgb,var(--ac) 30%,transparent));
-    opacity:0;transition:opacity .2s ease;z-index:3}
-  .card:hover{transform:translateY(-5px);border-color:color-mix(in srgb,var(--ac) 55%,var(--line));
-    box-shadow:var(--shadow),0 0 0 1px color-mix(in srgb,var(--ac) 22%,transparent)}
-  .card:hover::before{opacity:1}
-  .shot{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--panel);border-bottom:1px solid var(--line)}
-  .shot img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .4s ease}
-  .card:hover .shot img{transform:scale(1.035)}
-  .cat-lab{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:6px;
-    font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.02em;
-    background:color-mix(in srgb,var(--ac) 16%,#fff);color:color-mix(in srgb,var(--ac) 72%,#111);
-    border:1px solid color-mix(in srgb,var(--ac) 38%,transparent);border-radius:999px;padding:4px 10px 4px 8px;
-    backdrop-filter:blur(4px);box-shadow:0 4px 12px -6px rgba(0,0,0,.3)}
-  .cat-lab .d{width:7px;height:7px;border-radius:50%;background:var(--ac)}
-  .num{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:10.5px;font-weight:700;
-    color:#fff;background:rgba(12,14,20,.5);border:1px solid rgba(255,255,255,.22);border-radius:7px;
-    padding:3px 7px;backdrop-filter:blur(4px)}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--line)}
+  .shot{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--panel)}
+  .shot img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .5s var(--ease)}
+  .card:hover .shot img{transform:scale(1.04)}
+  .pill{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.02em;color:#fff;
+    background:rgba(10,11,13,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;
+    padding:4px 10px 4px 8px;backdrop-filter:blur(6px)}
+  .pill .d{width:6px;height:6px;border-radius:50%;background:var(--sd)}
 
   .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
-  .kicker{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.04em;
-    color:color-mix(in srgb,var(--ac) 68%,var(--ink3));margin-bottom:7px}
-  .card h2{margin:0;font-size:16.5px;font-weight:800;letter-spacing:-.015em;line-height:1.38}
-  .card .desc{margin:8px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.62;
+  .clab{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.05em;color:var(--ink3);text-transform:uppercase;margin-bottom:9px}
+  .clab .cd{width:7px;height:7px;border-radius:50%;background:var(--ac)}
+  .card h2{margin:0;font-size:16.5px;font-weight:800;letter-spacing:-.02em;line-height:1.36}
+  .card .desc{margin:9px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.62;
     display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
   .tag{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink2);
-    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;transition:.16s}
-  .card:hover .tag{border-color:color-mix(in srgb,var(--ac) 30%,var(--line))}
-  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:14px;
-    border-top:1px solid var(--line2)}
-  .foot .st{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
-    font-weight:600;color:var(--ink2)}
-  .foot .st::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ac);
-    box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 20%,transparent)}
-  .foot .go{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);transition:.16s;
-    display:inline-flex;align-items:center;gap:4px}
-  .card:hover .foot .go{color:color-mix(in srgb,var(--ac) 72%,var(--ink))}
-  .card:hover .foot .go .arw{transform:translate(2px,-2px)}
-  .foot .go .arw{transition:transform .16s ease}
+    background:var(--panel);border:1px solid var(--hair);border-radius:6px;padding:3px 8px}
 
   .empty{display:none;text-align:center;padding:72px 20px;color:var(--ink3);grid-column:1/-1;
-    border:1px dashed var(--line);border-radius:16px;background:color-mix(in srgb,var(--card) 55%,transparent)}
+    border:1px dashed var(--line);border-radius:18px}
   .empty.show{display:block}
   .empty h3{margin:0 0 6px;color:var(--ink2);font-size:15px;font-family:var(--mono);letter-spacing:.04em}
   .clear{margin-top:16px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);
@@ -171,16 +139,18 @@
 <div class="wrap">
   <div class="topbar">
     <div class="brand"><span class="mk"></span>CodeArts IDE Design</div>
-    <button class="theme-toggle" id="themeBtn" aria-label="切换深浅模式">
-      <svg class="ti-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
-      <svg class="ti-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      <span class="tl-d">深色</span><span class="tl-l">浅色</span>
+    <button class="toggle" id="themeBtn" aria-label="切换深浅模式">
+      <svg class="ico s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v1.6M12 19.4V21M4.6 4.6l1.1 1.1M18.3 18.3l1.1 1.1M3 12h1.6M19.4 12H21M4.6 19.4l1.1-1.1M18.3 5.7l1.1-1.1"/></svg>
+      <svg class="ico m" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      <span class="knob">
+        <svg class="k-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v1.6M12 19.4V21M4.6 4.6l1.1 1.1M18.3 18.3l1.1 1.1M3 12h1.6M19.4 12H21M4.6 19.4l1.1-1.1M18.3 5.7l1.1-1.1"/></svg>
+        <svg class="k-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </span>
     </button>
   </div>
 
   <header class="hero">
-    <span class="eyebrow">Experience Design · Material Library</span>
-    <h1>CodeArts IDE <span class="g">DESIGN</span></h1>
+    <h1>CodeArts IDE DESIGN</h1>
     <p class="lead">CodeArts IDE / 码道代码智能体的体验设计材料集——专项分析、业界洞察与竞品、交互原型与组件规范,一处托管,持续更新。</p>
   </header>
 
@@ -212,11 +182,16 @@
 </div>
 
 <script>
-const STATUS = { live:"可体验", proto:"可交互", concept:"概念探索", doc:"可阅读" };
+// status: label + dot color
+const STATUS = {
+  live:    { label:"可体验",   dot:"#3FB950" },
+  proto:   { label:"可交互",   dot:"#4C8DFF" },
+  concept: { label:"概念探索", dot:"#E0872E" },
+  doc:     { label:"可阅读",   dot:"#9A8CFF" }
+};
 
-// ★ 分类:未来加类型 → 在这里加一行(id 唯一,label 显示名,ac 为强调色)
 const CATEGORIES = [
-  { id:"all",  label:"全部",            ac:"#7C5CFC" },
+  { id:"all",  label:"全部",            ac:"#9A9DA3" },
   { id:"专项", label:"专项分析",         ac:"#7C5CFC" },
   { id:"洞察", label:"业界洞察+竞品分析", ac:"#E0872E" },
   { id:"原型", label:"交互原型",         ac:"#17A398" },
@@ -224,13 +199,10 @@ const CATEGORIES = [
 ];
 const catOf = id => CATEGORIES.find(c => c.id === id) || {};
 
-// ★ 添加新材料:复制一个对象,cat 填分类 id,填 kicker/标题/desc/preview/tags/href
 const ITEMS = [
   {
     title: "码道 · 生成响应体验优化专项",
-    kicker: "生成响应体验 · 40 页深挖",
-    cat: "专项",
-    status: "live",
+    cat: "专项", status: "live",
     desc: "把用户一句“感觉慢”拆成可证明的证据链:五款产品同题实测、码道输出结构拆解、根因机制归因,最终落到五阶段主干 + 异常旁路 + 状态动效的设计方案。",
     preview: "assets/preview-madao-response-deck.png",
     tags: ["五产品实测", "根因拆解", "40 页"],
@@ -238,9 +210,7 @@ const ITEMS = [
   },
   {
     title: "拆透 ADE,重构 AI 时代的开发工作流",
-    kicker: "CodeArts ADE · 设计主张",
-    cat: "洞察",
-    status: "concept",
+    cat: "洞察", status: "concept",
     desc: "AI 时代的开发工作流,什么该变、什么该留?从 ADE 逐层拆解到竞品横比,提出把“验收”做成新流程心脏的设计主张,并给出可落地的演进路线。",
     preview: "assets/preview-codearts-ade-vision.png",
     tags: ["ADE 拆解", "设计主张", "验收中心"],
@@ -248,9 +218,7 @@ const ITEMS = [
   },
   {
     title: "当 IDE 遇见 Agent,体验如何被重新定义",
-    kicker: "UX 五要素 · 5 款横评",
-    cat: "洞察",
-    status: "doc",
+    cat: "洞察", status: "doc",
     desc: "以用户体验五要素为标尺,系统拆解 Claude、Cursor 3、Codex、TRAE SOLO、WorkBuddy 五款产品,从战略层到表现层的设计取舍与竞争差异。",
     preview: "assets/preview-agentspace-insight.png",
     tags: ["UX 五要素", "5 款横评", "行业格局"],
@@ -258,9 +226,7 @@ const ITEMS = [
   },
   {
     title: "Agent Team 模式的 UX 解剖",
-    kicker: "多智能体协同 · 3 款横评",
-    cat: "洞察",
-    status: "doc",
+    cat: "洞察", status: "doc",
     desc: "当“一个 Agent 打天下”变成“一支 Agent 协同作战”——用五要素框架,解构 Claude Code、Qoder 专家团、Kimi Agent Swarm 三种截然不同的设计哲学。",
     preview: "assets/preview-agent-team-analysis.png",
     tags: ["Agent Team", "3 款横评", "多智能体"],
@@ -268,9 +234,7 @@ const ITEMS = [
   },
   {
     title: "Agent Space · IDE 内的智能体协同",
-    kicker: "高保真交互原型",
-    cat: "原型",
-    status: "proto",
+    cat: "原型", status: "proto",
     desc: "IDE 里 Agent Team 的全链路高保真原型:从需求下达,到多 Agent 的并行 / 串行编排、实时任务监控、交付物生成,一路贯通到代码落地。",
     preview: "assets/preview-agent-space-prototype.png",
     tags: ["高保真", "Agent 编排", "任务监控"],
@@ -278,9 +242,7 @@ const ITEMS = [
   },
   {
     title: "Agent 对话式交互指南",
-    kicker: "对话流组件库 · 4 层 28 组件",
-    cat: "组件",
-    status: "doc",
+    cat: "组件", status: "doc",
     desc: "过程要透明,但别淹没结果。把 chat / code 全过程拆成 4 层结构、28 张可复用组件、6 组状态机,沉淀为一套可直接落地的对话流交互规范。",
     preview: "assets/preview-ai-dialogflow-components.png",
     tags: ["组件库", "28 组件", "状态机"],
@@ -297,16 +259,12 @@ const emptyDesc = document.getElementById('emptyDesc');
 const countEl = document.getElementById('count');
 const state = { cat:'all', q:'' };
 
-// theme toggle
-const themeBtn = document.getElementById('themeBtn');
-themeBtn.onclick = () => {
-  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  const next = cur === 'dark' ? 'light' : 'dark';
+document.getElementById('themeBtn').onclick = () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   try{ localStorage.setItem('ide-theme', next); }catch(e){}
 };
 
-// build sidebar catalog
 CATEGORIES.forEach(c => {
   const n = c.id === 'all' ? ITEMS.length : ITEMS.filter(i => i.cat === c.id).length;
   const b = document.createElement('button');
@@ -321,29 +279,23 @@ function match(it){
   if (state.cat !== 'all' && it.cat !== state.cat) return false;
   const q = state.q.trim().toLowerCase();
   if (!q) return true;
-  return (it.title+' '+(it.kicker||'')+' '+it.desc+' '+(it.tags||[]).join(' ')+' '+(catOf(it.cat).label||'')).toLowerCase().includes(q);
+  return (it.title+' '+it.desc+' '+(it.tags||[]).join(' ')+' '+(catOf(it.cat).label||'')).toLowerCase().includes(q);
 }
 
 function render(){
   const list = ITEMS.filter(match);
   grid.innerHTML = list.map((it, i) => {
     const c = catOf(it.cat);
-    const st = STATUS[it.status] || it.status;
-    const no = String(ITEMS.indexOf(it)+1).padStart(2,'0');
+    const s = STATUS[it.status] || { label: it.status, dot:"#9A9DA3" };
     const tags = (it.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
     const thumb = it.preview ? `<img src="${it.preview}" alt="${it.title}" loading="lazy">` : '';
-    return `<a class="card" href="${it.href}" style="--ac:${c.ac};animation-delay:${i*55}ms">
-      <div class="shot">
-        <span class="cat-lab"><span class="d"></span>${c.label}</span>
-        <span class="num">${no}</span>
-        ${thumb}
-      </div>
+    return `<a class="card" href="${it.href}" style="--ac:${c.ac};--sd:${s.dot};animation-delay:${i*55}ms">
+      <div class="shot">${thumb}<span class="pill"><span class="d"></span>${s.label}</span></div>
       <div class="body">
-        ${it.kicker ? `<div class="kicker">${it.kicker}</div>` : ''}
+        <div class="clab"><span class="cd"></span>${c.label}</div>
         <h2>${it.title}</h2>
         <p class="desc">${it.desc}</p>
         <div class="tags">${tags}</div>
-        <div class="foot"><span class="st">${st}</span><span class="go">查看<span class="arw">↗</span></span></div>
       </div>
     </a>`;
   }).join('');
