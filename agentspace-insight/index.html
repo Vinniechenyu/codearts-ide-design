@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 开发工具 UX 五要素行业分析报告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1916;
+    --ink-2: #3d3c39;
+    --ink-3: #6b6a66;
+    --ink-4: #9b9a96;
+    --paper: #f5f3ee;
+    --paper-2: #ede9e1;
+    --paper-3: #e2ddd4;
+    --rule: rgba(26,25,22,0.12);
+    --accent: #c4521a;
+    --accent-2: #2563a8;
+    --accent-3: #1a7a52;
+    --gold: #b8962e;
+    --col-w: 860px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: 64px 72px;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(255,255,255,0.03) 48px),
+      repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(255,255,255,0.03) 48px);
+    pointer-events: none;
+  }
+  .cover-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    margin-bottom: 56px;
+  }
+  .cover-body { max-width: 680px; }
+  .cover-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+  .cover-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(42px, 6vw, 72px);
+    line-height: 1.05;
+    color: #fff;
+    margin-bottom: 24px;
+    letter-spacing: -.02em;
+  }
+  .cover-title em { color: var(--accent); font-style: italic; }
+  .cover-subtitle {
+    font-size: 17px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.65;
+    max-width: 520px;
+    margin-bottom: 48px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .cover-meta-item { }
+  .cover-meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 4px;
+  }
+  .cover-meta-value { font-size: 13px; color: rgba(255,255,255,0.65); }
+
+  .cover-products {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-self: end;
+  }
+  .cover-product-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 2px;
+    color: rgba(255,255,255,0.45);
+  }
+
+  /* ── NAV ── */
+  .toc-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 0 72px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .toc-bar a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    text-decoration: none;
+    padding: 14px 20px 12px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s;
+  }
+  .toc-bar a:hover { color: rgba(255,255,255,0.75); border-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .page { max-width: var(--col-w); margin: 0 auto; padding: 80px 40px; }
+  .section { margin-bottom: 96px; }
+
+  /* ── SECTION HEADERS ── */
+  .section-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+  .section-lead {
+    font-size: 16px;
+    color: var(--ink-3);
+    line-height: 1.75;
+    max-width: 660px;
+    margin-bottom: 48px;
+    border-left: 3px solid var(--paper-3);
+    padding-left: 20px;
+  }
+
+  /* ── LAYER INTRO ── */
+  .layer-intro {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    padding: 32px 0;
+    border-top: 1px solid var(--rule);
+    margin-bottom: 40px;
+    align-items: start;
+  }
+  .layer-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 80px;
+    line-height: 1;
+    color: var(--paper-3);
+    letter-spacing: -.04em;
+  }
+  .layer-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -.01em;
+  }
+  .layer-def {
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+  .layer-question {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    padding: 8px 12px;
+    border-left: 2px solid var(--accent);
+    background: rgba(196,82,26,0.05);
+  }
+
+  /* ── PRODUCT GRID ── */
+  .prod-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .prod-col {
+    background: var(--paper);
+    padding: 0;
+  }
+  .prod-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-2);
+  }
+  .prod-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 3px;
+  }
+  .prod-name-sm {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .prod-cell {
+    padding: 18px 16px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 12.5px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    vertical-align: top;
+    min-height: 90px;
+    position: relative;
+  }
+  .prod-cell:last-child { border-bottom: none; }
+  .prod-cell.highlight {
+    background: rgba(196,82,26,0.04);
+  }
+  .cell-score {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .score-a { background: #1a7a52; color: #fff; }
+  .score-b { background: #2563a8; color: #fff; }
+  .score-c { background: var(--gold); color: #fff; }
+  .score-d { background: var(--paper-3); color: var(--ink-3); }
+
+  /* ── ROW LABEL ── */
+  .row-label-col {
+    grid-column: 1;
+    background: var(--paper-2);
+    padding: 18px 16px;
+    border-bottom: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    display: flex;
+    align-items: flex-start;
+  }
+  .row-label-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── INSIGHT CALLOUT ── */
+  .insight {
+    margin: 32px 0;
+    padding: 24px 28px;
+    border-left: 4px solid var(--accent);
+    background: var(--paper-2);
+    position: relative;
+  }
+  .insight::before {
+    content: 'INSIGHT';
+    position: absolute;
+    top: -10px;
+    left: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .18em;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 8px;
+  }
+  .insight-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .insight-sub {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  /* ── FULL TABLE (6-col) ── */
+  .full-table-wrap { overflow-x: auto; margin: 32px 0; }
+  .full-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  .full-table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    border-bottom: 2px solid var(--ink);
+    background: var(--paper);
+    white-space: nowrap;
+  }
+  .full-table thead th:first-child { color: var(--ink); }
+  .full-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .full-table tbody td:first-child {
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .full-table tbody tr:last-child td { border-bottom: none; }
+  .full-table tbody tr:hover td { background: var(--paper-2); }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin: 1px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .tag-r { background: rgba(196,82,26,0.1); color: #8a3612; border: 1px solid rgba(196,82,26,0.2); }
+  .tag-b { background: rgba(37,99,168,0.1); color: #1a4d8a; border: 1px solid rgba(37,99,168,0.2); }
+  .tag-g { background: rgba(26,122,82,0.1); color: #0e5236; border: 1px solid rgba(26,122,82,0.2); }
+  .tag-k { background: var(--paper-3); color: var(--ink-3); border: 1px solid var(--rule); }
+
+  /* ── SUMMARY SECTION ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .summary-card {
+    padding: 24px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    position: relative;
+  }
+  .summary-card-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--paper-3);
+    margin-bottom: 12px;
+    letter-spacing: -.04em;
+  }
+  .summary-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .summary-card-body {
+    font-size: 12.5px;
+    color: var(--ink-3);
+    line-height: 1.6;
+  }
+  .summary-card-accent { border-top: 3px solid var(--accent); }
+  .summary-card-blue { border-top: 3px solid var(--accent-2); }
+  .summary-card-green { border-top: 3px solid var(--accent-3); }
+  .summary-card-gold { border-top: 3px solid var(--gold); }
+
+  /* ── RADAR / SCORE TABLE ── */
+  .score-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 24px 0;
+  }
+  .score-matrix th {
+    padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    font-weight: 400;
+  }
+  .score-matrix th:first-child { text-align: left; }
+  .score-matrix td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .score-matrix td:first-child { text-align: left; font-weight: 500; color: var(--ink); font-size: 13px; }
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; justify-content: center; }
+  .score-bar { height: 4px; border-radius: 2px; background: var(--paper-3); width: 60px; overflow: hidden; display: inline-block; }
+  .score-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width .4s; }
+  .score-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-3); min-width: 20px; }
+
+  /* ── STRATEGY BOX ── */
+  .strategy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .strategy-card {
+    padding: 22px 20px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .strategy-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .strategy-card.s-r::after { background: var(--accent); }
+  .strategy-card.s-b::after { background: var(--accent-2); }
+  .strategy-card.s-g::after { background: var(--accent-3); }
+  .strategy-card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 8px;
+  }
+  .strategy-card-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .strategy-card-body {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.65;
+  }
+
+  /* ── DIVIDER ── */
+  .hr { border: none; border-top: 1px solid var(--rule); margin: 48px 0; }
+  .hr-thick { border: none; border-top: 2px solid var(--ink); margin: 48px 0; }
+
+  /* ── FOOTNOTE ── */
+  .footnote {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: .06em;
+    margin-top: 8px;
+  }
+
+  /* ── QUOTE ── */
+  .pullquote {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1.4;
+    color: var(--ink);
+    padding: 32px 40px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+    margin: 48px 0;
+    letter-spacing: -.01em;
+  }
+  .pullquote em { color: var(--accent); font-style: italic; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.3);
+    padding: 40px 72px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ── PRINT-FRIENDLY ── */
+  @media print {
+    .toc-bar { display: none; }
+    .cover { min-height: auto; padding: 48px; }
+    .page { padding: 40px 0; }
+  }
+
+  @media (max-width: 700px) {
+    .cover { padding: 40px 24px; }
+    .page { padding: 48px 20px; }
+    .toc-bar { padding: 0 20px; }
+    .prod-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .strategy-grid { grid-template-columns: 1fr; }
+    .layer-intro { grid-template-columns: 1fr; }
+    .layer-number { font-size: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     COVER
+══════════════════════════════════════════ -->
+<section class="cover" id="cover">
+  <div>
+    <div class="cover-eyebrow">行业分析报告 · 2026 Q2 · AI 开发工具竞争格局</div>
+    <div class="cover-body">
+      <span class="cover-tag">UX 五要素框架</span>
+      <h1 class="cover-title">当 IDE 遇见<br><em>Agent</em>，<br>用户体验如何<br>重新定义</h1>
+      <p class="cover-subtitle">以 Jesse James Garrett 的用户体验五要素为分析框架，系统拆解 Claude、Cursor 3、Codex、TRAE SOLO、WorkBuddy 五款产品在战略层、范围层、结构层、框架层、表现层的设计决策与竞争差异。</p>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">分析产品</div>
+          <div class="cover-meta-value">5 款主流 AI 开发 / 办公工具</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">分析维度</div>
+          <div class="cover-meta-value">UX 五要素 × 竞争对比</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">数据截止</div>
+          <div class="cover-meta-value">2026 年 4 月</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cover-products">
+    <span class="cover-product-badge">Claude + Cowork</span>
+    <span class="cover-product-badge">Cursor 3.0</span>
+    <span class="cover-product-badge">OpenAI Codex</span>
+    <span class="cover-product-badge">TRAE SOLO</span>
+    <span class="cover-product-badge">Tencent WorkBuddy</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     NAV
+══════════════════════════════════════════ -->
+<nav class="toc-bar">
+  <a href="#framework">框架说明</a>
+  <a href="#layer1">战略层</a>
+  <a href="#layer2">范围层</a>
+  <a href="#layer3">结构层</a>
+  <a href="#layer4">框架层</a>
+  <a href="#layer5">表现层</a>
+  <a href="#synthesis">综合评估</a>
+  <a href="#implications">设计启示</a>
+</nav>
+
+<div class="page">
+
+<!-- ══════════════════════════════════════════
+     FRAMEWORK INTRO
+══════════════════════════════════════════ -->
+<section class="section" id="framework">
+  <div class="section-kicker">分析框架</div>
+  <h2 class="section-title">为什么用 UX 五要素<br>来看这轮范式迁移</h2>
+  <p class="section-lead">
+    Jesse James Garrett 的五要素模型（战略→范围→结构→框架→表现）最初是为 Web 产品设计的。把它用来分析 Agent 工具，恰恰能照出一个核心矛盾：这些产品在表现层疯狂创新，却在战略层和结构层做出了截然不同的底层赌注——而这些底层差异，才是 3 年后格局分化的真正预言。
+  </p>
+
+  <div class="summary-grid">
+    <div class="summary-card summary-card-accent">
+      <div class="summary-card-num">01</div>
+      <div class="summary-card-title">战略层 Strategy</div>
+      <div class="summary-card-body">产品目标与用户需要。分析各产品对「谁是用户」「用户的核心任务是什么」的不同定义，以及这些定义如何决定了其他四层的所有选择。</div>
+    </div>
+    <div class="summary-card summary-card-blue">
+      <div class="summary-card-num">02</div>
+      <div class="summary-card-title">范围层 Scope</div>
+      <div class="summary-card-body">功能规格与内容需求。分析哪些功能被选入、哪些被主动排除，以及「功能边界」本身作为战略信号的含义。</div>
+    </div>
+    <div class="summary-card summary-card-green">
+      <div class="summary-card-num">03</div>
+      <div class="summary-card-title">结构层 Structure</div>
+      <div class="summary-card-body">交互设计与信息架构。分析任务流、信息组织方式、人机协作的控制权分配，以及「中间过程可见性」的不同设计哲学。</div>
+    </div>
+    <div class="summary-card summary-card-gold">
+      <div class="summary-card-num">04</div>
+      <div class="summary-card-title">框架层 Skeleton</div>
+      <div class="summary-card-body">界面设计、导航设计与信息设计。分析布局模式、模式切换机制、左右面板的功能定义，以及这些选择背后的设计假设。</div>
+    </div>
+  </div>
+  <div class="summary-card" style="padding:24px; border:1px solid var(--rule); background:var(--paper); border-top:3px solid var(--ink);">
+    <div class="summary-card-num">05</div>
+    <div class="summary-card-title">表现层 Surface</div>
+    <div class="summary-card-body">感知设计。分析视觉语言、动效系统、品牌一致性，以及「信任感」是如何通过视觉设计来建立或破坏的——这在 Agent 产品里尤为关键。</div>
+  </div>
+</section>
+
+<hr class="hr-thick">
+
+<!-- ══════════════════════════════════════════
+     LAYER 1 — STRATEGY
+══════════════════════════════════════════ -->
+<section class="section" id="layer1">
+  <div class="section-kicker">第一层</div>
+  <h2 class="section-title">战略层：<br>谁的 Agent，为谁而生</h2>
+  <p class="section-lead">战略层是一切的起点。五款产品面向的用户定义不同，对「成功」的定义不同，由此产生的功能选择和设计决策也完全不同。这一层的分歧，是真正的竞争分水岭。</p>
+
+  <div class="layer-intro">
+    <div><div class="layer-number">01</div></div>
+    <div>
+      <div class="layer-name">战略层</div>
+      <div class="layer-def">「我们要做这个产品，是为了达成什么目标？用户希望从中得到什么？」—— Garrett</div>
+      <div class="layer-question">核心追问：这款产品的用户是谁？他们的核心任务是什么？产品的成功意味着什么？</div>
+    </div>
+  </div>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>Claude + Cowork</th>
+          <th>Cursor 3</th>
+          <th>Codex</th>
+          <th>TRAE SOLO</th>
+          <th>WorkBuddy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>核心用户定义</td>
+          <td>知识工作者（含非技术）+ 开发者双轨</td>
+          <td>专业开发者；agent 用户已 2:1 超 Tab 用户</td>
+          <td>高级开发者；云端异步执行场景</td>
+          <td>研发团队全链路：PM/设计/数据/工程师</td>
+          <td>非技术职场人员：HR/运营/销售/财务</td>
+        </tr>
+        <tr>
+          <td>产品核心目标</td>
+          <td>让 Agent 能力普惠到所有知识工作场景</td>
+          <td>让工程师管理「一支 Agent 军队」，不只是用一个</td>
+          <td>后台异步执行长程编码任务；最小人工干预</td>
+          <td>打通产品研发上下游；一个工具覆盖所有角色</td>
+          <td>让非技术人员「一句话指令」完成复杂办公任务</td>
+        </tr>
+        <tr>
+          <td>对「Agent」的定义</td>
+          <td>可信的长程任务执行者 + 知识协作伙伴</td>
+          <td>可并行调度的软件工程执行单元</td>
+          <td>后台自主运行的云端代码机器人</td>
+          <td>跨角色协作的全能产品助手</td>
+          <td>本地可信的自动化操作员</td>
+        </tr>
+        <tr>
+          <td>成功的核心度量</td>
+          <td>任务完成率 + Cowork/Code 双模采纳</td>
+          <td>agent 并行任务数 + 开发者日活留存</td>
+          <td>长程任务自主完成率（最小人工干预）</td>
+          <td>MTC 场景渗透率（非开发者用户占比）</td>
+          <td>非技术员工任务完成数 + 企业内部采纳</td>
+        </tr>
+        <tr>
+          <td>商业赌注</td>
+          <td>AI 工具的入口从 search 转向 agent OS</td>
+          <td>「代码开发」赛道的专业工具护城河</td>
+          <td>开发者不需要 IDE，只需要意图输入框</td>
+          <td>研发协作的水平整合：覆盖整个产品周期</td>
+          <td>企业级 AI 办公的本土化 + 安全合规卡位</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">战略层的核心分歧：「谁的 Agent」决定了「什么叫做完成任务」</div>
+    <div class="insight-sub">Codex 认为成功是「人最少参与」；Cursor 认为成功是「人管理得更多 agent」；WorkBuddy 认为成功是「非技术人员也能用」。这三个定义直接导致了信息架构、验收机制、安全设计的三条完全不同的路径。产品团队在做设计决策前，必须先回答「我们的战略层更像哪个？」</div>
+  </div>
+
+  <div class="pullquote">
+    这一轮产品竞争的本质，<em>不是谁的 AI 更强</em>，而是谁对「人机协作比例」的押注更接近用户真实需要。
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══════════════════════════════════════════
+     LAYER 2 — SCOPE
+══════════════════════════════════════════ -->
+<section class="section" id="layer2">
+  <div class="section-kicker">第二层</div>
+  <h2 class="section-title">范围层：<br>什么功能被选入，什么被主动排除</h2>
+  <p class="section-lead">功能边界本身是战略声明。一个产品选择不做的功能，往往比它选择做的功能更能说明它对用户的判断。五款产品的范围层呈现出三种完全不同的取舍哲学。</p>
+
+  <div class="layer-intro">
+    <div><div class="layer-number">02</div></div>
+    <div>
+      <div class="layer-name">范围层</div>
+      <div class="layer-def">「产品应该包含哪些功能和内容？哪些不应该包含？」—— Garrett</div>
+      <div class="layer-question">核心追问：取舍的逻辑是什么？功能的边界在哪里划定？谁来决定优先级？</div>
+    </div>
+  </div>
+
+  <div class="strategy-grid">
+    <div class="strategy-card s-r">
+      <div class="strategy-card-label">取舍哲学 A</div>
+      <div class="strategy-card-title">「全栈覆盖」策略<br>Claude · TRAE SOLO</div>
+      <div class="strategy-card-body">从编码到办公，从对话到执行，从单人到团队——横向拓展功能边界，以场景覆盖宽度为护城河。代价是产品定位模糊，每个场景都不是最深的。</div>
+    </div>
+    <div class="strategy-card s-b">
+      <div class="strategy-card-label">取舍哲学 B</div>
+      <div class="strategy-card-title">「专业深挖」策略<br>Cursor 3 · Codex</div>
+      <div class="strategy-card-body">只服务开发者，只做编码场景，功能深度优先于宽度。代价是用户群体相对窄，但在核心场景的体验护城河更深。</div>
+    </div>
+    <div class="strategy-card s-g">
+      <div class="strategy-card-label">取舍哲学 C</div>
+      <div class="strategy-card-title">「垂直切入」策略<br>WorkBuddy</div>
+      <div class="strategy-card-body">专注非技术用户的办公场景，以安全合规和本地化为差异点。代价是天花板相对明确，但企业级渗透路径清晰。</div>
+    </div>
+  </div>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th>功能维度</th>
+          <th>Claude</th>
+          <th>Cursor 3</th>
+          <th>Codex</th>
+          <th>TRAE SOLO</th>
+          <th>WorkBuddy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>编码执行</td>
+          <td><span class="tag tag-g">深度</span> Code + Cowork</td>
+          <td><span class="tag tag-g">核心场景</span> 全面</td>
+          <td><span class="tag tag-g">核心场景</span> 专精</td>
+          <td><span class="tag tag-g">Code 模式</span></td>
+          <td><span class="tag tag-k">不支持</span></td>
+        </tr>
+        <tr>
+          <td>非编码知识工作</td>
+          <td><span class="tag tag-g">深度</span> Cowork</td>
+          <td><span class="tag tag-k">不支持</span></td>
+          <td><span class="tag tag-k">不支持</span></td>
+          <td><span class="tag tag-g">深度</span> MTC 模式</td>
+          <td><span class="tag tag-g">核心场景</span></td>
+        </tr>
+        <tr>
+          <td>多 Agent 并行</td>
+          <td><span class="tag tag-b">Managed Agents</span></td>
+          <td><span class="tag tag-g">最深</span> multi-repo 并行</td>
+          <td><span class="tag tag-b">云端并行</span></td>
+          <td><span class="tag tag-b">并行独立 context</span></td>
+          <td><span class="tag tag-b">子任务分配</span></td>
+        </tr>
+        <tr>
+          <td>IDE / 编辑器</td>
+          <td><span class="tag tag-b">保留 IDE 模式</span></td>
+          <td><span class="tag tag-b">IDE + Agents Window 并存</span></td>
+          <td><span class="tag tag-k">主动放弃</span></td>
+          <td><span class="tag tag-k">SOLO 独立于 IDE</span></td>
+          <td><span class="tag tag-k">无</span></td>
+        </tr>
+        <tr>
+          <td>本地安全 / 沙箱</td>
+          <td><span class="tag tag-b">allowRead 权限</span></td>
+          <td><span class="tag tag-b">自托管云 agent</span></td>
+          <td><span class="tag tag-k">云端为主</span></td>
+          <td><span class="tag tag-b">本地 + 云双版本</span></td>
+          <td><span class="tag tag-g">Docker/E2B 最深</span></td>
+        </tr>
+        <tr>
+          <td>企业协作 / 权限</td>
+          <td><span class="tag tag-g">RBAC + 团队分析</span></td>
+          <td><span class="tag tag-b">团队 marketplace</span></td>
+          <td><span class="tag tag-k">弱</span></td>
+          <td><span class="tag tag-b">工作空间隔离</span></td>
+          <td><span class="tag tag-g">企微集成 + 审计</span></td>
+        </tr>
+        <tr>
+          <td>主动排除的功能</td>
+          <td>无明显主动放弃</td>
+          <td>非编码办公场景</td>
+          <td>所有 UI 界面</td>
+          <td>深度 IDE 功能</td>
+          <td>编码 / 开发场景</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">「主动排除」的勇气决定了产品的专注度</div>
+    <div class="insight-sub">Codex 是五款中功能边界最清晰的——主动放弃了 IDE 界面、本地执行、非编码场景。这种「砍功能的勇气」换来了极致简单的交互模型，但也意味着用户迁移成本更低、竞争护城河更薄。反观 TRAE SOLO 同时支持 Code/MTC 的全场景覆盖，横向宽度换来了更大的市场空间，但也带来了「到底在做什么」的产品定位挑战。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══════════════════════════════════════════
+     LAYER 3 — STRUCTURE
+══════════════════════════════════════════ -->
+<section class="section" id="layer3">
+  <div class="section-kicker">第三层</div>
+  <h2 class="section-title">结构层：<br>任务怎么流动，控制权在谁手里</h2>
+  <p class="section-lead">结构层是 Agent 产品设计中最具决定性的一层。核心问题不是「功能是否完整」，而是「人和 Agent 之间的控制权如何分配」——以及当 Agent 出错时，人如何介入、如何回滚、如何建立信任。</p>
+
+  <div class="layer-intro">
+    <div><div class="layer-number">03</div></div>
+    <div>
+      <div class="layer-name">结构层</div>
+      <div class="layer-def">「功能与内容如何相互关联，如何组织？用户如何在产品中移动？」—— Garrett</div>
+      <div class="layer-question">核心追问：任务流的控制权在哪里？人介入的节点如何设计？错误和意外如何处理？</div>
+    </div>
+  </div>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th>结构维度</th>
+          <th>Claude</th>
+          <th>Cursor 3</th>
+          <th>Codex</th>
+          <th>TRAE SOLO</th>
+          <th>WorkBuddy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>信息架构核心隐喻</td>
+          <td>「任务/对话」并列 + 项目工作空间</td>
+          <td>「Agent 调度台」——agent 是一等公民，而非对话</td>
+          <td>「意图输入框」——最小化界面隐喻</td>
+          <td>「模式化工作台」——Code/MTC 两套并行 IA</td>
+          <td>「桌面工作台」——文件夹授权 + 技能包执行</td>
+        </tr>
+        <tr>
+          <td>任务创建流</td>
+          <td>对话式输入 → Cowork 执行 → 结果审阅</td>
+          <td>意图输入 → agent 拆解 → 并行执行 → diff 审查</td>
+          <td>意图输入 → 后台执行 → 结果通知</td>
+          <td>意图输入 → 工作空间绑定 → 产物输出</td>
+          <td>一句话指令 → 技能包匹配 → 本地执行 → 交付</td>
+        </tr>
+        <tr>
+          <td>人介入节点设计</td>
+          <td>Monitor tool 实时响应 + autofix-pr</td>
+          <td>Design Mode 精确反馈 + diff 审查 + /best-of-n 比较</td>
+          <td>执行后 diff 审查（介入点靠后）</td>
+          <td>产物可审阅（右侧动态视图）</td>
+          <td>高危命令拦截 + 沙箱隔离（系统级防护）</td>
+        </tr>
+        <tr>
+          <td>错误 / 回滚机制</td>
+          <td>session recap + resume 恢复</td>
+          <td>worktree 隔离 + git 集成回滚</td>
+          <td>弱（依赖 git 外部工具）</td>
+          <td>弱（产物层面审阅）</td>
+          <td>沙箱隔离 + 高危拦截（预防为主）</td>
+        </tr>
+        <tr>
+          <td>上下文管理架构</td>
+          <td>1M token 长上下文 + 跨会话 memory</td>
+          <td>multi-repo 上下文 + worktree 隔离</td>
+          <td>repository 绑定上下文</td>
+          <td>工作空间持久上下文 + 各 agent 独立 context</td>
+          <td>授权文件夹 + 技能包 context</td>
+        </tr>
+        <tr>
+          <td>并发任务管理</td>
+          <td>Managed Agents + 多 tab 对话</td>
+          <td>Agents Window + Agent Tabs 网格视图</td>
+          <td>后台任务队列</td>
+          <td>多 agent 并行，各自独立 model + context</td>
+          <td>子任务动态分配</td>
+        </tr>
+        <tr>
+          <td>控制权分配哲学</td>
+          <td>「可信委托」——人委托，可干预</td>
+          <td>「主动编排」——人主导调度，agent 执行</td>
+          <td>「充分授权」——人信任 agent 自主完成</td>
+          <td>「协作陪伴」——人随时可见可介入</td>
+          <td>「受控自动化」——系统级安全边界保底</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">「人介入节点」的设计位置，是结构层最关键的架构决策</div>
+    <div class="insight-sub">Codex 把介入节点放在任务完成后（后验）；Cursor 3 把介入节点分散在执行过程中（Design Mode 实时反馈、diff 审查）；WorkBuddy 把介入节点前置到系统层（高危命令预防性拦截）。这三种设计对应了三种信任哲学：「信任后验收」「信任过程监控」「信任系统边界」。哪种更好？取决于用户对 agent 的信任基线，以及任务的可逆程度。</div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">「上下文可见性」是结构层被严重低估的设计问题</div>
+    <div class="insight-sub">所有产品都在解决「agent 能做什么」的问题，但几乎没有产品系统性地解决「agent 此刻知道什么、不知道什么」的可见性问题。1M token 的上下文窗口让上下文更大，但不等于让用户更清楚。这个设计空白，是下一阶段结构层创新的最大机会点。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══════════════════════════════════════════
+     LAYER 4 — SKELETON
+══════════════════════════════════════════ -->
+<section class="section" id="layer4">
+  <div class="section-kicker">第四层</div>
+  <h2 class="section-title">框架层：<br>布局如何映射心智模型</h2>
+  <p class="section-lead">框架层是战略层的视觉化兑现——界面布局不只是美学选择，它是对「用户在这里最需要什么信息」的核心判断。五款产品在布局设计上呈现出高度收敛的趋势，同时也保留了各自的关键差异。</p>
+
+  <div class="layer-intro">
+    <div><div class="layer-number">04</div></div>
+    <div>
+      <div class="layer-name">框架层</div>
+      <div class="layer-def">「界面中各元素如何排列？如何导航？信息如何呈现？」—— Garrett</div>
+      <div class="layer-question">核心追问：布局选择背后的假设是什么？哪些信息被优先展示？模式切换的心智成本有多高？</div>
+    </div>
+  </div>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th>框架维度</th>
+          <th>Claude</th>
+          <th>Cursor 3</th>
+          <th>Codex</th>
+          <th>TRAE SOLO</th>
+          <th>WorkBuddy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>整体布局模式</td>
+          <td>左栏任务记录 + 中央对话/执行 + 右侧产物</td>
+          <td>左侧 Agents sidebar + 中央 Agents Window</td>
+          <td>单栏极简：意图输入 + 结果输出</td>
+          <td>左侧任务记录 + 中央对话 + 右侧动态视图</td>
+          <td>对话流 + 文件夹视图 + 工具执行区</td>
+        </tr>
+        <tr>
+          <td>左侧面板定义</td>
+          <td>任务历史 + 项目分组 + 模式切换</td>
+          <td>所有 agent 状态（跨来源聚合）</td>
+          <td>无左侧面板</td>
+          <td>工作空间 + 任务记录 + 模式切换入口</td>
+          <td>任务历史 + 文件夹权限管理</td>
+        </tr>
+        <tr>
+          <td>中间区域定义</td>
+          <td>对话流 + task monitor（展开/收起）</td>
+          <td>agent 对话 + 执行进度</td>
+          <td>纯对话/结果视图</td>
+          <td>对话流（Team Leader 主导）</td>
+          <td>对话流 + 步骤分解</td>
+        </tr>
+        <tr>
+          <td>右侧面板定义</td>
+          <td>Browser/Terminal/Diff/File 产物 tabs</td>
+          <td>内嵌浏览器 + 代码编辑器</td>
+          <td>无（或最小化）</td>
+          <td>动态视图（产物实时展示）</td>
+          <td>执行结果文件区</td>
+        </tr>
+        <tr>
+          <td>模式切换机制</td>
+          <td>顶部 tab 切换（Chat / Cowork / Code）</td>
+          <td>顶部 pill：IDE ↔ Agents Window（可并存）</td>
+          <td>无需切换（单一模式）</td>
+          <td>左上角 Code / MTC 切换</td>
+          <td>无显式模式切换</td>
+        </tr>
+        <tr>
+          <td>收起/展开设计</td>
+          <td>左右面板独立收起；task monitor 独立控制</td>
+          <td>Agents Window 全屏或分屏</td>
+          <td>N/A</td>
+          <td>右侧动态视图可展开</td>
+          <td>基础展开收起</td>
+        </tr>
+        <tr>
+          <td>输入区域设计</td>
+          <td>@ 符号 + 模式选择 + agent/agent team 切换</td>
+          <td>/ 命令 + @ 文件 + 模型选择器</td>
+          <td>纯文本意图输入</td>
+          <td>角色配置 + 模型选择 + 语音输入</td>
+          <td>自然语言指令框</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">「三栏布局」正在成为 Agent 工具的新标准框架</div>
+    <div class="insight-sub">Claude、TRAE SOLO、Cursor 3 均在向「左侧任务历史 + 中央对话流 + 右侧产物/工具区」三栏格局收敛。这不是巧合，而是 agent 交互范式的内在逻辑使然：任务历史需要持久可见（左）、执行过程需要实时展示（中）、产物需要随时查验（右）。Codex 的单栏设计是一个刻意的逆势选择，背后是「信任 agent，不需要这些脚手架」的哲学。</div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">模式切换的「摩擦感」是框架层最被低估的设计挑战</div>
+    <div class="insight-sub">TRAE SOLO 的 Code/MTC 切换、Claude 的 Chat/Cowork/Code 切换、Cursor 的 IDE/Agents Window 切换——这些模式边界的设计，直接决定了用户切换场景的心智成本。Cursor 允许 IDE 和 Agents Window「同时开启」，是一个刻意降低切换成本的设计选择，代价是界面复杂度升高。如何让「切换即获得新能力」而非「切换即迷失」，是框架层最值得深挖的设计命题。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══════════════════════════════════════════
+     LAYER 5 — SURFACE
+══════════════════════════════════════════ -->
+<section class="section" id="layer5">
+  <div class="section-kicker">第五层</div>
+  <h2 class="section-title">表现层：<br>信任感是如何被视觉建立的</h2>
+  <p class="section-lead">表现层在 Agent 产品中有一个特殊的任务：建立「可信度」。不同于普通 SaaS 产品，Agent 在执行任务时会读取文件、运行代码、修改内容——视觉语言必须同时传递「能力感」和「可控感」。</p>
+
+  <div class="layer-intro">
+    <div><div class="layer-number">05</div></div>
+    <div>
+      <div class="layer-name">表现层</div>
+      <div class="layer-def">「用户最终感知到的产品是什么样子？视觉、听觉、触觉体验如何？」—— Garrett</div>
+      <div class="layer-question">核心追问：视觉语言如何建立信任？「agent 正在工作」的状态如何感知？品牌一致性是否延伸到 agent 的输出？</div>
+    </div>
+  </div>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th>表现维度</th>
+          <th>Claude</th>
+          <th>Cursor 3</th>
+          <th>Codex</th>
+          <th>TRAE SOLO</th>
+          <th>WorkBuddy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>整体视觉风格</td>
+          <td>柔和米白 + 克制中性；品牌紫色点缀</td>
+          <td>深色 IDE 传统 + Agent Window 新设计语言</td>
+          <td>OpenAI 系：极简纯白，几乎无视觉装饰</td>
+          <td>深灰中性 + 高亮紫色；密度中等</td>
+          <td>轻量国产 SaaS 风格；功能密度高</td>
+        </tr>
+        <tr>
+          <td>「agent 执行中」的状态表达</td>
+          <td>进度动效 + session recap + Monitor 实时流</td>
+          <td>Agents Window 实时进度 + diff 流式展示</td>
+          <td>简单 loading 状态</td>
+          <td>右侧动态视图实时反馈（最直观）</td>
+          <td>步骤分解 + 进度条</td>
+        </tr>
+        <tr>
+          <td>代码/产物的视觉呈现</td>
+          <td>语法高亮 diff + 文件树 + Terminal 输出</td>
+          <td>原生 IDE 代码视图（最精深）</td>
+          <td>代码 diff 视图</td>
+          <td>产物预览 + 动态视图</td>
+          <td>文档/PPT/表格直接预览</td>
+        </tr>
+        <tr>
+          <td>错误 / 警告的视觉设计</td>
+          <td>系统级权限提示 + 高危命令警告</td>
+          <td>inline 错误提示 + lint 集成</td>
+          <td>弱（主要依赖文本）</td>
+          <td>基础错误提示</td>
+          <td>高危命令拦截弹窗（最显眼）</td>
+        </tr>
+        <tr>
+          <td>角色 / 身份感设计</td>
+          <td>Claude 品牌一致；Cowork 有独立产品感</td>
+          <td>「编程工具」专业感强；agent 无独立角色感</td>
+          <td>极简；无角色感</td>
+          <td>多 agent 角色卡片（有差异化视觉）</td>
+          <td>技能包有独立 icon（浅层角色感）</td>
+        </tr>
+        <tr>
+          <td>信任感建立机制</td>
+          <td>透明度（context 显示）+ 品牌一致性</td>
+          <td>专业深度感 + 代码可见性</td>
+          <td>极简「聪明感」</td>
+          <td>过程可见性（动态视图）</td>
+          <td>安全感（沙箱 + 拦截的视觉反馈）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">「过程可见性」是 Agent 产品信任感的核心视觉命题</div>
+    <div class="insight-sub">TRAE SOLO 的右侧动态视图是目前五款产品中「过程可见性」最高的设计。WorkBuddy 通过拦截弹窗建立安全感。而 Codex 则是刻意压低可见性——极简 loading 背后是「请信任我」的设计哲学。这三种路径对应了三种截然不同的信任建立策略：「让你看见」「让你有控制权」「让你不必看」。对于 agent 这类高自主性产品，哪种信任策略更适合普通用户？目前行业仍在探索。</div>
+  </div>
+</section>
+
+<hr class="hr-thick">
+
+<!-- ══════════════════════════════════════════
+     SYNTHESIS
+══════════════════════════════════════════ -->
+<section class="section" id="synthesis">
+  <div class="section-kicker">综合评估</div>
+  <h2 class="section-title">五要素综合评分：<br>各产品的优势层与短板层</h2>
+  <p class="section-lead">以下评分基于各产品在五要素每层的设计完成度和创新性进行综合判断，满分 5 分。评分维度包括：设计一致性、用户体验完整性、对自身战略的服务程度，以及在该层的差异化创新贡献。</p>
+
+  <div class="footnote" style="margin-bottom:24px;">注：评分为定性判断，基于各产品公开发布信息的分析，不代表实际用户数据。A=优秀(4.5-5) B=良好(3.5-4.5) C=中等(2.5-3.5) D=需改进(&lt;2.5)</div>
+
+  <table class="score-matrix">
+    <thead>
+      <tr>
+        <th>评估层</th>
+        <th>Claude</th>
+        <th>Cursor 3</th>
+        <th>Codex</th>
+        <th>TRAE SOLO</th>
+        <th>WorkBuddy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>战略层 — 用户定义清晰度</td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:80%"></div></div>
+            <span class="score-num">4.0</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:90%"></div></div>
+            <span class="score-num">4.5</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:90%"></div></div>
+            <span class="score-num">4.5</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:72%"></div></div>
+            <span class="score-num">3.5</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:86%"></div></div>
+            <span class="score-num">4.3</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>范围层 — 功能取舍清晰度</td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:66%"></div></div>
+            <span class="score-num">3.3</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:82%"></div></div>
+            <span class="score-num">4.1</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:92%"></div></div>
+            <span class="score-num">4.6</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:68%"></div></div>
+            <span class="score-num">3.4</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:80%"></div></div>
+            <span class="score-num">4.0</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>结构层 — 控制权设计成熟度</td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:78%"></div></div>
+            <span class="score-num">3.9</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:88%"></div></div>
+            <span class="score-num">4.4</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:60%"></div></div>
+            <span class="score-num">3.0</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:72%"></div></div>
+            <span class="score-num">3.6</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:76%"></div></div>
+            <span class="score-num">3.8</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>框架层 — 布局与导航合理性</td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:80%"></div></div>
+            <span class="score-num">4.0</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:86%"></div></div>
+            <span class="score-num">4.3</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:74%"></div></div>
+            <span class="score-num">3.7</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:76%"></div></div>
+            <span class="score-num">3.8</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:66%"></div></div>
+            <span class="score-num">3.3</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>表现层 — 信任感与视觉一致性</td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:82%"></div></div>
+            <span class="score-num">4.1</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:84%"></div></div>
+            <span class="score-num">4.2</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:78%"></div></div>
+            <span class="score-num">3.9</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:72%"></div></div>
+            <span class="score-num">3.6</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar"><div class="score-bar-fill" style="width:64%"></div></div>
+            <span class="score-num">3.2</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pullquote">
+    Cursor 3 是五款产品中<em>五层最均衡</em>的设计；Codex 是战略层最清晰但结构层最薄的赌注；WorkBuddy 解决了一个真实问题，但框架层和表现层的打磨还有空间。
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══════════════════════════════════════════
+     IMPLICATIONS
+══════════════════════════════════════════ -->
+<section class="section" id="implications">
+  <div class="section-kicker">设计启示</div>
+  <h2 class="section-title">对 Agent Space 设计的<br>六条直接启示</h2>
+  <p class="section-lead">基于以上五要素的行业分析，结合你们正在设计的 IDE Agent Space 模式，以下六条启示直接对应五要素的核心发现，并提出具体的设计行动建议。</p>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th>对应要素</th>
+          <th>行业观察</th>
+          <th>对你们的设计启示</th>
+          <th>具体行动</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-r">战略层</span></td>
+          <td>TRAE SOLO 和 WorkBuddy 的「模式分离」背后，是对两类用户心智的主动切割——编码用户和日常办公用户根本是两套交互语言</td>
+          <td>你们的 Claw/Code 分区方向正确，但需要更清晰地回答「Claw 模式下的成功是什么」——它的产物是文档、分析报告、还是工作流自动化？</td>
+          <td>为 Claw 模式定义 3 个核心任务场景 + 成功标准，作为后续功能取舍的决策依据</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">范围层</span></td>
+          <td>Codex 「主动放弃 IDE」的勇气让它的功能边界极清晰；反观全场景产品的定位模糊风险</td>
+          <td>Agent Space 作为 IDE 内的「第二模式」，需要明确它的边界：哪些任务留在 IDE 模式做，哪些任务只能在 Space 模式做？边界模糊会让用户困惑</td>
+          <td>画一张「任务分流图」：哪些任务走 IDE 模式，哪些走 Agent 模式，判断标准是什么</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-r">结构层</span></td>
+          <td>行业最大的结构层空白：「agent 此刻知道什么、不知道什么」的上下文可见性，没有产品系统解决</td>
+          <td>在你们的 Space 设计中，右侧工具面板底部的「Context 消耗」展示是一个起点，可以进化为「上下文面板」——显式展示 agent 当前的信息边界</td>
+          <td>设计一个「context scope panel」：当前任务上下文包括哪些文件/内容，用户可手动增减，agent 据此执行</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">结构层</span></td>
+          <td>Cursor 3 的「人介入节点」分散在执行全程（Design Mode + diff + /best-of-n），WorkBuddy 的「高危拦截」是系统级前置防护</td>
+          <td>你们的 task monitor 目前只做进度展示，需要升级为「介入控制面板」——包含：暂停/继续、修改任务方向、局部回滚三个基础介入能力</td>
+          <td>在 task monitor 中增加「介入操作区」：pause · redirect · rollback，对应三种介入场景</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-g">框架层</span></td>
+          <td>「三栏布局」（左任务历史 + 中对话流 + 右产物）已成行业标准框架；Cursor 3 允许 IDE/Agents Window 并存降低切换摩擦</td>
+          <td>你们的三栏框架方向对；关键是 IDE ↔ Space 的切换体验——切换时不应该「重置状态」，用户的上下文和任务历史应该在两个模式间无缝携带</td>
+          <td>设计「模式切换时的状态保留规则」：哪些状态跨模式持久，哪些重置，明确用户预期</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-r">表现层</span></td>
+          <td>TRAE SOLO 的右侧动态视图是过程可见性最高的设计，但所有产品都缺乏「agent 为什么这样做」的决策透明度</td>
+          <td>右侧产物面板可以升级：不只展示「做了什么」（diff/文件），也展示「为什么这样做」（agent 的决策摘要）——这是表现层建立信任感的最大差异化机会</td>
+          <td>在产物面板顶部增加「agent 决策摘要」区域：3-5 句话说明这个任务的执行逻辑和关键决策点</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-text">一句话总结：行业在「能做什么」上已经趋同，差距将在「如何让人信任」上分开</div>
+    <div class="insight-sub">到 2026 年底，五要素的战略层和范围层将基本趋同——每款产品都会有 Agent、多模式、工作空间。真正分化格局的，是结构层的「控制权设计」和表现层的「信任感建立」——也就是这份报告反复强调的两个问题：人介入节点设计得是否优雅？过程透明度是否让用户敢于放手？这两个问题，是你们 Agent Space 下一阶段设计的核心战场。</div>
+  </div>
+</section>
+
+</div><!-- /page -->
+
+<footer class="footer">
+  <span>行业分析报告 · AI 开发工具 UX 五要素竞争格局 · 2026 Q2</span>
+  <span>内容截止 2026.04 · 基于公开发布信息分析</span>
+</footer>
+
+</body>
+</html>

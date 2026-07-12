@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeSpace · Agent Space</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#111113;--bg1:#161618;--bg2:#1c1c1f;--bg3:#222226;--bg4:#28282d;--bg5:#2e2e35;
+  --b0:#242428;--b1:#2e2e36;--b2:#383840;--b3:#44444e;
+  --t1:#e4e4ea;--t2:#9494a4;--t3:#5a5a6a;--t4:#38383f;
+  --pur:#8b5cf6;--pur-d:rgba(139,92,246,.12);--pur-b:rgba(139,92,246,.28);--pur-t:#a78bfa;
+  --grn:#34d399;--grn-d:rgba(52,211,153,.10);--grn-b:rgba(52,211,153,.28);
+  --amb:#f59e0b;--amb-d:rgba(245,158,11,.10);
+  --blu:#60a5fa;--blu-d:rgba(96,165,250,.10);
+  --red:#f87171;
+  --mono:'JetBrains Mono',monospace;--sans:'Noto Sans SC',sans-serif;
+  --r:6px;--rl:10px;--ease:.16s cubic-bezier(.4,0,.2,1);
+  --tbar:40px;--lw:248px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased;}
+/* TITLEBAR */
+.tbar{height:var(--tbar);background:var(--bg2);border-bottom:1px solid var(--b0);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;position:relative;z-index:100;}
+.dots{display:flex;gap:5px;}.dot{width:11px;height:11px;border-radius:50%;}.dr{background:#ff5f57;}.da{background:#febc2e;}.dg{background:#28c840;}
+.mtog{display:flex;background:var(--bg0);border:1px solid var(--b1);border-radius:18px;padding:2px;gap:1px;}
+.mbtn{padding:3px 16px;border-radius:14px;border:none;background:transparent;color:var(--t3);font-size:11.5px;font-family:var(--mono);font-weight:500;cursor:pointer;transition:var(--ease);}
+.mbtn.on{background:var(--pur);color:#fff;box-shadow:0 1px 8px rgba(139,92,246,.3);}
+.mbtn:not(.on):hover{color:var(--t2);}
+.tbar-mid{flex:1;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.bc{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11.5px;color:var(--t3);}
+.bc-cur{color:var(--t2);}
+.tbtns{display:flex;gap:3px;}
+.tb{width:28px;height:26px;background:transparent;border:1px solid transparent;border-radius:var(--r);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease);font-size:12px;}
+.tb:hover{background:var(--bg5);border-color:var(--b1);color:var(--t1);}
+.tb.on{background:var(--pur-d);border-color:var(--pur-b);color:var(--pur-t);}
+/* LAYOUT */
+.app{height:calc(100vh - var(--tbar));display:flex;overflow:hidden;}
+/* LEFT */
+.sl{width:var(--lw);background:var(--bg2);border-right:1px solid var(--b0);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s cubic-bezier(.4,0,.2,1),opacity .15s ease;}
+.sl.off{width:0;opacity:0;pointer-events:none;}
+.sl-tabs{display:flex;padding:10px 12px 0;gap:3px;flex-shrink:0;}
+.slt{flex:1;padding:6px 8px;background:transparent;border:1px solid transparent;border-radius:var(--r);color:var(--t3);font-size:12px;font-weight:500;cursor:pointer;transition:var(--ease);text-align:center;}
+.slt.on{background:var(--bg4);border-color:var(--b1);color:var(--t1);}
+.slt:not(.on):hover{color:var(--t2);}
+.nbtn{margin:10px 12px 6px;padding:7px 12px;background:var(--bg4);border:1px solid var(--b1);border-radius:var(--r);color:var(--t2);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:var(--ease);flex-shrink:0;}
+.nbtn:hover{background:var(--bg5);border-color:var(--b2);color:var(--t1);}
+.sl-srch{margin:0 12px 6px;flex-shrink:0;}
+.sl-srch input{width:100%;background:var(--bg3);border:1px solid var(--b0);border-radius:var(--r);padding:5px 10px;color:var(--t2);font-family:var(--sans);font-size:12px;outline:none;transition:var(--ease);}
+.sl-srch input::placeholder{color:var(--t4);}
+.sl-srch input:focus{border-color:var(--b2);}
+.slsec{padding:8px 14px 4px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--t4);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sbadge{background:var(--pur-d);border:1px solid var(--pur-b);border-radius:8px;padding:1px 6px;font-size:10px;color:var(--pur-t);}
+.tlist{overflow-y:auto;padding:3px 8px;flex:1;}
+.ti{padding:8px 9px;border-radius:var(--r);cursor:pointer;display:flex;flex-direction:column;gap:3px;margin-bottom:1px;border:1px solid transparent;transition:var(--ease);}
+.ti:hover{background:var(--bg4);border-color:var(--b1);}
+.ti.on{background:var(--bg3);border-color:var(--b1);}
+.ti-n{font-size:12.5px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ti-m{display:flex;align-items:center;gap:5px;}
+.tdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.td-r{background:var(--grn);box-shadow:0 0 5px var(--grn);animation:p 1.8s infinite;}
+.td-d{background:var(--t4);}.td-w{background:var(--amb);}
+@keyframes p{0%,100%{opacity:1;}50%{opacity:.3;}}
+.ttime{font-family:var(--mono);font-size:10px;color:var(--t3);}
+.chan-i{padding:6px 9px;border-radius:var(--r);display:flex;align-items:center;gap:7px;cursor:pointer;color:var(--t2);font-size:12.5px;transition:var(--ease);border:1px solid transparent;margin-bottom:1px;}
+.chan-i:hover{background:var(--bg4);border-color:var(--b1);color:var(--t1);}
+.sl-bot{padding:10px 12px;border-top:1px solid var(--b0);flex-shrink:0;}
+.setbtn{width:100%;padding:6px 10px;background:var(--bg3);border:1px solid var(--b0);border-radius:var(--r);color:var(--t3);font-size:12px;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;gap:5px;transition:var(--ease);}
+.setbtn:hover{background:var(--bg4);color:var(--t2);}
+/* CENTER AREA = chat + task monitor side panel */
+.center-area{flex:1;display:flex;overflow:hidden;min-width:0;}
+/* CHAT COLUMN */
+.mc{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg1);border-right:1px solid var(--b0);min-width:0;}
+.chat-hd{display:flex;align-items:center;padding:0 16px;height:38px;border-bottom:1px solid var(--b0);background:var(--bg2);flex-shrink:0;gap:8px;}
+.chat-hd-title{font-size:12px;font-weight:600;color:var(--t2);}
+.chat-hd-sp{flex:1;}
+.mon-btn{display:flex;align-items:center;gap:5px;padding:3px 10px;background:var(--bg4);border:1px solid var(--b1);border-radius:var(--r);color:var(--t3);font-size:11px;font-family:var(--mono);cursor:pointer;transition:var(--ease);user-select:none;}
+.mon-btn:hover{border-color:var(--b2);color:var(--t2);}
+.mon-btn.on{background:var(--pur-d);border-color:var(--pur-b);color:var(--pur-t);}
+.mon-dot{width:5px;height:5px;border-radius:50%;background:var(--grn);}
+.chat{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+.ts-div{text-align:center;}
+.ts-pill{display:inline-block;padding:3px 12px;background:var(--bg3);border:1px solid var(--b0);border-radius:10px;font-family:var(--mono);font-size:11px;color:var(--t3);}
+/* messages */
+.msg{display:flex;gap:9px;align-items:flex-start;}
+.msg.u{flex-direction:row-reverse;}
+.av-u{width:28px;height:28px;flex-shrink:0;border-radius:50%;background:var(--pur);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+/* pixel avatar wrapper */
+.pav-w{width:28px;height:28px;flex-shrink:0;border-radius:4px;overflow:hidden;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;}
+canvas{image-rendering:pixelated;display:block;}
+.mb{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+.msg.u .mb{align-items:flex-end;}
+.sender{font-size:10px;font-family:var(--mono);color:var(--t3);letter-spacing:.04em;}
+.bubble{padding:9px 13px;border-radius:9px;line-height:1.68;font-size:13px;}
+.msg.u .bubble{background:var(--bg4);border:1px solid var(--b1);color:var(--t1);max-width:85%;}
+.msg:not(.u) .bubble{background:transparent;color:var(--t2);padding:2px 0;}
+/* tool block */
+.tl-block{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-top:4px;}
+.tl-hd{padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--b0);display:flex;align-items:center;gap:7px;font-size:12px;color:var(--t2);}
+.tag{padding:1px 7px;border-radius:4px;font-size:10px;font-family:var(--mono);font-weight:600;}
+.tag-tl{background:var(--pur-d);border:1px solid var(--pur-b);color:var(--pur-t);}
+.tag-par{background:var(--blu-d);border:1px solid rgba(96,165,250,.28);color:var(--blu);}
+.tag-seq{background:var(--amb-d);border:1px solid rgba(245,158,11,.28);color:var(--amb);}
+.phase-lbl{display:flex;align-items:center;gap:8px;margin:6px 0 5px;font-size:11px;color:var(--t3);}
+.phase-line{flex:1;height:1px;background:var(--b0);}
+/* subagent card */
+.sub-card{background:var(--bg2);border:1px solid var(--b1);border-left:3px solid rgba(52,211,153,.35);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:var(--ease);margin-bottom:4px;}
+.sub-card:hover{background:var(--bg4);border-color:var(--b2);border-left-color:var(--grn);}
+.sc-pav{width:30px;height:30px;flex-shrink:0;border-radius:4px;overflow:hidden;image-rendering:pixelated;}
+.sc-info{flex:1;min-width:0;}
+.sc-name{font-size:12.5px;font-weight:600;color:var(--t1);margin-bottom:2px;}
+.sc-desc{font-size:11.5px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.sc-tag{padding:2px 8px;border-radius:7px;font-size:10px;font-family:var(--mono);}
+.sct-done{background:var(--grn-d);border:1px solid var(--grn-b);color:var(--grn);}
+.sc-del{font-family:var(--mono);font-size:10px;color:var(--t4);}
+.sc-drill{font-size:10px;color:var(--t4);cursor:pointer;}
+.sc-drill:hover{color:var(--pur-t);}
+/* summary */
+.sum-card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:16px 18px;margin-top:4px;}
+.sum-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.sum-sub{font-size:11px;color:var(--t3);font-family:var(--mono);margin-bottom:12px;}
+.sum-sec{margin-bottom:10px;}
+.sum-sec-hd{font-size:11.5px;font-weight:600;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.sum-sec-hd::before{content:'';width:2px;height:10px;background:var(--pur);border-radius:1px;}
+.sum-item{display:flex;gap:7px;font-size:12px;color:var(--t2);line-height:1.65;margin-bottom:4px;}
+.sbul{width:4px;height:4px;border-radius:50%;background:var(--t4);margin-top:7px;flex-shrink:0;}
+.notice{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:7px 12px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--t2);margin-top:6px;}
+/* INPUT */
+.ibar{padding:10px 16px 12px;border-top:1px solid var(--b0);background:var(--bg2);flex-shrink:0;}
+.ibar-top{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.mpills{display:flex;background:var(--bg0);border:1px solid var(--b1);border-radius:13px;padding:2px;gap:1px;}
+.mpill{padding:3px 11px;border-radius:10px;border:none;background:transparent;color:var(--t3);font-size:11px;font-family:var(--mono);cursor:pointer;transition:var(--ease);}
+.mpill.on{background:var(--bg4);border:1px solid var(--b2);color:var(--t1);}
+.mpill:not(.on):hover{color:var(--t2);}
+.model-sel{display:flex;align-items:center;gap:4px;padding:3px 9px;background:var(--bg3);border:1px solid var(--b1);border-radius:11px;font-size:11px;font-family:var(--mono);color:var(--t2);cursor:pointer;}
+.model-sel:hover{border-color:var(--b2);}
+.mdot{width:5px;height:5px;border-radius:50%;background:var(--grn);}
+.team-cfg{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
+.tcchip{padding:2px 8px;background:var(--bg3);border:1px solid var(--b1);border-radius:9px;font-size:11px;font-family:var(--mono);color:var(--t2);}
+.tcchip.p{background:var(--pur-d);border-color:var(--pur-b);color:var(--pur-t);}
+.tc-edit{font-size:11px;font-family:var(--mono);color:var(--t3);cursor:pointer;margin-left:auto;}
+.tc-edit:hover{color:var(--pur-t);}
+.iwrap{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);display:flex;flex-direction:column;padding:9px 12px;gap:8px;transition:border-color var(--ease);}
+.iwrap:focus-within{border-color:var(--b2);}
+.cinput{background:transparent;border:none;outline:none;color:var(--t1);font-family:var(--sans);font-size:13px;resize:none;line-height:1.5;min-height:20px;max-height:90px;overflow-y:auto;width:100%;}
+.cinput::placeholder{color:var(--t4);}
+.ibar-bot{display:flex;align-items:center;gap:6px;}
+.ishortcut{width:24px;height:24px;background:var(--bg4);border:1px solid var(--b1);border-radius:5px;color:var(--t3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-family:var(--mono);font-weight:600;transition:var(--ease);}
+.ishortcut:hover{background:var(--bg5);color:var(--t1);}
+.isp{flex:1;}
+.ibtns2{display:flex;align-items:center;gap:4px;}
+.ibtn2{width:24px;height:24px;background:transparent;border:none;color:var(--t3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:var(--ease);}
+.ibtn2:hover{color:var(--t1);}
+.sbtn{width:28px;height:28px;background:var(--pur);border:none;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0;transition:var(--ease);box-shadow:0 1px 8px rgba(139,92,246,.3);}
+.sbtn:hover{background:#7c3aed;}
+.agent-sel{display:flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg4);border:1px solid var(--b1);border-radius:10px;font-size:11.5px;color:var(--t2);cursor:pointer;transition:var(--ease);}
+.agent-sel:hover{border-color:var(--b2);}
+.agent-dot{width:5px;height:5px;border-radius:50%;background:var(--pur-t);}
+.usage-bar{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:11px;font-family:var(--mono);color:var(--t4);}
+.local-tag{display:flex;align-items:center;gap:4px;padding:1px 7px;background:var(--bg3);border:1px solid var(--b0);border-radius:8px;color:var(--t3);}
+.lc-dot{width:4px;height:4px;border-radius:50%;background:var(--amb);}
+.ctx-bar{display:flex;align-items:center;gap:4px;}
+.ctx-track{width:60px;height:3px;background:var(--b0);border-radius:2px;overflow:hidden;}
+.ctx-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--pur),var(--grn));width:6.7%;}
+/* TASK MONITOR SIDE PANEL */
+.task-monitor{width:272px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--b0);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1),opacity .18s ease;}
+.task-monitor.off{width:0;opacity:0;pointer-events:none;}
+.tm-hd{padding:10px 14px 8px;border-bottom:1px solid var(--b0);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.tm-hd-title{font-size:11px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--t3);}
+.tm-close{width:20px;height:20px;background:var(--bg4);border:1px solid var(--b1);border-radius:4px;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.tm-close:hover{color:var(--t1);}
+.tm-body{overflow-y:auto;flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:10px;}
+.po{padding:12px 13px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);}
+.po-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;}
+.po-track{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:10px;}
+.po-fill{height:100%;background:linear-gradient(90deg,var(--pur),var(--grn));border-radius:2px;width:100%;}
+.po-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.po-s{text-align:center;}
+.po-n{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--t1);line-height:1;margin-bottom:2px;}
+.po-n.g{color:var(--grn);}
+.po-l{font-size:10px;color:var(--t3);}
+.ac{padding:9px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);display:flex;}
+.ac-i{flex:1;text-align:center;}
+.ac-n{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--t1);}
+.ac-l{font-size:10px;color:var(--t3);margin-top:2px;}
+.ac-div{width:1px;background:var(--b0);margin:3px 0;}
+.tm-sec{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:5px;}
+.tp-list{display:flex;flex-direction:column;gap:3px;}
+.tp-item{padding:7px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;transition:var(--ease);}
+.tp-item:hover{background:var(--bg4);}
+.tp-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.tp-av{width:18px;height:18px;flex-shrink:0;border-radius:3px;overflow:hidden;image-rendering:pixelated;}
+.tp-name{font-size:11.5px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tp-ck{font-size:10px;color:var(--grn);}
+.tp-sub{font-size:10.5px;color:var(--t4);font-family:var(--mono);padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tp-phase{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t4);padding-left:24px;margin-top:3px;font-family:var(--mono);}
+.del{padding:10px 13px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);}
+.del-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:7px;}
+.del-list{display:flex;flex-direction:column;gap:4px;}
+.del-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--t2);padding:3px 0;cursor:pointer;}
+.del-item:hover{color:var(--pur-t);}
+.del-badge{padding:1px 5px;background:var(--grn-d);border:1px solid var(--grn-b);border-radius:4px;font-size:9px;color:var(--grn);flex-shrink:0;}
+.tok{padding:9px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);}
+.tok-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:7px;}
+.tok-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.tok-name{font-size:10px;font-family:var(--mono);color:var(--t3);width:48px;flex-shrink:0;}
+.tok-track{flex:1;height:3px;background:var(--bg5);border-radius:2px;overflow:hidden;}
+.tok-fill{height:100%;border-radius:2px;}
+.tf-p{background:var(--pur);width:13%;}
+.tf-b{background:var(--blu);width:25%;}
+.tok-pct{font-size:10px;font-family:var(--mono);color:var(--t3);width:24px;text-align:right;}
+/* RIGHT ARTIFACT PANEL */
+.ap{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg1);min-width:0;border-left:1px solid var(--b0);transition:flex .22s cubic-bezier(.4,0,.2,1),opacity .18s ease,min-width .22s;}
+.ap.off{flex:0;min-width:0;width:0;opacity:0;pointer-events:none;overflow:hidden;border:none;}
+.ap-tabs{display:flex;align-items:center;border-bottom:1px solid var(--b0);padding:0 12px;background:var(--bg2);flex-shrink:0;gap:0;}
+.ap-tab{padding:9px 13px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--t3);font-size:12px;cursor:pointer;margin-bottom:-1px;transition:var(--ease);display:flex;align-items:center;gap:5px;}
+.ap-tab.on{color:var(--t1);border-bottom-color:var(--t2);}
+.ap-tab:not(.on):hover{color:var(--t2);}
+.ap-tab-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ap-acts{margin-left:auto;display:flex;gap:3px;}
+.apbtn{width:24px;height:22px;background:transparent;border:none;border-radius:4px;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:var(--ease);}
+.apbtn:hover{background:var(--bg4);color:var(--t1);}
+.ap-bc{padding:7px 14px;border-bottom:1px solid var(--b0);background:var(--bg2);display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:var(--t3);flex-shrink:0;}
+.bc-sep{color:var(--t4);}
+.ap-body{flex:1;display:flex;overflow:hidden;}
+.filetree{width:172px;border-right:1px solid var(--b0);overflow-y:auto;padding:8px 4px;flex-shrink:0;background:var(--bg2);}
+.ft-item{padding:5px 8px;border-radius:4px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--t2);transition:var(--ease);}
+.ft-item:hover{background:var(--bg4);}
+.ft-item.on{background:var(--bg4);color:var(--t1);}
+.ft-sec{padding:8px 8px 3px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);}
+pre.code{margin:0;padding:14px 0;font-family:var(--mono);font-size:11.5px;line-height:1.75;overflow:auto;background:var(--bg1);flex:1;}
+.cl{display:flex;}
+.ln{width:42px;text-align:right;padding-right:16px;color:var(--t4);user-select:none;flex-shrink:0;font-size:11px;}
+.lc{color:var(--t2);flex:1;white-space:pre;padding-right:20px;}
+.lc .k{color:#c792ea;}.lc .s{color:#c3e88d;}.lc .cm{color:var(--t3);font-style:italic;}
+.lc .n{color:#82aaff;}.lc .p{color:var(--t1);}.lc .num{color:#f78c6c;}
+.code-hd{padding:7px 14px;border-bottom:1px solid var(--b0);display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);flex-shrink:0;}
+.code-badge{padding:1px 6px;background:var(--grn-d);border:1px solid var(--grn-b);border-radius:4px;font-size:10px;color:var(--grn);}
+.code-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.terminal{flex:1;overflow:auto;padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.8;background:var(--bg0);color:var(--t2);}
+.t-pr{color:var(--grn);}.t-cm{color:var(--t1);}.t-ot{color:var(--t3);}.t-ok{color:var(--grn);}
+.diff-view{flex:1;overflow:auto;font-family:var(--mono);font-size:11.5px;line-height:1.75;background:var(--bg0);}
+.df{padding:7px 14px;border-bottom:1px solid var(--b0);background:var(--bg2);font-size:11.5px;color:var(--t2);}
+.da2{background:rgba(52,211,153,.05);color:var(--grn);padding:0 16px;}
+.dd{background:rgba(248,113,113,.05);color:var(--red);opacity:.65;padding:0 16px;}
+.dc{color:var(--t4);padding:0 16px;}
+/* DRILL */
+.drill-ov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;}
+.drill-ov.v{display:flex;}
+.drill-panel{width:640px;max-height:78vh;background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rl);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.drill-hd{padding:12px 16px;border-bottom:1px solid var(--b0);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.drill-av-c{width:32px;height:32px;flex-shrink:0;border-radius:5px;overflow:hidden;image-rendering:pixelated;}
+.drill-close{margin-left:auto;width:24px;height:24px;background:var(--bg4);border:1px solid var(--b1);border-radius:5px;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.drill-close:hover{color:var(--t1);}
+.drill-body{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.ds{display:flex;gap:10px;}
+.ds-ic{width:20px;height:20px;border-radius:50%;background:var(--grn-d);border:1px solid var(--grn-b);color:var(--grn);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;}
+.ds-c{flex:1;}
+.ds-t{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:3px;}
+.ds-d{font-size:12px;color:var(--t2);line-height:1.6;}
+.ds-code{background:var(--bg0);border:1px solid var(--b0);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:6px;line-height:1.6;white-space:pre;}
+.ds-r{display:flex;align-items:center;gap:5px;margin-top:5px;font-size:11.5px;font-family:var(--mono);color:var(--grn);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- TITLEBAR -->
+<div class="tbar">
+  <div class="dots"><div class="dot dr"></div><div class="dot da"></div><div class="dot dg"></div></div>
+  <div class="mtog">
+    <button class="mbtn" id="btn-ide" onclick="switchMode('ide')">IDE</button>
+    <button class="mbtn on" id="btn-space" onclick="switchMode('space')">Space</button>
+  </div>
+  <div class="tbar-mid">
+    <div class="bc"><span>设计电商平台登录功能</span><span style="color:var(--t4)">›</span><span class="bc-cur">Agent Team 任务</span></div>
+  </div>
+  <div class="tbtns">
+    <button class="tb on" id="tb-l" onclick="togglePanel('l')" title="任务面板">
+      <svg width="13" height="13" viewBox="0 0 13 13"><rect x=".5" y=".5" width="3.5" height="12" rx="1" fill="currentColor" opacity=".4"/><rect x="6" y=".5" width="6.5" height="12" rx="1" fill="currentColor"/></svg>
+    </button>
+    <button class="tb on" id="tb-r" onclick="togglePanel('r')" title="产物面板">
+      <svg width="13" height="13" viewBox="0 0 13 13"><rect x=".5" y=".5" width="6.5" height="12" rx="1" fill="currentColor"/><rect x="9" y=".5" width="3.5" height="12" rx="1" fill="currentColor" opacity=".4"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="app" id="app">
+<!-- LEFT -->
+<div class="sl" id="sl">
+  <div class="sl-tabs">
+    <button class="slt" id="slt-claw" onclick="switchSideTab('claw')">XClaw</button>
+    <button class="slt on" id="slt-code" onclick="switchSideTab('code')">Code</button>
+  </div>
+  <button class="nbtn"><svg width="11" height="11" viewBox="0 0 11 11"><line x1="5.5" y1="1" x2="5.5" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="5.5" x2="10" y2="5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> 新建任务</button>
+  <div id="claw-c" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="slsec">渠道消息</div>
+    <div style="padding:0 8px;">
+      <div class="chan-i">📌 钉钉消息</div><div class="chan-i">📗 飞书消息</div><div class="chan-i">💬 企业微信消息</div>
+    </div>
+    <div class="slsec">历史任务</div>
+    <div class="tlist"><div class="ti on"><div class="ti-n">周报整理 & 邮件发送</div><div class="ti-m"><div class="tdot td-d"></div><span class="ttime">10:24</span></div></div></div>
+  </div>
+  <div id="code-c" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="sl-srch"><input type="text" placeholder="搜索任务…"></div>
+    <div class="slsec">进行中 <span class="sbadge">● 1</span></div>
+    <div style="padding:0 8px 4px;">
+      <div class="ti on"><div class="ti-n">设计电商平台登录功能</div><div class="ti-m"><div class="tdot td-r"></div><span class="ttime">刚刚</span></div></div>
+    </div>
+    <div class="slsec">历史任务 <span style="color:var(--t4)">5</span></div>
+    <div class="tlist">
+      <div class="ti"><div class="ti-n">设计电商平台注册功能</div><div class="ti-m"><div class="tdot td-d"></div><span class="ttime">1分钟前</span></div></div>
+      <div class="ti"><div class="ti-n">设计电商平台登录功能</div><div class="ti-m"><div class="tdot td-d"></div><span class="ttime">2分钟前</span></div></div>
+      <div class="ti"><div class="ti-n">设计电商平台基本功能</div><div class="ti-m"><div class="tdot td-d" style="background:var(--red)"></div><span class="ttime">3分钟前</span></div></div>
+      <div class="ti"><div class="ti-n">设计一个电商网站首页</div><div class="ti-m"><div class="tdot td-d"></div><span class="ttime">刚刚</span></div></div>
+      <div class="ti"><div class="ti-n">设计自定义头像功能</div><div class="ti-m"><div class="tdot td-d"></div><span class="ttime">2分钟前</span></div></div>
+    </div>
+  </div>
+  <div class="sl-bot"><button class="setbtn" id="setbtn">⚙ Code 设置</button></div>
+</div>
+
+<!-- CENTER: chat column + task monitor side panel -->
+<div class="center-area">
+  <div class="mc">
+    <div class="chat-hd">
+      <span class="chat-hd-title">Chat</span>
+      <span class="chat-hd-sp"></span>
+      <button class="mon-btn on" id="mon-btn" onclick="toggleMonitor()">
+        <span class="mon-dot"></span>
+        Task Monitor
+        <span id="mon-arrow" style="font-size:10px;">‹</span>
+      </button>
+    </div>
+
+    <div class="chat" id="chat-area">
+      <div class="ts-div"><span class="ts-pill">11:15</span></div>
+
+      <!-- User -->
+      <div class="msg u">
+        <div class="av-u">U</div>
+        <div class="mb">
+          <div class="sender">You</div>
+          <div class="bubble">帮我做一个登录的功能，并使用 node.js 来实现这个接口。</div>
+        </div>
+      </div>
+
+      <!-- TL: planning -->
+      <div class="msg">
+        <div class="pav-w"><canvas id="av-tl" width="12" height="12"></canvas></div>
+        <div class="mb" style="flex:1;">
+          <div class="sender">Team Leader <span style="color:var(--t4)">· 11:15</span></div>
+          <div class="bubble">检查当前目录结构，准备创建项目：</div>
+          <div class="tl-block">
+            <div class="tl-hd"><span class="tag tag-tl">TOOL</span>list_directory <span style="margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--grn);">→ 完成</span></div>
+            <div style="padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--t3);line-height:1.6;">List model provided non-existent directory<br>→ 准备重新初始化项目结构</div>
+          </div>
+          <div class="bubble" style="margin-top:6px;">创建电商登录系统：前端界面 + Node.js 后端接口。任务已拆分，安排并行与串行阶段执行：</div>
+
+          <div class="phase-lbl"><div class="phase-line"></div><span class="tag tag-par" style="flex-shrink:0;">⇉ 并行阶段</span><div class="phase-line"></div></div>
+          <div class="sub-card" onclick="openDrill('arch')">
+            <canvas class="sc-pav" id="sc-arch" width="10" height="10"></canvas>
+            <div class="sc-info"><div class="sc-name">Arch Agent</div><div class="sc-desc">目录检查 · 项目初始化 · package.json</div></div>
+            <div class="sc-right"><span class="sc-tag sct-done">✓ 完成</span><span class="sc-del">交付 3 项</span><span class="sc-drill">详情 ›</span></div>
+          </div>
+          <div class="sub-card" onclick="openDrill('db')">
+            <canvas class="sc-pav" id="sc-db" width="10" height="10"></canvas>
+            <div class="sc-info"><div class="sc-name">DB Agent</div><div class="sc-desc">数据库 Schema · users 表 · 索引设计</div></div>
+            <div class="sc-right"><span class="sc-tag sct-done">✓ 完成</span><span class="sc-del">交付 2 项</span><span class="sc-drill">详情 ›</span></div>
+          </div>
+
+          <div class="phase-lbl"><div class="phase-line"></div><span class="tag tag-seq" style="flex-shrink:0;">→ 串行阶段</span><div class="phase-line"></div></div>
+          <div class="sub-card" onclick="openDrill('backend')">
+            <canvas class="sc-pav" id="sc-be" width="10" height="10"></canvas>
+            <div class="sc-info"><div class="sc-name">Backend Dev Agent</div><div class="sc-desc">Node.js API · JWT 鉴权 · 登录接口</div></div>
+            <div class="sc-right"><span class="sc-tag sct-done">✓ 完成</span><span class="sc-del">交付 4 项</span><span class="sc-drill">详情 ›</span></div>
+          </div>
+          <div class="sub-card" onclick="openDrill('frontend')">
+            <canvas class="sc-pav" id="sc-fe" width="10" height="10"></canvas>
+            <div class="sc-info"><div class="sc-name">Frontend Dev Agent</div><div class="sc-desc">登录页面 · 表单校验 · API 对接</div></div>
+            <div class="sc-right"><span class="sc-tag sct-done">✓ 完成</span><span class="sc-del">交付 3 项</span><span class="sc-drill">详情 ›</span></div>
+          </div>
+
+          <div class="phase-lbl"><div class="phase-line"></div><span class="tag tag-seq" style="flex-shrink:0;">→ 验收阶段</span><div class="phase-line"></div></div>
+          <div class="sub-card" onclick="openDrill('test')">
+            <canvas class="sc-pav" id="sc-test" width="10" height="10"></canvas>
+            <div class="sc-info"><div class="sc-name">Test Agent</div><div class="sc-desc">接口测试 · 运行沙箱 · 输出测试报告</div></div>
+            <div class="sc-right"><span class="sc-tag sct-done">✓ 完成</span><span class="sc-del">交付 2 项</span><span class="sc-drill">详情 ›</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TL: summary -->
+      <div class="msg">
+        <div class="pav-w"><canvas id="av-tl2" width="12" height="12"></canvas></div>
+        <div class="mb" style="flex:1;">
+          <div class="sender">Team Leader <span style="color:var(--t4)">· 11:18</span></div>
+          <div class="sum-card">
+            <div class="sum-title">电商平台登录功能 · 交付总结</div>
+            <div class="sum-sub">5 个子任务全部完成 · 并行 + 串行执行 · 耗时约 3 分钟</div>
+            <div class="sum-sec">
+              <div class="sum-sec-hd">后端接口（Node.js）</div>
+              <div class="sum-item"><div class="sbul"></div>POST /api/auth/login：邮密校验，返回 JWT Token（有效期 7 天）</div>
+              <div class="sum-item"><div class="sbul"></div>POST /api/auth/logout：Token 加入黑名单，注销会话</div>
+              <div class="sum-item"><div class="sbul"></div>GET /api/auth/me：Bearer Token 验证，返回当前用户信息</div>
+            </div>
+            <div class="sum-sec">
+              <div class="sum-sec-hd">前端页面</div>
+              <div class="sum-item"><div class="sbul"></div>登录表单：邮箱/密码双字段，前端校验 + 错误提示 + 加载态</div>
+              <div class="sum-item"><div class="sbul"></div>Token 存储于 localStorage，路由守卫拦截未登录访问</div>
+            </div>
+            <div class="sum-sec" style="margin-bottom:0;">
+              <div class="sum-sec-hd">测试结果</div>
+              <div class="sum-item"><div class="sbul"></div>12 个接口测试用例全部通过，覆盖正常登录、密码错误、Token 过期，覆盖率 89%</div>
+            </div>
+          </div>
+          <div class="notice"><span>ℹ️</span>此任务由 Agent Swarm 处理，后续跟进将继续使用 K2.5 Agent。</div>
+        </div>
+      </div>
+    </div><!-- /chat -->
+
+    <!-- INPUT BAR -->
+    <div class="ibar">
+      <div class="ibar-top">
+        <div class="mpills">
+          <button class="mpill" id="mp-ask" onclick="switchInputMode('ask')">ASK</button>
+          <button class="mpill" id="mp-agent" onclick="switchInputMode('agent')">Agent</button>
+          <button class="mpill on" id="mp-team" onclick="switchInputMode('team')">Agent Team</button>
+        </div>
+        <div class="model-sel"><div class="mdot"></div>GLM-5<span style="color:var(--t4);margin-left:2px;">▾</span></div>
+      </div>
+      <div class="team-cfg" id="team-cfg">
+        <span class="tcchip p">Team Leader</span>
+        <span class="tcchip">Arch</span><span class="tcchip">DB</span>
+        <span class="tcchip">Backend</span><span class="tcchip">Frontend</span><span class="tcchip">Test</span>
+        <span class="tc-edit">编辑 ›</span>
+      </div>
+      <div class="iwrap">
+        <textarea class="cinput" rows="1" placeholder="/ 调用快捷指令，# 引用上下文…" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <div class="ibar-bot">
+          <div class="agent-sel"><div class="agent-dot"></div>Agent Team<span style="color:var(--t4);margin-left:2px;">▾</span></div>
+          <div class="ishortcut">@</div><div class="ishortcut">#</div><div class="ishortcut">/</div>
+          <div class="isp"></div>
+          <div class="ibtns2"><button class="ibtn2">📎</button><button class="ibtn2">🎤</button></div>
+          <button class="sbtn" onclick="sendMsg()">↑</button>
+        </div>
+      </div>
+      <div class="usage-bar">
+        <div class="local-tag"><div class="lc-dot"></div>Local</div>
+        <span>内容由 AI 生成，仅供参考</span>
+        <span style="flex:1;"></span>
+        <div class="ctx-bar"><span style="color:var(--t4)">Context</span><div class="ctx-track"><div class="ctx-fill"></div></div><span style="color:var(--pur-t);font-size:10.5px;">6.7%</span></div>
+      </div>
+    </div>
+  </div><!-- /mc -->
+
+  <!-- TASK MONITOR SIDE PANEL -->
+  <div class="task-monitor" id="task-monitor">
+    <div class="tm-hd">
+      <span class="tm-hd-title">Task Monitor</span>
+      <button class="tm-close" onclick="toggleMonitor()">✕</button>
+    </div>
+    <div class="tm-body">
+      <div class="po">
+        <div class="po-lbl"><span>整体完成度</span><span style="color:var(--grn);font-size:11px;font-family:var(--mono);">100%</span></div>
+        <div class="po-track"><div class="po-fill"></div></div>
+        <div class="po-stats">
+          <div class="po-s"><div class="po-n g">5</div><div class="po-l">已完成</div></div>
+          <div class="po-s"><div class="po-n">0</div><div class="po-l">进行中</div></div>
+          <div class="po-s"><div class="po-n">0</div><div class="po-l">等待中</div></div>
+        </div>
+      </div>
+      <div class="ac">
+        <div class="ac-i"><div class="ac-n">5</div><div class="ac-l">子 Agent 总数</div></div>
+        <div class="ac-div"></div>
+        <div class="ac-i"><div class="ac-n" style="color:var(--grn)">5</div><div class="ac-l">任务完成</div></div>
+        <div class="ac-div"></div>
+        <div class="ac-i"><div class="ac-n" style="color:var(--t3)">0</div><div class="ac-l">活跃中</div></div>
+      </div>
+      <div>
+        <div class="tm-sec">任务进度</div>
+        <div class="tp-list">
+          <div class="tp-item" onclick="openDrill('arch')">
+            <div class="tp-top"><canvas class="tp-av" id="tp-arch" width="6" height="6"></canvas><span class="tp-name">Arch Agent</span><span class="tp-ck">✓</span></div>
+            <div class="tp-sub">目录检查 · 项目初始化 · package.json</div>
+            <div class="tp-phase"><span class="tag tag-par" style="font-size:9px;padding:1px 5px;">⇉ 并行</span>3 项交付</div>
+          </div>
+          <div class="tp-item" onclick="openDrill('db')">
+            <div class="tp-top"><canvas class="tp-av" id="tp-db" width="6" height="6"></canvas><span class="tp-name">DB Agent</span><span class="tp-ck">✓</span></div>
+            <div class="tp-sub">users 表 · Schema 设计 · 索引优化</div>
+            <div class="tp-phase"><span class="tag tag-par" style="font-size:9px;padding:1px 5px;">⇉ 并行</span>2 项交付</div>
+          </div>
+          <div class="tp-item" onclick="openDrill('backend')">
+            <div class="tp-top"><canvas class="tp-av" id="tp-be" width="6" height="6"></canvas><span class="tp-name">Backend Dev Agent</span><span class="tp-ck">✓</span></div>
+            <div class="tp-sub">Node.js API · JWT · /login /logout /me</div>
+            <div class="tp-phase"><span class="tag tag-seq" style="font-size:9px;padding:1px 5px;">→ 串行</span>4 项交付</div>
+          </div>
+          <div class="tp-item" onclick="openDrill('frontend')">
+            <div class="tp-top"><canvas class="tp-av" id="tp-fe" width="6" height="6"></canvas><span class="tp-name">Frontend Dev Agent</span><span class="tp-ck">✓</span></div>
+            <div class="tp-sub">登录页面 · 表单校验 · API 对接</div>
+            <div class="tp-phase"><span class="tag tag-seq" style="font-size:9px;padding:1px 5px;">→ 串行</span>3 项交付</div>
+          </div>
+          <div class="tp-item" onclick="openDrill('test')">
+            <div class="tp-top"><canvas class="tp-av" id="tp-test" width="6" height="6"></canvas><span class="tp-name">Test Agent</span><span class="tp-ck">✓</span></div>
+            <div class="tp-sub">12 用例 · 覆盖率 89% · 沙箱验证</div>
+            <div class="tp-phase"><span class="tag tag-seq" style="font-size:9px;padding:1px 5px;">→ 验收</span>2 项交付</div>
+          </div>
+        </div>
+      </div>
+      <div class="del">
+        <div class="del-lbl">交付件</div>
+        <div class="del-list">
+          <div class="del-item"><span>📁</span>ecommerce-login/<span class="del-badge">NEW</span></div>
+          <div class="del-item"><span>📄</span>server.js<span class="del-badge">NEW</span></div>
+          <div class="del-item"><span>📄</span>src/routes/auth.js<span class="del-badge">NEW</span></div>
+          <div class="del-item"><span>📄</span>src/middleware/jwt.js<span class="del-badge">NEW</span></div>
+          <div class="del-item"><span>📄</span>public/index.html<span class="del-badge">NEW</span></div>
+          <div class="del-item"><span>📄</span>package.json<span class="del-badge">MOD</span></div>
+        </div>
+      </div>
+      <div class="tok">
+        <div class="tok-lbl">Tokens 消耗</div>
+        <div class="tok-row"><span class="tok-name">Input</span><div class="tok-track"><div class="tok-fill tf-p"></div></div><span class="tok-pct">13%</span></div>
+        <div class="tok-row"><span class="tok-name">Output</span><div class="tok-track"><div class="tok-fill tf-b"></div></div><span class="tok-pct">25%</span></div>
+        <div style="margin-top:8px;font-size:10.5px;font-family:var(--mono);color:var(--t3);display:flex;justify-content:space-between;">
+          <span>Total: ~4.2k tokens</span><span style="color:var(--pur-t);">Cost: $0.008</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /task-monitor -->
+</div><!-- /center-area -->
+
+<!-- RIGHT ARTIFACT PANEL -->
+<div class="ap" id="ap">
+  <div class="ap-tabs">
+    <button class="ap-tab on" id="apt-browser" onclick="switchAP('browser')"><div class="ap-tab-dot" style="background:var(--t3);"></div>Browser</button>
+    <button class="ap-tab" id="apt-terminal" onclick="switchAP('terminal')"><div class="ap-tab-dot" style="background:var(--grn);"></div>Terminal</button>
+    <button class="ap-tab" id="apt-diff" onclick="switchAP('diff')"><div class="ap-tab-dot" style="background:var(--amb);"></div>Diff</button>
+    <button class="ap-tab" id="apt-file" onclick="switchAP('file')"><div class="ap-tab-dot" style="background:var(--blu);"></div>File</button>
+    <div class="ap-acts"><button class="apbtn">…</button><button class="apbtn" onclick="togglePanel('r')">✕</button></div>
+  </div>
+  <div id="ap-browser" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="ap-bc"><span>Users</span><span class="bc-sep">›</span><span>vinnie</span><span class="bc-sep">›</span><span>ecommerce-login</span><span class="bc-sep">›</span><span style="color:var(--t1);">server.js</span></div>
+    <div class="ap-body">
+      <div class="filetree">
+        <div class="ft-sec">ecommerce-login</div>
+        <div class="ft-item"><span>📁</span>src</div>
+        <div class="ft-item" style="padding-left:20px;"><span>📁</span>routes</div>
+        <div class="ft-item" style="padding-left:28px;"><span>📄</span>auth.js</div>
+        <div class="ft-item" style="padding-left:20px;"><span>📁</span>middleware</div>
+        <div class="ft-item" style="padding-left:28px;"><span>📄</span>jwt.js</div>
+        <div class="ft-item" style="padding-left:20px;"><span>📁</span>models</div>
+        <div class="ft-item" style="padding-left:28px;"><span>📄</span>User.js</div>
+        <div class="ft-item on"><span>📄</span>server.js</div>
+        <div class="ft-item"><span>📄</span>package.json</div>
+        <div class="ft-item"><span>📄</span>.env</div>
+        <div class="ft-sec" style="margin-top:8px;">public</div>
+        <div class="ft-item"><span>📄</span>index.html</div>
+        <div class="ft-item"><span>📄</span>login.js</div>
+        <div class="ft-item"><span>📄</span>style.css</div>
+      </div>
+      <div class="code-wrap">
+        <div class="code-hd"><span style="color:var(--t2);">server.js</span><span class="code-badge">✓ 已生成</span><span style="margin-left:auto;font-size:10px;color:var(--t4);">+24 lines</span></div>
+        <pre class="code">
+<div class="cl"><span class="ln">1</span><span class="lc"><span class="k">const</span> <span class="n">express</span> = <span class="n">require</span>(<span class="s">'express'</span>);</span></div>
+<div class="cl"><span class="ln">2</span><span class="lc"><span class="k">const</span> <span class="n">cors</span> = <span class="n">require</span>(<span class="s">'cors'</span>);</span></div>
+<div class="cl"><span class="ln">3</span><span class="lc"><span class="k">const</span> <span class="n">authRoutes</span> = <span class="n">require</span>(<span class="s">'./src/routes/auth'</span>);</span></div>
+<div class="cl"><span class="ln">4</span><span class="lc"></span></div>
+<div class="cl"><span class="ln">5</span><span class="lc"><span class="k">const</span> <span class="n">app</span> = <span class="n">express</span>();</span></div>
+<div class="cl"><span class="ln">6</span><span class="lc"><span class="n">app</span>.<span class="n">use</span>(<span class="n">cors</span>());</span></div>
+<div class="cl"><span class="ln">7</span><span class="lc"><span class="n">app</span>.<span class="n">use</span>(<span class="n">express</span>.<span class="n">json</span>());</span></div>
+<div class="cl"><span class="ln">8</span><span class="lc"><span class="n">app</span>.<span class="n">use</span>(<span class="s">'/api/auth'</span>, <span class="n">authRoutes</span>);</span></div>
+<div class="cl"><span class="ln">9</span><span class="lc"></span></div>
+<div class="cl"><span class="ln">10</span><span class="lc"><span class="cm">// Health check</span></span></div>
+<div class="cl"><span class="ln">11</span><span class="lc"><span class="n">app</span>.<span class="n">get</span>(<span class="s">'/health'</span>, (<span class="n">req</span>, <span class="n">res</span>) =></span></div>
+<div class="cl"><span class="ln">12</span><span class="lc">  <span class="n">res</span>.<span class="n">json</span>({ <span class="n">status</span>: <span class="s">'ok'</span> }));</span></div>
+<div class="cl"><span class="ln">13</span><span class="lc"></span></div>
+<div class="cl"><span class="ln">14</span><span class="lc"><span class="k">const</span> <span class="n">PORT</span> = <span class="n">process</span>.<span class="n">env</span>.<span class="n">PORT</span> || <span class="num">3000</span>;</span></div>
+<div class="cl"><span class="ln">15</span><span class="lc"><span class="n">app</span>.<span class="n">listen</span>(<span class="n">PORT</span>, () => {</span></div>
+<div class="cl"><span class="ln">16</span><span class="lc">  <span class="n">console</span>.<span class="n">log</span>(<span class="s">`Server on port <span class="p">${PORT}</span>`</span>);</span></div>
+<div class="cl"><span class="ln">17</span><span class="lc">});</span></div>
+        </pre>
+      </div>
+    </div>
+  </div>
+  <div id="ap-terminal" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+    <div class="ap-bc"><span style="color:var(--t1);">/Users/nieyuchen/ecommerce-login</span></div>
+    <div class="terminal">
+      <div><span class="t-pr">$ </span><span class="t-cm">mkdir -p ecommerce-login && cd ecommerce-login && npm init -y</span></div>
+      <div class="t-ot">Wrote to package.json: {"name":"ecommerce-login"...}</div>
+      <div><span class="t-pr">$ </span><span class="t-cm">npm install express jsonwebtoken bcryptjs cors</span></div>
+      <div class="t-ot">added 72 packages in 3.2s</div>
+      <div><span class="t-pr">$ </span><span class="t-cm">node server.js</span></div>
+      <div class="t-ok">✓ Server running on port 3000</div>
+      <div><span class="t-pr">$ </span><span class="t-cm">npm test</span></div>
+      <div class="t-ok">✓  POST /api/auth/login   — 正常登录返回 token</div>
+      <div class="t-ok">✓  POST /api/auth/login   — 密码错误 401</div>
+      <div class="t-ok">✓  POST /api/auth/login   — 用户不存在 401</div>
+      <div class="t-ok">✓  GET  /api/auth/me      — Token 有效</div>
+      <div class="t-ok">✓  GET  /api/auth/me      — Token 过期 401</div>
+      <div class="t-ok">✓  POST /api/auth/logout  — 注销成功</div>
+      <div style="margin-top:4px;color:var(--grn);">12 passing (1.2s)  coverage: 89%</div>
+    </div>
+  </div>
+  <div id="ap-diff" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+    <div class="ap-bc"><span style="color:var(--t1);">变更文件 · 6 个</span></div>
+    <div class="diff-view">
+      <div class="df">+ src/routes/auth.js  (new)</div>
+      <div class="da2">+ const router = require('express').Router();</div>
+      <div class="da2">+ const jwt = require('jsonwebtoken');</div>
+      <div class="da2">+ router.post('/login', async (req, res) => {</div>
+      <div class="dc">  ...</div>
+      <div class="df" style="margin-top:6px;">+ src/middleware/jwt.js  (new)</div>
+      <div class="da2">+ module.exports = (req, res, next) => {</div>
+      <div class="da2">+   const token = req.headers.authorization?.split(' ')[1];</div>
+      <div class="dc">  ...</div>
+      <div class="df" style="margin-top:6px;">M package.json  (modified)</div>
+      <div class="dd">- "version": "1.0.0"</div>
+      <div class="da2">+ "version": "1.0.0",</div>
+      <div class="da2">+ "description": "电商登录系统"</div>
+    </div>
+  </div>
+  <div id="ap-file" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+    <div class="ap-bc"><span style="color:var(--t1);">package.json</span></div>
+    <div class="ap-body">
+      <div class="code-wrap">
+        <pre class="code">
+<div class="cl"><span class="ln">1</span><span class="lc">{</span></div>
+<div class="cl"><span class="ln">2</span><span class="lc">  <span class="s">"name"</span>: <span class="s">"ecommerce-login"</span>,</span></div>
+<div class="cl"><span class="ln">3</span><span class="lc">  <span class="s">"version"</span>: <span class="s">"1.0.0"</span>,</span></div>
+<div class="cl"><span class="ln">4</span><span class="lc">  <span class="s">"description"</span>: <span class="s">"电商登录系统"</span>,</span></div>
+<div class="cl"><span class="ln">5</span><span class="lc">  <span class="s">"main"</span>: <span class="s">"server.js"</span>,</span></div>
+<div class="cl"><span class="ln">6</span><span class="lc">  <span class="s">"scripts"</span>: {</span></div>
+<div class="cl"><span class="ln">7</span><span class="lc">    <span class="s">"start"</span>: <span class="s">"node server.js"</span>,</span></div>
+<div class="cl"><span class="ln">8</span><span class="lc">    <span class="s">"test"</span>: <span class="s">"jest"</span></span></div>
+<div class="cl"><span class="ln">9</span><span class="lc">  }</span></div>
+<div class="cl"><span class="ln">10</span><span class="lc">}</span></div>
+        </pre>
+      </div>
+    </div>
+  </div>
+</div><!-- /ap -->
+
+</div><!-- /app -->
+
+<!-- DRILL OVERLAY -->
+<div class="drill-ov" id="drill" onclick="closeDrillOv(event)">
+  <div class="drill-panel">
+    <div class="drill-hd">
+      <canvas class="drill-av-c" id="drill-av" width="10" height="10"></canvas>
+      <div>
+        <div id="drill-name" style="font-size:13px;font-weight:700;color:var(--t1);"></div>
+        <div id="drill-role" style="font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:2px;"></div>
+      </div>
+      <span class="sc-tag sct-done" style="margin-left:auto;">✓ 任务完成</span>
+      <button class="drill-close" onclick="closeDrillBtn()">✕</button>
+    </div>
+    <div class="drill-body" id="drill-body"></div>
+  </div>
+</div>
+
+<script>
+/* ── PIXEL AVATAR ENGINE ──
+   12×12 grid per avatar (fits nicely in 28-32px display)
+   palette chars → hex colors
+*/
+const P = {
+  _:null,
+  K:'#1a1a20',k:'#28282d',S:'#38383f',s:'#52525e',
+  W:'#e4e4ea',w:'#c0c0cc',G:'#34d399',g:'#6ee7b7',
+  B:'#60a5fa',b:'#93c5fd',O:'#f59e0b',o:'#fcd34d',
+  R:'#f87171',r:'#fca5a5',V:'#8b5cf6',v:'#a78bfa',
+  N:'#1e3a5f',n:'#2d5f8a',T:'#2d1b4e',t:'#4c1d95',
+  Y:'#d97706',y:'#f59e0b',
+};
+// 12 chars per row, 12 rows
+const AVMAP = {
+  tl:[  // Team Leader: gold crown, noble face
+    '____OoOo____',
+    '___OoOoOo___',
+    '____OOOO____',
+    '__OOOOOOOO__',
+    '_KKWWwWWKK__',
+    '_KWwwwwwWK__',
+    '_KWoOwwOoWK_',
+    '_KWwwwwwwWK_',
+    '_KWwwwwwwWK_',
+    '__KKwwwwKK__',
+    '____WwWw____',
+    '____________',
+  ],
+  arch:[ // Arch Agent: blue helmet/hardhat, methodical
+    '____BBBB____',
+    '__BBbbbbBB__',
+    '_BBBbbbbBBB_',
+    '_BBBBBBBBB__',
+    '_KKWWwWWKK__',
+    '_KWwwwwwWK__',
+    '_KWBBwwBBWK_',
+    '_KWwwwwwwWK_',
+    '_KWNNwwNNWK_',
+    '__KKwwwwKK__',
+    '____WwWw____',
+    '____________',
+  ],
+  db:[ // DB Agent: green glasses, data-nerd
+    '____________',
+    '__GGGGGGGG__',
+    '_GGggggggGG_',
+    '_GGGGGGGGGG_',
+    '_KKWWwWWKK__',
+    '_KWwwwwwWK__',
+    '_KWGGkGGkWK_',
+    '_KWwwwwwwWK_',
+    '_KWssssssWK_',
+    '__KKwwwwKK__',
+    '____WwWw____',
+    '____________',
+  ],
+  be:[ // Backend: dark hoodie, focused
+    '__kkkkkkkk__',
+    '_kkKKKKKKkk_',
+    '_kkKKKKKKkk_',
+    '_kkKKKKKKkk_',
+    '_kkWWwWWkk__',
+    '_kkWwwwwWkk_',
+    '_kkWSSwSSWkk',
+    '_kkWwwwwwWkk',
+    '_kkKkkkkKkk_',
+    '__kkkkkkkk__',
+    '____WwWw____',
+    '____________',
+  ],
+  fe:[ // Frontend: colorful beret, creative
+    '____VVVV____',
+    '__VVvvvvVV__',
+    '_VVVvvvvVVV_',
+    '_VVVVVVVVV__',
+    '_KKWWwWWKK__',
+    '_KWwwwwwWK__',
+    '_KWRRwBBwWK_',
+    '_KWwwwwwwWK_',
+    '_KWGwwwwGWK_',
+    '__KKwwwwKK__',
+    '____WwWw____',
+    '____________',
+  ],
+  test:[ // Test Agent: clipboard / magnifier
+    '____OOOO____',
+    '__OOoooOOO__',
+    '_OOoooooOO__',
+    '_OOOOOOOO___',
+    '_KKWWwWWKK__',
+    '_KWwwwwwWK__',
+    '_KWoOwwoOWK_',
+    '_KWwwwwwwWK_',
+    '_KWSssssSWK_',
+    '__KKwwwwKK__',
+    '____WwWw____',
+    '____________',
+  ],
+};
+
+function drawAv(canvas, key, displaySize) {
+  const rows = AVMAP[key];
+  if (!rows || !canvas) return;
+  const h = rows.length, w = rows[0].length;
+  canvas.width = w; canvas.height = h;
+  canvas.style.width = displaySize + 'px';
+  canvas.style.height = displaySize + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,w,h);
+  for (let r=0;r<h;r++) for (let c=0;c<w;c++) {
+    const col = P[rows[r][c]];
+    if (!col) continue;
+    ctx.fillStyle = col;
+    ctx.fillRect(c,r,1,1);
+  }
+}
+
+function initAvatars() {
+  drawAv(document.getElementById('av-tl'), 'tl', 28);
+  drawAv(document.getElementById('av-tl2'),'tl', 28);
+  drawAv(document.getElementById('sc-arch'),'arch',30);
+  drawAv(document.getElementById('sc-db'),  'db',  30);
+  drawAv(document.getElementById('sc-be'),  'be',  30);
+  drawAv(document.getElementById('sc-fe'),  'fe',  30);
+  drawAv(document.getElementById('sc-test'),'test',30);
+  drawAv(document.getElementById('tp-arch'),'arch',18);
+  drawAv(document.getElementById('tp-db'),  'db',  18);
+  drawAv(document.getElementById('tp-be'),  'be',  18);
+  drawAv(document.getElementById('tp-fe'),  'fe',  18);
+  drawAv(document.getElementById('tp-test'),'test',18);
+}
+
+/* ── DRILL DATA ── */
+const DD = {
+  arch:{key:'arch',name:'Arch Agent',role:'目录检查 · 项目初始化',steps:[
+    {t:'检查目录结构',d:'执行 list_directory，发现目录不存在，准备重新创建。',c:'$ pwd\n/Users/nieyuchen',r:'目录已确认'},
+    {t:'初始化 npm 项目',d:'创建 ecommerce-login 目录，执行 npm init -y，生成 package.json。',c:'$ mkdir -p ecommerce-login && npm init -y\nWrote to package.json',r:'package.json 已生成'},
+    {t:'创建目录骨架',d:'创建 src/routes、src/middleware、src/models 三个子目录。',c:'$ mkdir -p src/routes src/middleware src/models',r:'目录结构就绪'},
+  ]},
+  db:{key:'db',name:'DB Agent',role:'数据库 Schema · users 表',steps:[
+    {t:'设计 users 表结构',d:'分析登录需求，定义 id / email / password_hash / created_at 四个核心字段。',c:'CREATE TABLE users (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  email VARCHAR(255) UNIQUE NOT NULL,\n  password_hash VARCHAR(60) NOT NULL,\n  created_at TIMESTAMP DEFAULT NOW()\n);',r:'Schema 设计完成'},
+    {t:'创建 User.js Model',d:'封装 findOne、create 方法，供 Backend Agent 调用，屏蔽底层存储细节。',c:'// src/models/User.js\nconst users = [];\nmodule.exports = { findOne, create };',r:'User.js 已输出'},
+  ]},
+  backend:{key:'be',name:'Backend Dev Agent',role:'Node.js API · JWT 鉴权',steps:[
+    {t:'实现登录接口',d:'POST /api/auth/login：bcrypt 密码比对，成功签发 JWT，有效期 7 天。',c:"router.post('/login', async (req, res) => {\n  const user = await User.findOne({email});\n  const ok = await bcrypt.compare(pwd, user.hash);\n  const token = jwt.sign({id:user.id}, SECRET, {expiresIn:'7d'});\n  res.json({ token });\n});",r:'登录接口完成'},
+    {t:'JWT 中间件',d:'解析 Authorization: Bearer token，验证签名与过期时间，注入 req.user。',c:'const payload = jwt.verify(token, SECRET);\nreq.user = payload; next();',r:'jwt.js 完成'},
+    {t:'/me & logout 接口',d:'GET /me 返回用户信息；POST /logout 将 token 加入内存黑名单。',c:"router.get('/me', jwtMw, (req,res) => res.json(req.user));\nrouter.post('/logout', (req,res) => {\n  blacklist.add(token); res.json({ok:true});\n});",r:'3 个接口全部完成'},
+    {t:'启动服务验证',d:'node server.js 确认在 3000 端口运行，health check 返回 200。',c:'$ node server.js\n✓ Server running on port 3000',r:'服务启动成功'},
+  ]},
+  frontend:{key:'fe',name:'Frontend Dev Agent',role:'登录页面 · 表单校验',steps:[
+    {t:'创建 HTML 登录页',d:'public/index.html：邮箱/密码输入框、按钮、错误提示。',c:'<form id="login-form">\n  <input type="email" id="email" />\n  <input type="password" id="password" />\n  <button type="submit">登 录</button>\n</form>',r:'index.html 完成'},
+    {t:'前端请求逻辑',d:'fetch POST /api/auth/login，成功存 Token，失败展示错误提示。',c:"const res = await fetch('/api/auth/login', {\n  method:'POST', body: JSON.stringify({email, password})\n});\nif(res.ok) localStorage.setItem('token', data.token);",r:'login.js 完成'},
+    {t:'样式与动效',d:'按钮加载动画、shake 错误动效、响应式布局。',c:'button[disabled]{opacity:.6;cursor:wait;}\n.shake{animation:shake .3s ease;}',r:'style.css 完成'},
+  ]},
+  test:{key:'test',name:'Test Agent',role:'接口测试 · 沙箱运行',steps:[
+    {t:'编写 12 个测试用例',d:'覆盖正常登录、密码错误、用户不存在、Token 验证、过期、Logout 等场景。',c:"describe('POST /api/auth/login', () => {\n  it('正常登录返回 token', ...);\n  it('密码错误返回 401', ...);\n  it('用户不存在返回 401', ...);\n});",r:'12 个用例就绪'},
+    {t:'沙箱运行 & 输出报告',d:'在隔离沙箱启动服务，执行 npm test，全部通过，覆盖率 89%。',c:'$ npm test\n✓ 12 passing (1.2s)\n✗ 0 failing\ncoverage: 89%',r:'全部通过，覆盖率 89%'},
+  ]},
+};
+
+function openDrill(key) {
+  const d = DD[key]; if(!d) return;
+  drawAv(document.getElementById('drill-av'), d.key, 32);
+  document.getElementById('drill-name').textContent = d.name;
+  document.getElementById('drill-role').textContent = d.role;
+  let html = '';
+  d.steps.forEach((s,i) => {
+    html += `<div class="ds"><div class="ds-ic">✓</div><div class="ds-c">
+      <div class="ds-t">${i+1}. ${s.t}</div>
+      <div class="ds-d">${s.d}</div>
+      <div class="ds-code">${s.c.replace(/</g,'&lt;')}</div>
+      <div class="ds-r">✓ ${s.r}</div>
+    </div></div>`;
+  });
+  document.getElementById('drill-body').innerHTML = html;
+  document.getElementById('drill').classList.add('v');
+}
+function closeDrillOv(e){if(e.target.id==='drill')document.getElementById('drill').classList.remove('v');}
+function closeDrillBtn(){document.getElementById('drill').classList.remove('v');}
+
+/* ── UI STATE ── */
+const S={mode:'space',stab:'code',imode:'team',lopen:true,ropen:true,monopen:true,aptab:'browser'};
+
+function switchMode(m){
+  S.mode=m;
+  document.getElementById('btn-ide').classList.toggle('on',m==='ide');
+  document.getElementById('btn-space').classList.toggle('on',m==='space');
+  document.getElementById('sl').classList.toggle('off',m==='ide');
+  if(m==='ide'){document.getElementById('ap').classList.add('off');}
+  else if(S.ropen){document.getElementById('ap').classList.remove('off');}
+}
+function togglePanel(side){
+  if(side==='l'){
+    S.lopen=!S.lopen;
+    document.getElementById('sl').classList.toggle('off',!S.lopen);
+    document.getElementById('tb-l').classList.toggle('on',S.lopen);
+  } else {
+    S.ropen=!S.ropen;
+    document.getElementById('ap').classList.toggle('off',!S.ropen);
+    document.getElementById('tb-r').classList.toggle('on',S.ropen);
+  }
+}
+function toggleMonitor(){
+  S.monopen=!S.monopen;
+  document.getElementById('task-monitor').classList.toggle('off',!S.monopen);
+  document.getElementById('mon-btn').classList.toggle('on',S.monopen);
+  document.getElementById('mon-arrow').textContent=S.monopen?'‹':'›';
+}
+function switchSideTab(t){
+  S.stab=t;
+  document.getElementById('slt-claw').classList.toggle('on',t==='claw');
+  document.getElementById('slt-code').classList.toggle('on',t==='code');
+  document.getElementById('claw-c').style.display=t==='claw'?'flex':'none';
+  document.getElementById('code-c').style.display=t==='code'?'flex':'none';
+  document.getElementById('setbtn').textContent=t==='claw'?'⚙ Claw 设置':'⚙ Code 设置';
+}
+function switchAP(t){
+  S.aptab=t;
+  ['browser','terminal','diff','file'].forEach(x=>{
+    document.getElementById('apt-'+x).classList.toggle('on',x===t);
+    document.getElementById('ap-'+x).style.display=x===t?'flex':'none';
+  });
+}
+function switchInputMode(m){
+  S.imode=m;
+  ['ask','agent','team'].forEach(x=>document.getElementById('mp-'+x).classList.toggle('on',x===m));
+  document.getElementById('team-cfg').style.display=m==='team'?'flex':'none';
+}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function sendMsg(){
+  const el=document.querySelector('.cinput');
+  const t=el.value.trim();if(!t)return;
+  const area=document.getElementById('chat-area');
+  const d=document.createElement('div');d.className='msg u';
+  d.innerHTML=`<div class="av-u">U</div><div class="mb"><div class="sender">You</div><div class="bubble">${t.replace(/</g,'&lt;')}</div></div>`;
+  area.appendChild(d);el.value='';el.style.height='auto';area.scrollTop=area.scrollHeight;
+  setTimeout(()=>{
+    const r=document.createElement('div');r.className='msg';
+    const pw=document.createElement('div');pw.className='pav-w';
+    const c=document.createElement('canvas');drawAv(c,'tl',28);pw.appendChild(c);
+    const mb=document.createElement('div');mb.className='mb';
+    mb.innerHTML=`<div class="sender">Team Leader <span style="color:var(--t4)">· 刚刚</span></div><div class="bubble" style="color:var(--t2)">已接收任务，正在规划子 Agent 分配方案…</div>`;
+    r.appendChild(pw);r.appendChild(mb);area.appendChild(r);area.scrollTop=area.scrollHeight;
+  },500);
+}
+
+initAvatars();
+switchSideTab('code');
+document.getElementById('team-cfg').style.display='flex';
+</script>
+</body>
+</html>

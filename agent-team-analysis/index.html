@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Team 模式 UX 五要素深度分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #0a0a0b;
+  --void-2: #111114;
+  --void-3: #18181c;
+  --void-4: #222228;
+  --grid: rgba(255,255,255,0.05);
+  --rule: rgba(255,255,255,0.08);
+  --rule-2: rgba(255,255,255,0.14);
+  --text-1: #f0efe8;
+  --text-2: #9e9d97;
+  --text-3: #5c5b57;
+  --neon: #c8f542;        /* lime — primary accent */
+  --neon-2: #42d4f5;      /* cyan */
+  --neon-3: #f5a142;      /* amber */
+  --neon-4: #f542a1;      /* pink */
+  --neon-5: #a142f5;      /* purple */
+  --col: 920px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--void);
+  color: var(--text-1);
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── BG GRID ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── COVER ── */
+.cover {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 0;
+  overflow: hidden;
+}
+.cover-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(200,245,66,0.03) 100%);
+  pointer-events: none;
+}
+.cover-top {
+  padding: 32px 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+}
+.cover-logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.cover-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: .1em;
+}
+.cover-main {
+  padding: 80px 64px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 48px;
+}
+.cover-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--neon);
+  border: 1px solid rgba(200,245,66,0.3);
+  padding: 5px 12px;
+  width: fit-content;
+}
+.cover-tag::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--neon);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.cover-h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: .95;
+  letter-spacing: -.03em;
+  color: var(--text-1);
+  max-width: 840px;
+}
+.cover-h1 .hi { color: var(--neon); }
+.cover-h1 .hi2 { color: var(--neon-2); }
+
+.cover-desc {
+  max-width: 560px;
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.75;
+}
+
+.cover-products {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+  border: 1px solid var(--rule);
+  width: fit-content;
+}
+.cover-prod {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 10px 20px;
+  border-right: 1px solid var(--rule);
+}
+.cover-prod:last-child { border-right: none; }
+.cover-prod.active { color: var(--neon); background: rgba(200,245,66,0.04); }
+
+.cover-bottom {
+  padding: 24px 64px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cover-bottom-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: .08em;
+}
+.scroll-hint {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: .1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.scroll-hint::after {
+  content: '↓';
+  animation: bounce 1.5s infinite;
+}
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
+
+/* ── NAV ── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,11,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 64px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+.nav a {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  text-decoration: none;
+  padding: 14px 16px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color .2s, border-color .2s;
+}
+.nav a:hover { color: var(--neon); border-color: var(--neon); }
+
+/* ── LAYOUT ── */
+.page { max-width: var(--col); margin: 0 auto; padding: 80px 40px; position: relative; z-index: 1; }
+.section { margin-bottom: 100px; }
+
+/* ── SECTION HEADERS ── */
+.kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--neon);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.kicker::before { content:''; width:24px; height:1px; background:var(--neon); }
+.kicker.cyan { color: var(--neon-2); }
+.kicker.cyan::before { background: var(--neon-2); }
+.kicker.amber { color: var(--neon-3); }
+.kicker.amber::before { background: var(--neon-3); }
+.kicker.pink { color: var(--neon-4); }
+.kicker.pink::before { background: var(--neon-4); }
+.kicker.purple { color: var(--neon-5); }
+.kicker.purple::before { background: var(--neon-5); }
+
+.section-h {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  color: var(--text-1);
+  margin-bottom: 20px;
+}
+.section-lead {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.8;
+  max-width: 680px;
+  margin-bottom: 48px;
+  padding-left: 20px;
+  border-left: 2px solid var(--rule-2);
+}
+
+/* ── PRODUCT HEADER STRIP ── */
+.prod-strip {
+  display: grid;
+  grid-template-columns: 200px repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--rule);
+  margin-bottom: 0;
+}
+.prod-strip-cell {
+  padding: 16px 18px;
+  border-right: 1px solid var(--rule);
+}
+.prod-strip-cell:last-child { border-right: none; }
+.prod-strip-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.prod-strip-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-1);
+}
+.prod-strip-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.prod-c { border-top: 2px solid var(--neon); }
+.prod-c .prod-strip-label { color: var(--neon); }
+.prod-q { border-top: 2px solid var(--neon-2); }
+.prod-q .prod-strip-label { color: var(--neon-2); }
+.prod-k { border-top: 2px solid var(--neon-3); }
+.prod-k .prod-strip-label { color: var(--neon-3); }
+
+/* ── DATA TABLE ── */
+.dtable {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--rule);
+  border-top: none;
+  margin-bottom: 32px;
+}
+.dtable thead th {
+  padding: 11px 16px;
+  text-align: left;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  background: var(--void-3);
+}
+.dtable thead th:last-child { border-right: none; }
+.dtable tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  color: var(--text-2);
+  vertical-align: top;
+  line-height: 1.6;
+  font-size: 13px;
+}
+.dtable tbody td:last-child { border-right: none; }
+.dtable tbody td:first-child {
+  color: var(--text-1);
+  font-weight: 500;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  background: var(--void-2);
+  width: 200px;
+}
+.dtable tbody tr:last-child td { border-bottom: none; }
+.dtable tbody tr:hover td { background: rgba(255,255,255,0.015); }
+
+/* ── ARCH COMPARISON ── */
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-bottom: 32px;
+}
+.arch-card {
+  background: var(--void-2);
+  padding: 24px 22px;
+}
+.arch-accent-c { border-top: 2px solid var(--neon); }
+.arch-accent-q { border-top: 2px solid var(--neon-2); }
+.arch-accent-k { border-top: 2px solid var(--neon-3); }
+.arch-product {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.arch-accent-c .arch-product { color: var(--neon); }
+.arch-accent-q .arch-product { color: var(--neon-2); }
+.arch-accent-k .arch-product { color: var(--neon-3); }
+.arch-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-1);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.arch-body { font-size: 12.5px; color: var(--text-2); line-height: 1.65; }
+.arch-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.arch-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid var(--rule-2);
+  color: var(--text-3);
+}
+
+/* ── DIAGRAM BLOCK ── */
+.diagram-block {
+  border: 1px solid var(--rule);
+  background: var(--void-2);
+  padding: 32px;
+  margin-bottom: 32px;
+  position: relative;
+}
+.diagram-label {
+  position: absolute;
+  top: -10px;
+  left: 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  background: var(--neon);
+  color: var(--void);
+  padding: 2px 10px;
+  font-weight: 500;
+}
+.diagram-label.cyan { background: var(--neon-2); }
+.diagram-label.amber { background: var(--neon-3); }
+
+/* ── FLOW VISUAL ── */
+.flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+.flow-node {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 8px 14px;
+  border: 1px solid var(--rule-2);
+  color: var(--text-1);
+  background: var(--void-3);
+  white-space: nowrap;
+}
+.flow-node.active-c { border-color: var(--neon); color: var(--neon); background: rgba(200,245,66,0.06); }
+.flow-node.active-q { border-color: var(--neon-2); color: var(--neon-2); background: rgba(66,212,245,0.06); }
+.flow-node.active-k { border-color: var(--neon-3); color: var(--neon-3); background: rgba(245,161,66,0.06); }
+.flow-arr {
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 0 8px;
+}
+.flow-parallel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+/* ── INSIGHT ── */
+.insight {
+  position: relative;
+  padding: 24px 28px 24px 36px;
+  border: 1px solid rgba(200,245,66,0.2);
+  background: rgba(200,245,66,0.03);
+  margin: 32px 0;
+}
+.insight::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--neon);
+}
+.insight.cyan { border-color: rgba(66,212,245,0.2); background: rgba(66,212,245,0.03); }
+.insight.cyan::before { background: var(--neon-2); }
+.insight.amber { border-color: rgba(245,161,66,0.2); background: rgba(245,161,66,0.03); }
+.insight.amber::before { background: var(--neon-3); }
+.insight-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--neon);
+  margin-bottom: 8px;
+}
+.insight.cyan .insight-label { color: var(--neon-2); }
+.insight.amber .insight-label { color: var(--neon-3); }
+.insight-text { font-size: 14px; color: var(--text-1); line-height: 1.7; }
+.insight-sub { font-size: 12.5px; color: var(--text-2); margin-top: 8px; line-height: 1.65; }
+
+/* ── MATRIX ── */
+.matrix-wrap { overflow-x: auto; margin: 32px 0; }
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--rule);
+  min-width: 680px;
+}
+.matrix th {
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  background: var(--void-3);
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  text-align: left;
+}
+.matrix th.h-c { color: var(--neon); }
+.matrix th.h-q { color: var(--neon-2); }
+.matrix th.h-k { color: var(--neon-3); }
+.matrix th:last-child { border-right: none; }
+.matrix td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  font-size: 12.5px;
+  color: var(--text-2);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.matrix td:last-child { border-right: none; }
+.matrix td.row-head {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .06em;
+  color: var(--text-1);
+  background: var(--void-2);
+  white-space: nowrap;
+  width: 160px;
+}
+.matrix tr:last-child td { border-bottom: none; }
+
+/* ── SCORE BARS ── */
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.score-row:last-child { border-bottom: none; }
+.score-label { font-size: 13px; color: var(--text-1); min-width: 200px; font-weight: 500; }
+.score-bars { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.score-bar-item { display: flex; align-items: center; gap: 10px; }
+.score-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  width: 80px;
+  flex-shrink: 0;
+}
+.score-name.c { color: var(--neon); }
+.score-name.q { color: var(--neon-2); }
+.score-name.k { color: var(--neon-3); }
+.score-track { flex: 1; height: 3px; background: var(--void-4); border-radius: 2px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; }
+.score-fill.c { background: var(--neon); }
+.score-fill.q { background: var(--neon-2); }
+.score-fill.k { background: var(--neon-3); }
+.score-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  min-width: 28px;
+  text-align: right;
+}
+.score-val.c { color: var(--neon); }
+.score-val.q { color: var(--neon-2); }
+.score-val.k { color: var(--neon-3); }
+
+/* ── PULLQUOTE ── */
+.pullquote {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px,2.5vw,26px);
+  line-height: 1.35;
+  color: var(--text-1);
+  padding: 32px 0;
+  border-top: 1px solid var(--rule-2);
+  border-bottom: 1px solid var(--rule);
+  margin: 48px 0;
+  letter-spacing: -.01em;
+}
+.pullquote .hl-c { color: var(--neon); }
+.pullquote .hl-q { color: var(--neon-2); }
+.pullquote .hl-k { color: var(--neon-3); }
+
+/* ── LAYER INTRO ── */
+.layer-intro {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 32px;
+  align-items: start;
+  padding: 28px 0;
+  border-top: 1px solid var(--rule);
+  margin-bottom: 36px;
+}
+.layer-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--void-4);
+  letter-spacing: -.04em;
+}
+.layer-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 600; color: var(--text-1); margin-bottom: 6px; }
+.layer-def { font-size: 12.5px; color: var(--text-3); font-style: italic; margin-bottom: 12px; line-height: 1.55; }
+.layer-q {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--neon);
+  padding: 8px 12px;
+  border-left: 2px solid var(--neon);
+  background: rgba(200,245,66,0.04);
+  line-height: 1.5;
+}
+
+/* ── HR ── */
+.hr { border: none; border-top: 1px solid var(--rule); margin: 56px 0; }
+.hr-bright { border-top: 1px solid var(--rule-2); }
+
+/* ── TAG CHIPS ── */
+.chip {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 0;
+  margin: 1px;
+}
+.chip-c { color: var(--neon); border-color: rgba(200,245,66,0.3); background: rgba(200,245,66,0.05); }
+.chip-q { color: var(--neon-2); border-color: rgba(66,212,245,0.3); background: rgba(66,212,245,0.05); }
+.chip-k { color: var(--neon-3); border-color: rgba(245,161,66,0.3); background: rgba(245,161,66,0.05); }
+.chip-g { color: #4af090; border-color: rgba(74,240,144,0.3); background: rgba(74,240,144,0.05); }
+.chip-x { color: var(--text-3); border-color: var(--rule); background: transparent; }
+
+/* ── COMPARISON VISUAL ── */
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 16px 0;
+}
+.comparison-cell {
+  background: var(--void-2);
+  padding: 18px 18px;
+}
+.comparison-head {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.comparison-head.c { color: var(--neon); }
+.comparison-head.q { color: var(--neon-2); }
+.comparison-head.k { color: var(--neon-3); }
+.comparison-content { font-size: 12.5px; color: var(--text-2); line-height: 1.6; }
+.comparison-content strong { color: var(--text-1); font-weight: 500; }
+
+/* ── IMPLICATION CARDS ── */
+.imp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 32px 0; }
+.imp-card {
+  padding: 22px 20px;
+  border: 1px solid var(--rule);
+  background: var(--void-2);
+  position: relative;
+  overflow: hidden;
+}
+.imp-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.imp-card.c::after { background: var(--neon); }
+.imp-card.q::after { background: var(--neon-2); }
+.imp-card.k::after { background: var(--neon-3); }
+.imp-card.mix::after { background: linear-gradient(90deg, var(--neon), var(--neon-2), var(--neon-3)); }
+.imp-layer {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
+.imp-title { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 8px; line-height: 1.3; }
+.imp-body { font-size: 12px; color: var(--text-2); line-height: 1.65; }
+
+/* ── FOOTER ── */
+.footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--rule);
+  padding: 28px 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--void);
+}
+.footer-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: .08em;
+}
+.footer-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+@media (max-width: 720px) {
+  .cover-top, .cover-bottom { padding: 20px 24px; }
+  .cover-main { padding: 48px 24px 40px; }
+  .nav { padding: 0 16px; }
+  .page { padding: 48px 20px; }
+  .prod-strip, .arch-grid, .comparison-row { grid-template-columns: 1fr; }
+  .imp-grid { grid-template-columns: 1fr; }
+  .layer-intro { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ══ -->
+<section class="cover">
+  <div class="cover-scan"></div>
+  <div class="cover-top">
+    <div class="cover-logo">AI Tool Analysis · Series 02</div>
+    <div class="cover-date">2026.04 · UX Five Elements Framework</div>
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-tag">Agent Team Mode · Multi-product Analysis</div>
+    <h1 class="cover-h1">
+      <span class="hi">Agent Team</span><br>
+      模式的<br>
+      <span class="hi2">UX 解剖</span>
+    </h1>
+    <p class="cover-desc">
+      当「一个 Agent 打天下」变成「一支 Agent 军队协同作战」——Claude Code、Qoder 专家团、Kimi Agent Swarm 三款产品如何在战略层、范围层、结构层、框架层、表现层各自下注？这份报告用 UX 五要素框架，系统解构三种 Agent Team 设计哲学的底层逻辑与竞争差异。
+    </p>
+    <div class="cover-products">
+      <div class="cover-prod active">Claude Code Agent Teams</div>
+      <div class="cover-prod active">Qoder 专家团 Experts</div>
+      <div class="cover-prod active">Kimi Agent Swarm</div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-bottom-left">UX Five Elements · Strategy → Scope → Structure → Skeleton → Surface</div>
+    <div class="scroll-hint">Scroll to explore</div>
+  </div>
+</section>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <a href="#overview">产品概览</a>
+  <a href="#layer1">战略层</a>
+  <a href="#layer2">范围层</a>
+  <a href="#layer3">结构层</a>
+  <a href="#layer4">框架层</a>
+  <a href="#layer5">表现层</a>
+  <a href="#synthesis">综合评估</a>
+  <a href="#implications">设计启示</a>
+</nav>
+
+<div class="page">
+
+<!-- ══ OVERVIEW ══ -->
+<section class="section" id="overview">
+  <div class="kicker">产品概览</div>
+  <h2 class="section-h">三种 Agent Team 的<br>底层架构差异</h2>
+  <p class="section-lead">
+    表面上，Claude Code Agent Teams、Qoder 专家团、Kimi Agent Swarm 都是「多 agent 并行执行任务」。但在架构层面，三者的 agent 间通信方式、编排来源、角色定义机制截然不同——这些差异不是实现细节，而是产品哲学的体现。
+  </p>
+
+  <div class="prod-strip">
+    <div class="prod-strip-cell" style="background:var(--void-3); display:flex; align-items:center;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--text-3);">维度对比</span>
+    </div>
+    <div class="prod-strip-cell prod-c">
+      <div class="prod-strip-label">Anthropic</div>
+      <div class="prod-strip-name">Claude Code</div>
+      <div class="prod-strip-sub">Agent Teams · Feb 2026</div>
+    </div>
+    <div class="prod-strip-cell prod-q">
+      <div class="prod-strip-label">Alibaba · Qoder</div>
+      <div class="prod-strip-name">专家团 Experts</div>
+      <div class="prod-strip-sub">Experts Mode · Mar 2026</div>
+    </div>
+    <div class="prod-strip-cell prod-k">
+      <div class="prod-strip-label">Moonshot AI</div>
+      <div class="prod-strip-name">Kimi Agent Swarm</div>
+      <div class="prod-strip-sub">K2.5 / K2.6 · Jan–Apr 2026</div>
+    </div>
+  </div>
+
+  <table class="dtable">
+    <thead>
+      <tr>
+        <th style="width:200px;">基础参数</th>
+        <th style="color:var(--neon)">Claude Code</th>
+        <th style="color:var(--neon-2)">Qoder 专家团</th>
+        <th style="color:var(--neon-3)">Kimi Agent Swarm</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>发布时间</td>
+        <td>2026-02-05（Opus 4.6 同步）</td>
+        <td>2026-03-18</td>
+        <td>K2.5: 2026-01-27；K2.6: 2026-04-20</td>
+      </tr>
+      <tr>
+        <td>最大 agent 数量</td>
+        <td>无硬性上限（实测 5–10 效果最佳）</td>
+        <td>动态拉起，依任务复杂度</td>
+        <td>K2.5: 100 sub-agents；K2.6: 300 sub-agents</td>
+      </tr>
+      <tr>
+        <td>Agent 间通信</td>
+        <td><span class="chip chip-c">P2P mailbox</span> peer-to-peer 直接消息 + 共享 task list</td>
+        <td><span class="chip chip-q">Team Lead 中转</span> 通过 Lead 协调，支持实时调整</td>
+        <td><span class="chip chip-k">Orchestrator</span> 中央编排器动态调度，sub-agent 独立执行</td>
+      </tr>
+      <tr>
+        <td>角色定义方式</td>
+        <td>用户 prompt 指定 + subagent 定义文件（.claude/agents/）</td>
+        <td>Team Lead 自动分析需求后动态拉起</td>
+        <td>无预定义角色；orchestrator 根据任务自主创建</td>
+      </tr>
+      <tr>
+        <td>技术状态</td>
+        <td>Research Preview（需 env flag）；Opus 4.6 required</td>
+        <td>正式上线；Pro 计划可用</td>
+        <td>Agent Swarm Beta；K2.6 已 GA</td>
+      </tr>
+      <tr>
+        <td>执行环境</td>
+        <td>本地 terminal + tmux（推荐）；各 agent 独立 context window</td>
+        <td>IDE 内嵌；共享项目上下文</td>
+        <td>Kimi 云端集群；本地为「指挥台」</td>
+      </tr>
+      <tr>
+        <td>训练支撑</td>
+        <td>工程架构设计；无专项训练</td>
+        <td>工程架构设计</td>
+        <td>专项 RL 训练：PARL（Parallel Agent Reinforcement Learning）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="arch-grid">
+    <div class="arch-card arch-accent-c">
+      <div class="arch-product">Claude Code</div>
+      <div class="arch-title">「工程师团队」模型<br>Squad Collaboration</div>
+      <div class="arch-body">多个独立 Claude 实例（各有 1M token 上下文）通过 mailbox 系统点对点通信，共享 task list 协作。不依赖中心节点——前端 agent 可以直接告知后端 agent API 变更，无需经过 Team Lead。</div>
+      <div class="arch-tags">
+        <span class="arch-tag">P2P 通信</span>
+        <span class="arch-tag">独立 context</span>
+        <span class="arch-tag">去中心化</span>
+        <span class="arch-tag">terminal-first</span>
+      </div>
+    </div>
+    <div class="arch-card arch-accent-q">
+      <div class="arch-product">Qoder 专家团</div>
+      <div class="arch-title">「项目经理 + 专家」模型<br>PM-Led Delegation</div>
+      <div class="arch-body">Team Lead 作为「大脑」统一理解目标、拆解任务、协调全局、质量把关。专家并行工作，但协调权集中在 Lead。用户可随时补充需求，Lead 实时适应变化，无需停止执行。</div>
+      <div class="arch-tags">
+        <span class="arch-tag">中心化 Lead</span>
+        <span class="arch-tag">实时可干预</span>
+        <span class="arch-tag">计划先行</span>
+        <span class="arch-tag">IDE 内嵌</span>
+      </div>
+    </div>
+    <div class="arch-card arch-accent-k">
+      <div class="arch-product">Kimi Agent Swarm</div>
+      <div class="arch-title">「自组织集群」模型<br>Self-Directed Swarm</div>
+      <div class="arch-body">无预定义角色，orchestrator 用专项 RL 训练（PARL）学会自主分解任务、动态实例化 frozen sub-agents 并行执行。sub-agent 执行完毕即消亡，结果汇聚给 orchestrator 合并。</div>
+      <div class="arch-tags">
+        <span class="arch-tag">PARL 专训</span>
+        <span class="arch-tag">动态实例化</span>
+        <span class="arch-tag">无预设角色</span>
+        <span class="arch-tag">云端集群</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pullquote">
+    同样是「多 agent」，<span class="hl-c">Claude Code</span> 让 agent 像工程师一样<strong>互相沟通</strong>，<span class="hl-q">Qoder</span> 让 agent 像员工一样<strong>听从 PM 指挥</strong>，<span class="hl-k">Kimi</span> 让 agent 像集群一样<strong>自主分裂执行</strong>——三种组织哲学，三套 UX 体系。
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ LAYER 1 ══ -->
+<section class="section" id="layer1">
+  <div class="kicker">第一层 · 战略层</div>
+  <h2 class="section-h">战略层：<br>为什么要做 Agent Team</h2>
+  <p class="section-lead">三款产品做 Agent Team 的出发点不同，面向的核心用户不同，「成功」的定义也截然不同。战略层的分歧，决定了后四层的所有设计选择。</p>
+
+  <div class="layer-intro">
+    <div class="layer-num">01</div>
+    <div>
+      <div class="layer-name">战略层 Strategy</div>
+      <div class="layer-def">「我们为什么做 Agent Team？这个功能为谁服务？用户核心需求是什么？」</div>
+      <div class="layer-q">核心追问：Agent Team 是解决「单 agent 上下文不够」的工程问题，还是解决「复杂任务需要专业分工」的协作问题，还是解决「大规模任务需要速度」的效率问题？</div>
+    </div>
+  </div>
+
+  <div class="comparison-row">
+    <div class="comparison-cell">
+      <div class="comparison-head c">Claude Code</div>
+      <div class="comparison-content">
+        <strong>战略定位：</strong>解决单 agent 上下文溢出 + 工程任务自然分层协作<br><br>
+        核心用户是<strong>专业开发者</strong>，执行跨层（frontend/backend/test）的大型工程任务。Agent Team 的本质是把「一个 agent 撑爆 context」变成「多个 agent 各管一层，互相告知变更」。<br><br>
+        <strong>成功标准：</strong>并行速度提升 + 代码质量（Claude Code Review 内测覆盖率从 16% 升至 54%）
+      </div>
+    </div>
+    <div class="comparison-cell">
+      <div class="comparison-head q">Qoder 专家团</div>
+      <div class="comparison-content">
+        <strong>战略定位：</strong>从「AI 程序员」进化为「AI 工程交付团队」<br><br>
+        核心用户是<strong>中高级开发者或技术 PM</strong>，提交需求，由专家团完成方案设计→编码→测试→评审的完整交付物。你拿到的不是代码片段，是一份经过规划的工程结果。<br><br>
+        <strong>成功标准：</strong>质量提升（内部测试 +67%）+ 用户「可以不盯着」的信任感
+      </div>
+    </div>
+    <div class="comparison-cell">
+      <div class="comparison-head k">Kimi Agent Swarm</div>
+      <div class="comparison-content">
+        <strong>战略定位：</strong>让单一模型获得「规模化并行」的能力，速度是第一性能指标<br><br>
+        核心用户跨度最大：从开发者到研究人员到内容创作者。Swarm 的价值不在于专业分工，而在于<strong>「把需要串行100步的任务压缩为并行10步」</strong>。执行时间减少最高 4.5x。<br><br>
+        <strong>成功标准：</strong>执行速度 + 大规模任务完成率（BrowseComp 86.3，领先 GPT-5.4）
+      </div>
+    </div>
+  </div>
+
+  <table class="dtable">
+    <thead>
+      <tr>
+        <th style="width:160px;">战略维度</th>
+        <th style="color:var(--neon)">Claude Code</th>
+        <th style="color:var(--neon-2)">Qoder</th>
+        <th style="color:var(--neon-3)">Kimi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>核心问题假设</td>
+        <td>单 agent context 有限 + 工程任务天然分层，需要专家各司其职并互通</td>
+        <td>AI 能力需要从「辅助编码」升级为「完整交付」，用户需要信任而非监控</td>
+        <td>复杂任务的天花板是串行执行速度，并行才能突破</td>
+      </tr>
+      <tr>
+        <td>目标用户</td>
+        <td>专业开发者（Pro/Max/Team）；需要 tmux 等工具配置</td>
+        <td>中高级开发者、技术 PM；期望完整交付物而非代码片段</td>
+        <td>开发者 + 研究者 + 内容工作者；最宽泛的目标用户群</td>
+      </tr>
+      <tr>
+        <td>产品成熟度赌注</td>
+        <td>工程严谨性：去中心化 P2P 架构是长期技术赌注</td>
+        <td>体验完整性：「提需求→拿结果」全流程顺滑是核心护城河</td>
+        <td>规模优先：300 agents 是技术 benchmark，但实际使用场景仍在探索</td>
+      </tr>
+      <tr>
+        <td>开放度</td>
+        <td>高度开放（subagent 定义、工具权限完全可配置）</td>
+        <td>黑盒偏高（用户无需了解内部专家分工）</td>
+        <td>完全黑盒（orchestrator 自主决策，用户不参与角色设计）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <div class="insight-label">战略层洞察</div>
+    <div class="insight-text">「解决上下文溢出」vs「提升交付质量」vs「压缩执行时间」——三个起点，三条产品路径</div>
+    <div class="insight-sub">Claude Code 的战略起点是工程架构问题（context 隔离、跨层协作）；Qoder 的起点是用户体验问题（交付完整性、信任感）；Kimi 的起点是模型能力边界问题（突破串行执行上限）。这三个起点导致了截然不同的设计优先级——Claude Code 更关注「agent 如何协调」，Qoder 更关注「用户如何验收」，Kimi 更关注「任务如何分解」。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ LAYER 2 ══ -->
+<section class="section" id="layer2">
+  <div class="kicker cyan">第二层 · 范围层</div>
+  <h2 class="section-h">范围层：<br>做了什么，刻意不做什么</h2>
+  <p class="section-lead">Agent Team 模式下，功能边界的选择直接暴露了每款产品对「用户应该控制多少」的判断。从角色可定制性到介入机制，三款产品划定了三条不同的功能边界线。</p>
+
+  <div class="layer-intro">
+    <div class="layer-num">02</div>
+    <div>
+      <div class="layer-name">范围层 Scope</div>
+      <div class="layer-def">「在 Agent Team 模式下，包含哪些功能？主动排除了什么？取舍逻辑是什么？」</div>
+      <div class="layer-q">核心追问：角色定义权交给谁？用户能看到多少中间过程？错误处理机制在哪一层？</div>
+    </div>
+  </div>
+
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th class="row-head">功能维度</th>
+          <th class="h-c">Claude Code Agent Teams</th>
+          <th class="h-q">Qoder 专家团</th>
+          <th class="h-k">Kimi Agent Swarm</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-head">角色定义权</td>
+          <td><span class="chip chip-g">用户完全控制</span><br>用户在 prompt 中指定角色（strategist/researcher/reviewer），或通过 .claude/agents/ 配置文件预定义角色；模型也可自主新增 agent</td>
+          <td><span class="chip chip-q">系统自动分配</span><br>Team Lead 根据需求分析自动拉起对应专家，用户无需指定角色；角色类型（架构/编码/测试/QA）由系统内置</td>
+          <td><span class="chip chip-k">完全黑盒</span><br>Orchestrator 自主决定拆分方式和 sub-agent 数量（最多 300），用户无从干预角色创建过程</td>
+        </tr>
+        <tr>
+          <td class="row-head">任务分解可见性</td>
+          <td>执行前用户可通过 prompt 设计任务结构；执行中可通过 tmux 面板观察各 agent 活动</td>
+          <td><span class="chip chip-c">执行前审阅</span> Team Lead 生成结构化实施计划，用户可修改后再确认执行</td>
+          <td>对用户不可见；orchestrator 内部分解，用户只看到最终结果（或 task map 里的 agent 状态）</td>
+        </tr>
+        <tr>
+          <td class="row-head">中途介入机制</td>
+          <td>可通过 tmux 直接与单个 teammate 交互，无需经过 Team Lead；可实时重定向单个 agent</td>
+          <td>无需停止会话：随时补充需求、修正方向、变更优先级；Team Lead 实时吸收并重新分配</td>
+          <td>K2.6 的 Claw Groups 允许人类加入 swarm 协作；但传统 Swarm 模式介入点极少</td>
+        </tr>
+        <tr>
+          <td class="row-head">错误处理机制</td>
+          <td>各 agent 独立 context 隔离，单 agent 失败不污染全局；用户可手动介入修复单个 agent</td>
+          <td>高危命令拦截；Team Lead 实时监控专家输出，发现偏差可协调调整；极少数情况需用户确认</td>
+          <td>Orchestrator 检测到 sub-agent 失败或停滞时自动重新分配任务；K2.6 有自动故障恢复</td>
+        </tr>
+        <tr>
+          <td class="row-head">主动排除的能力</td>
+          <td>不提供图形化管理界面（纯 terminal）；不自动选择模型分级（社区有需求）</td>
+          <td>不暴露 agent 内部分工细节（黑盒交付）；不支持 P2P agent 间消息</td>
+          <td>不支持用户自定义角色；不提供详细的 agent 通信日志</td>
+        </tr>
+        <tr>
+          <td class="row-head">适用任务类型</td>
+          <td>跨层工程任务（frontend+backend+test）；竞争假设调试；大型代码库重构</td>
+          <td>中高复杂度开发任务；需要完整交付物（规划→编码→测试→评审）</td>
+          <td>大规模信息检索和研究；批量内容生成；宽度优先型任务（100 域名 × N 维度）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight cyan">
+    <div class="insight-label">范围层洞察</div>
+    <div class="insight-text">「角色定义权」的归属，是三款产品范围层最关键的分叉</div>
+    <div class="insight-sub">Claude Code 把角色定义权完全交给用户（高灵活性，高学习成本）；Qoder 把它收回给 Team Lead（低门槛，低透明度）；Kimi 完全黑盒（零配置，零控制）。这三种选择背后是对用户「能力水平」和「信任意愿」的不同判断——越是面向专业开发者，越倾向于把控制权外露；越是面向普通用户，越倾向于封装成黑盒。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ LAYER 3 ══ -->
+<section class="section" id="layer3">
+  <div class="kicker amber">第三层 · 结构层</div>
+  <h2 class="section-h">结构层：<br>Agent 如何协调，人如何介入</h2>
+  <p class="section-lead">结构层是 Agent Team 设计中最技术性也最关键的一层：信息流动路径、任务分配机制、人的介入节点——这些「看不见的架构」决定了产品在实际使用中的体验质量和可靠性。</p>
+
+  <div class="layer-intro">
+    <div class="layer-num">03</div>
+    <div>
+      <div class="layer-name">结构层 Structure</div>
+      <div class="layer-def">「多个 Agent 之间的信息如何流动？任务如何分配和协调？人的介入节点在哪里？」</div>
+      <div class="layer-q">核心追问：当多个 agent 同时写代码，谁来解决冲突？agent 之间的通信是同步还是异步？人在什么时候必须介入、可以介入、不需要介入？</div>
+    </div>
+  </div>
+
+  <!-- 架构流程图 -->
+  <div class="diagram-block">
+    <div class="diagram-label">ARCHITECTURE FLOW</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+
+      <!-- Claude Code -->
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--neon); margin-bottom:16px;">Claude Code P2P</div>
+        <div class="flow-parallel">
+          <div class="flow">
+            <div class="flow-node active-c" style="width:100%">👑 Team Lead</div>
+          </div>
+          <div style="display:flex; gap:4px; justify-content:center; font-size:12px; color:var(--neon); opacity:.5;">↙ &nbsp;↓&nbsp; ↘</div>
+          <div style="display:flex; gap:4px;">
+            <div class="flow-node" style="font-size:10px; flex:1; text-align:center;">Frontend</div>
+            <div class="flow-node" style="font-size:10px; flex:1; text-align:center;">Backend</div>
+            <div class="flow-node" style="font-size:10px; flex:1; text-align:center;">Test</div>
+          </div>
+          <div style="display:flex; gap:4px; justify-content:center; font-size:11px; color:var(--neon-2); opacity:.6;">⟺ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟺</div>
+          <div style="font-size:10px; color:var(--text-3); font-family:'IBM Plex Mono',monospace; text-align:center;">Mailbox P2P 直接通信</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--neon); text-align:center; margin-top:8px; border:1px solid rgba(200,245,66,0.2); padding:4px;">Shared Task List ←→</div>
+        </div>
+      </div>
+
+      <!-- Qoder -->
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--neon-2); margin-bottom:16px;">Qoder Hub-Spoke</div>
+        <div class="flow-parallel">
+          <div class="flow-node active-q" style="width:100%; text-align:center;">Team Lead（大脑）</div>
+          <div style="display:flex; justify-content:center; gap:20px; font-size:11px; color:var(--neon-2); opacity:.5;">↓ ↓ ↓ ↓</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px;">
+            <div class="flow-node" style="font-size:10px; text-align:center;">架构师</div>
+            <div class="flow-node" style="font-size:10px; text-align:center;">工程师</div>
+            <div class="flow-node" style="font-size:10px; text-align:center;">测试员</div>
+            <div class="flow-node" style="font-size:10px; text-align:center;">评审员</div>
+          </div>
+          <div style="display:flex; justify-content:center; gap:20px; font-size:11px; color:var(--neon-2); opacity:.5;">↑ ↑ ↑ ↑</div>
+          <div style="font-size:10px; color:var(--text-3); font-family:'IBM Plex Mono',monospace; text-align:center;">结果汇聚→Lead整合→交付</div>
+        </div>
+      </div>
+
+      <!-- Kimi -->
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--neon-3); margin-bottom:16px;">Kimi Orchestrator</div>
+        <div class="flow-parallel">
+          <div class="flow-node active-k" style="width:100%; text-align:center;">Orchestrator（PARL 训练）</div>
+          <div style="text-align:center; font-size:11px; color:var(--neon-3); opacity:.5;">↓ 动态实例化</div>
+          <div style="display:flex; gap:3px; flex-wrap:wrap; justify-content:center;">
+            <div class="flow-node" style="font-size:9px; padding:4px 6px;">SA-01</div>
+            <div class="flow-node" style="font-size:9px; padding:4px 6px;">SA-02</div>
+            <div class="flow-node" style="font-size:9px; padding:4px 6px;">SA-03</div>
+            <div class="flow-node" style="font-size:9px; padding:4px 6px;">SA-N</div>
+          </div>
+          <div style="text-align:center; font-size:10px; color:var(--text-3); font-family:'IBM Plex Mono',monospace;">Frozen workers · 执行完毕消亡</div>
+          <div style="text-align:center; font-size:11px; color:var(--neon-3); opacity:.5;">↑ 结果聚合</div>
+          <div style="font-size:10px; color:var(--text-3); font-family:'IBM Plex Mono',monospace; text-align:center;">K2.6 最大 300 agents×4000 steps</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="dtable">
+    <thead>
+      <tr>
+        <th style="width:160px;">结构维度</th>
+        <th style="color:var(--neon)">Claude Code</th>
+        <th style="color:var(--neon-2)">Qoder</th>
+        <th style="color:var(--neon-3)">Kimi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>通信拓扑</td>
+        <td>去中心化 P2P：任意两个 teammate 可直接消息，绕过 Team Lead；同时有共享 task list</td>
+        <td>Star 型中心化：所有协调经 Team Lead，专家间无直接通信</td>
+        <td>单向辐射型：orchestrator 下发，sub-agent 上报，sub-agent 间无通信</td>
+      </tr>
+      <tr>
+        <td>任务分配机制</td>
+        <td>Team Lead 分配初始任务 + 共享 task list claim 机制（teammates 自主认领）</td>
+        <td>Team Lead 动态拉起专家并分配任务；执行中可根据用户新需求重新分配</td>
+        <td>Orchestrator 全权决策：分解 → 实例化 → 调度 → 故障检测 → 重分配，全自动</td>
+      </tr>
+      <tr>
+        <td>上下文隔离策略</td>
+        <td>每个 agent 独立 1M token context window；主对话不被中间噪声污染</td>
+        <td>共享项目上下文（已知问题：跨轮次重新启动专家时上下文不连贯）</td>
+        <td>Orchestrator 统一管理；sub-agent 为 frozen 实例，执行完毕后上下文不保留</td>
+      </tr>
+      <tr>
+        <td>人的介入节点</td>
+        <td>随时（tmux 直接接触任意 teammate）；可独立重定向单 agent 无需停止全局</td>
+        <td>执行前审阅计划；执行中随时补充/修改/变更优先级，无需中断</td>
+        <td>K2.5/K2.6 Swarm：极少（设计为最小人工干预）；K2.6 Claw Groups：人作为 swarm 成员</td>
+      </tr>
+      <tr>
+        <td>冲突解决机制</td>
+        <td>git worktree 隔离变更；teammate 通过 mailbox 协商 API 合约；merge 时可触发冲突解决 agent</td>
+        <td>Team Lead 作为仲裁者协调专家间的输出一致性</td>
+        <td>Orchestrator 负责结果合并和冲突处理；PARL 训练包含任务分解和合并逻辑</td>
+      </tr>
+      <tr>
+        <td>适合的任务结构</td>
+        <td>有清晰分层边界（frontend/backend/test）；各层可独立推进；存在跨层 API 合约</td>
+        <td>有明确交付目标；任务可被规划为 plan→code→test→review 流水线</td>
+        <td>高度可并行的宽度任务（N个相似子任务）；各子任务之间依赖少</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight amber">
+    <div class="insight-label">结构层最大差异</div>
+    <div class="insight-text">通信拓扑决定了「协作」的深度上限</div>
+    <div class="insight-sub">Claude Code 的 P2P mailbox 是三款中结构最复杂、能力上限最高的设计——前端 agent 可以直接告知后端 agent「我需要这个 API」，不需要 Team Lead 中转，这才是真正的「工程师团队协作」。Qoder 的中心化 Lead 简化了协调逻辑，代价是 Lead 成为单点瓶颈。Kimi 的单向辐射型只适合「独立子任务 → 结果聚合」型任务，不适合子任务间有深度依赖的工程协作。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ LAYER 4 ══ -->
+<section class="section" id="layer4">
+  <div class="kicker pink">第四层 · 框架层</div>
+  <h2 class="section-h">框架层：<br>Agent Team 的界面如何组织</h2>
+  <p class="section-lead">框架层是战略层的视觉兑现。Agent Team 的状态该怎么展示、任务进度在哪里显示、用户如何看到「正在发生什么」——三款产品在框架层做出了截然不同的选择，对应了三种完全不同的「可见性哲学」。</p>
+
+  <div class="layer-intro">
+    <div class="layer-num">04</div>
+    <div>
+      <div class="layer-name">框架层 Skeleton</div>
+      <div class="layer-def">「Agent Team 模式下，界面如何布局？Agent 状态如何可视化？用户如何导航？」</div>
+      <div class="layer-q">核心追问：多个 agent 同时运行时，界面如何让用户知道「全局在哪里」「单个 agent 在干什么」「整体进度如何」？</div>
+    </div>
+  </div>
+
+  <div class="comparison-row">
+    <div class="comparison-cell">
+      <div class="comparison-head c">Claude Code</div>
+      <div class="comparison-content">
+        <strong>Terminal + tmux 多面板</strong><br><br>
+        每个 teammate 一个 tmux 面板，可独立观察；没有图形化主界面。用户通过命令行直接与任意 teammate 交互，或查看 /agents 标签页的 Running/Library 视图。<br><br>
+        <strong>可见性哲学：「工程师级透明」</strong> — 不做封装，直接把原始执行状态暴露给用户，用户看到的是 agent 真实的输出流。
+      </div>
+    </div>
+    <div class="comparison-cell">
+      <div class="comparison-head q">Qoder 专家团</div>
+      <div class="comparison-content">
+        <strong>IDE 内嵌任务列表 + 通知系统</strong><br><br>
+        聊天面板底部实时任务列表（待处理/进行中/已完成）；点击单个任务可查看执行进度和过程；需用户确认时通知展示在对话框上方。<br><br>
+        <strong>可见性哲学：「按需透明」</strong> — 默认给用户一个清洁的进度视图，需要时可下钻查看单个任务详情。
+      </div>
+    </div>
+    <div class="comparison-cell">
+      <div class="comparison-head k">Kimi Agent Swarm</div>
+      <div class="comparison-content">
+        <strong>Task Map 侧边栏（K2.6 Swarm Workstation）</strong><br><br>
+        侧边栏展示「task map」，每个 sub-agent 是一个活跃进程节点；可点击任意 agent 查看实时执行内容；云端集群，本地为「指挥台」。<br><br>
+        <strong>可见性哲学：「群体视图」</strong> — 强调规模感（300 个并发节点），但单个 agent 的决策过程不可读。
+      </div>
+    </div>
+  </div>
+
+  <table class="dtable">
+    <thead>
+      <tr>
+        <th style="width:160px;">框架维度</th>
+        <th style="color:var(--neon)">Claude Code</th>
+        <th style="color:var(--neon-2)">Qoder</th>
+        <th style="color:var(--neon-3)">Kimi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>整体界面模式</td>
+        <td>Terminal-first；tmux 多面板；无 GUI；/agents 视图（Running/Library tab）</td>
+        <td>IDE 内嵌；聊天面板 + 底部任务列表 + 通知栏</td>
+        <td>Web/App 聊天界面 + 侧边 task map；K2.6 Workstation 有专属桌面客户端</td>
+      </tr>
+      <tr>
+        <td>Agent 状态展示</td>
+        <td>各 agent 独立 tmux 面板，原始输出流；/agents Running tab 显示运行中 subagents</td>
+        <td>底部任务列表（待处理/进行中/完成）；点击下钻查看单任务</td>
+        <td>Task map 节点图：每个 sub-agent 是一个点，可点击查看当前执行内容</td>
+      </tr>
+      <tr>
+        <td>进度可视化</td>
+        <td>无结构化进度视图；依赖 agent 自己的输出日志</td>
+        <td>任务颗粒度进度：每个子任务有明确状态；Team Lead 实时对齐</td>
+        <td>节点数量和活跃状态；K2.6 Claw Groups 中有协作状态视图</td>
+      </tr>
+      <tr>
+        <td>下钻查看能力</td>
+        <td>最强：可直接与任意 teammate 交互，读取其 context，发送消息</td>
+        <td>中等：可查看单个任务执行进度和过程，但不能直接与专家对话</td>
+        <td>有限：可点击 task map 中的 agent 节点查看当前执行内容，不可交互</td>
+      </tr>
+      <tr>
+        <td>任务历史 / 记录</td>
+        <td>session 文件持久化；/resume 可恢复大型 session（67% 速度提升）</td>
+        <td>IDE 内聊天历史；专家团任务结果保留在对话流中</td>
+        <td>标准聊天历史；Swarm 执行详情不作为独立记录保存</td>
+      </tr>
+      <tr>
+        <td>输入框设计</td>
+        <td>命令行 prompt；支持 / 命令（/team-plan, /team-build 等插件）</td>
+        <td>自然语言输入框；支持执行中补充需求</td>
+        <td>自然语言输入框；模式切换（Instant/Thinking/Agent/Swarm）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <div class="insight-label">框架层洞察</div>
+    <div class="insight-text">「可见性」不是越多越好——三款产品代表了三种完全不同的可见性哲学</div>
+    <div class="insight-sub">Claude Code 给你最高的可见性（直接看到每个 agent 的原始输出），代价是认知负载最高；Qoder 给你结构化的进度视图，隐藏细节，降低认知负载；Kimi 给你规模感但不给你决策过程，适合「我只关心结果」的用户。哪种可见性水平是对的？取决于用户对 agent 的信任基线和干预意愿——这正是产品团队需要通过用户研究来校准的核心参数。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ LAYER 5 ══ -->
+<section class="section" id="layer5">
+  <div class="kicker purple">第五层 · 表现层</div>
+  <h2 class="section-h">表现层：<br>如何让用户「感受到」Agent Team 在工作</h2>
+  <p class="section-lead">当 300 个 agent 并行运行时，用户的感知是什么？是秩序感、能量感，还是不安感？表现层决定了 Agent Team 这一抽象概念如何转化为用户可感知的体验——信任感在这一层被建立或摧毁。</p>
+
+  <div class="layer-intro">
+    <div class="layer-num">05</div>
+    <div>
+      <div class="layer-name">表现层 Surface</div>
+      <div class="layer-def">「Agent Team 工作时，用户的视觉体验是什么？如何传递「有序、可信、高效」的感知？」</div>
+      <div class="layer-q">核心追问：多 agent 并行执行时的视觉语言是什么？进度、速度、秩序感如何通过设计传达？agent 的「角色感」有多强？</div>
+    </div>
+  </div>
+
+  <table class="dtable">
+    <thead>
+      <tr>
+        <th style="width:160px;">表现维度</th>
+        <th style="color:var(--neon)">Claude Code</th>
+        <th style="color:var(--neon-2)">Qoder</th>
+        <th style="color:var(--neon-3)">Kimi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>「Agent 工作中」的感知</td>
+        <td>多 tmux 面板同时滚动输出流；raw terminal 输出；视觉密度极高，「工程师感」强</td>
+        <td>底部任务列表动态更新；状态标签颜色变化（进行中/完成）；通知出现时有明显提示</td>
+        <td>Task map 节点闪烁/活跃状态；数字跳动（N agents running）；视觉上的「蜂群感」</td>
+      </tr>
+      <tr>
+        <td>角色差异化设计</td>
+        <td>弱角色感：各 teammate 名字不同（frontend/backend/test）但视觉上无差异</td>
+        <td>中等角色感：专家有内置角色名（架构师/工程师/测试员/评审员），列表中可区分</td>
+        <td>无角色感：sub-agent 是匿名执行单元（SA-01/02...），无角色标识</td>
+      </tr>
+      <tr>
+        <td>进度感知设计</td>
+        <td>无结构化进度指示；靠 agent 输出量感知进度</td>
+        <td>任务状态条（待处理→进行中→已完成）+ 实时任务计数；有明确的完成感</td>
+        <td>K2.6 数字量化：「N agents running, M steps completed」；规模即进度</td>
+      </tr>
+      <tr>
+        <td>品牌一致性</td>
+        <td>Claude 品牌延伸；terminal 工具感；与 Claude.ai 视觉割裂</td>
+        <td>Qoder IDE 设计语言一致延伸；团队执行感与品牌「专业工程」定位吻合</td>
+        <td>Kimi 聊天界面一致；Kimi K2.6 Swarm Workstation 有独立视觉语言</td>
+      </tr>
+      <tr>
+        <td>错误 / 等待的表现</td>
+        <td>terminal 报错原样显示；无视觉柔化处理；需用户自己判断严重性</td>
+        <td>高危命令拦截时弹窗提示；等待用户确认的通知在对话框上方显著展示</td>
+        <td>orchestrator 自动重分配失败任务，用户通常不感知单个 agent 的失败</td>
+      </tr>
+      <tr>
+        <td>信任感建立机制</td>
+        <td>透明度（看到一切）+ 专业工具感（terminal 让有经验的开发者安心）</td>
+        <td>结构化进度 + 计划先行（执行前看到 plan）+ 随时可干预机制</td>
+        <td>规模数字（300 agents）+ 速度（4.5x）+ 自动容错（orchestrator 兜底）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <div class="insight-label">表现层最关键的设计问题</div>
+    <div class="insight-text">「Agent 有角色感」vs「Agent 是匿名执行单元」——这个选择影响的不只是视觉</div>
+    <div class="insight-sub">Qoder 给专家贴上「架构师/工程师/测试员/评审员」的角色标签，这不只是 UI 装饰，而是在建立「分工有秩序」的信任感——用户知道「有人在专职做测试」；Kimi 的匿名 sub-agent 则传递「效率机器」的信号，用户信任的是 orchestrator 而非单个 agent；Claude Code 的「frontend/backend/test」命名折中于两者之间。在你们的 Agent Team 设计中，为每个 agent 设计有辨识度的「像素风头像 + 角色名」，是表现层建立信任感的低成本高回报投入。</div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ SYNTHESIS ══ -->
+<section class="section" id="synthesis">
+  <div class="kicker">综合评估</div>
+  <h2 class="section-h">五要素综合评分</h2>
+  <p class="section-lead">基于各产品在 Agent Team 模式五要素每层的设计完成度、创新性、与自身战略的一致性进行综合判断。</p>
+
+  <div style="border:1px solid var(--rule); padding:32px; background:var(--void-2); margin-bottom:32px;">
+    <!-- 战略层 -->
+    <div class="score-row">
+      <div class="score-label">战略层 — 用户定义清晰度</div>
+      <div class="score-bars">
+        <div class="score-bar-item">
+          <div class="score-name c">Claude</div>
+          <div class="score-track"><div class="score-fill c" style="width:78%"></div></div>
+          <div class="score-val c">3.9</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name q">Qoder</div>
+          <div class="score-track"><div class="score-fill q" style="width:88%"></div></div>
+          <div class="score-val q">4.4</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name k">Kimi</div>
+          <div class="score-track"><div class="score-fill k" style="width:72%"></div></div>
+          <div class="score-val k">3.6</div>
+        </div>
+      </div>
+    </div>
+    <!-- 范围层 -->
+    <div class="score-row">
+      <div class="score-label">范围层 — 功能取舍清晰度</div>
+      <div class="score-bars">
+        <div class="score-bar-item">
+          <div class="score-name c">Claude</div>
+          <div class="score-track"><div class="score-fill c" style="width:82%"></div></div>
+          <div class="score-val c">4.1</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name q">Qoder</div>
+          <div class="score-track"><div class="score-fill q" style="width:74%"></div></div>
+          <div class="score-val q">3.7</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name k">Kimi</div>
+          <div class="score-track"><div class="score-fill k" style="width:78%"></div></div>
+          <div class="score-val k">3.9</div>
+        </div>
+      </div>
+    </div>
+    <!-- 结构层 -->
+    <div class="score-row">
+      <div class="score-label">结构层 — 协作机制成熟度</div>
+      <div class="score-bars">
+        <div class="score-bar-item">
+          <div class="score-name c">Claude</div>
+          <div class="score-track"><div class="score-fill c" style="width:86%"></div></div>
+          <div class="score-val c">4.3</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name q">Qoder</div>
+          <div class="score-track"><div class="score-fill q" style="width:72%"></div></div>
+          <div class="score-val q">3.6</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name k">Kimi</div>
+          <div class="score-track"><div class="score-fill k" style="width:80%"></div></div>
+          <div class="score-val k">4.0</div>
+        </div>
+      </div>
+    </div>
+    <!-- 框架层 -->
+    <div class="score-row">
+      <div class="score-label">框架层 — 信息架构合理性</div>
+      <div class="score-bars">
+        <div class="score-bar-item">
+          <div class="score-name c">Claude</div>
+          <div class="score-track"><div class="score-fill c" style="width:66%"></div></div>
+          <div class="score-val c">3.3</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name q">Qoder</div>
+          <div class="score-track"><div class="score-fill q" style="width:82%"></div></div>
+          <div class="score-val q">4.1</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name k">Kimi</div>
+          <div class="score-track"><div class="score-fill k" style="width:74%"></div></div>
+          <div class="score-val k">3.7</div>
+        </div>
+      </div>
+    </div>
+    <!-- 表现层 -->
+    <div class="score-row" style="border-bottom:none">
+      <div class="score-label">表现层 — 信任感与视觉完整性</div>
+      <div class="score-bars">
+        <div class="score-bar-item">
+          <div class="score-name c">Claude</div>
+          <div class="score-track"><div class="score-fill c" style="width:62%"></div></div>
+          <div class="score-val c">3.1</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name q">Qoder</div>
+          <div class="score-track"><div class="score-fill q" style="width:78%"></div></div>
+          <div class="score-val q">3.9</div>
+        </div>
+        <div class="score-bar-item">
+          <div class="score-name k">Kimi</div>
+          <div class="score-track"><div class="score-fill k" style="width:72%"></div></div>
+          <div class="score-val k">3.6</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pullquote">
+    <span class="hl-c">Claude Code</span> 在结构层领先（P2P 架构最成熟），在框架层和表现层落后（terminal-only 门槛高）；<span class="hl-q">Qoder</span> 在框架层和表现层领先（用户体验最顺滑），在结构层相对薄弱（上下文连贯性问题）；<span class="hl-k">Kimi</span> 在规模上领先，在用户可控性上最弱。
+  </div>
+</section>
+
+<hr class="hr">
+
+<!-- ══ IMPLICATIONS ══ -->
+<section class="section" id="implications">
+  <div class="kicker">设计启示</div>
+  <h2 class="section-h">对你们 Agent Team 设计的<br>六条直接启示</h2>
+  <p class="section-lead">结合 UX 五要素分析，以下启示直接对应三款产品的关键发现，并转化为你们 Agent Space 中 Agent Team 模式的具体设计行动。</p>
+
+  <div class="imp-grid">
+    <div class="imp-card c">
+      <div class="imp-layer">战略层 → 结构层</div>
+      <div class="imp-title">优先回答「什么任务需要 Agent Team，什么只需要单 Agent」</div>
+      <div class="imp-body">行业共识：Qoder 建议「中高复杂度任务」用专家团，简单任务用单 Agent；Claude Code 的 5-agent 规则是「单 agent context 超 50K 行代码」时考虑 team。你们需要在 Agent/Agent Team 切换的输入框处，给用户清晰的任务复杂度指引，而非让用户盲目选择模式。</div>
+    </div>
+    <div class="imp-card q">
+      <div class="imp-layer">范围层 → 框架层</div>
+      <div class="imp-title">「执行前计划审阅」是 Qoder 最值得借鉴的设计</div>
+      <div class="imp-body">Qoder 的 Team Lead 在执行前生成结构化实施计划，用户可修改后再确认——这是「人机协作」在范围层最优雅的设计点。你们的 Team Leader 在输出任务分配计划时，可以设计一个「计划确认」步骤，允许用户在执行前调整子任务的优先级和分工，而不是直接开始执行。</div>
+    </div>
+    <div class="imp-card mix">
+      <div class="imp-layer">结构层</div>
+      <div class="imp-title">子 Agent 间的通信方式决定了 Agent Team 能解决问题的上限</div>
+      <div class="imp-body">Claude Code 的 P2P mailbox 让前端 agent 可以直接告知后端 agent API 变更，这是目前行业中协作深度最高的设计。你们如果想让 Agent Team 真正解决跨层依赖问题，需要设计 agent 间的「通知机制」——至少让一个 agent 的关键产出能触发其他相关 agent 的感知。</div>
+    </div>
+    <div class="imp-card k">
+      <div class="imp-layer">框架层</div>
+      <div class="imp-title">Task Monitor 需要做到任务颗粒度，而非 Agent 颗粒度</div>
+      <div class="imp-body">Qoder 的底部任务列表（待处理/进行中/完成）比 Kimi 的 agent 节点图更实用，因为用户关心的是「任务是否完成」而非「哪个 agent 在跑」。你们的 task monitor 应以「任务/子任务」为展示单位，而非 agent 为单位，并支持点击单个任务下钻查看该任务的执行 agent 和过程。</div>
+    </div>
+    <div class="imp-card c">
+      <div class="imp-layer">表现层</div>
+      <div class="imp-title">Agent 的「角色感」直接影响信任感——像素风头像不只是装饰</div>
+      <div class="imp-body">三款产品中，Qoder 的「架构师/工程师/测试员/评审员」角色标签最有效地传递了「分工有秩序」的信任感。你们已经设计了像素风 Agent 头像（Team Leader/Arch/DB/Backend/Frontend/Test），这是表现层的重要投入——确保每个 agent 的视觉标识在 task monitor、对话流、下钻详情三个场景下保持一致显示。</div>
+    </div>
+    <div class="imp-card q">
+      <div class="imp-layer">结构层 → 表现层</div>
+      <div class="imp-title">「子 Agent 上下文连贯性」是当前行业最大的结构层未解问题</div>
+      <div class="imp-body">Qoder 的社区反馈明确指出：跨轮次重启专家时上下文不连贯，导致每次都要重新灌入上下文，token 消耗增大且体验下降。这是行业级的设计难题。你们在设计 Agent Team 时，需要明确「同一任务中，同一个子 Agent 的会话如何保持连续」——这不只是技术问题，也是产品层面需要做出承诺的体验保证。</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-label">最终结论</div>
+    <div class="insight-text">你们的 Agent Team 设计机会：把 Qoder 的「体验完整性」和 Claude Code 的「协作深度」结合起来</div>
+    <div class="insight-sub">当前行业没有一款产品同时做好了「框架层的信息架构」（Qoder 领先）和「结构层的协作机制」（Claude Code 领先）。你们在做 IDE 内嵌的 Agent Space，有机会做到：执行前 Team Leader 生成可审阅的计划（学 Qoder）+ 各 agent 有清晰角色标识（学 Qoder）+ 支持关键产出跨 agent 通知（学 Claude Code）+ 任务粒度的 task monitor（超越两者）+ 产物可见且可验收（你们已有基础）。这个组合，是行业里目前没有人完整做出来的 Agent Team 体验。</div>
+  </div>
+</section>
+
+</div><!-- /page -->
+
+<footer class="footer">
+  <div class="footer-left">Agent Team 模式 UX 五要素分析 · 行业系列报告 · 2026 Q2</div>
+  <div class="footer-right">Claude Code · Qoder Experts · Kimi Agent Swarm · 数据截止 2026.04</div>
+</footer>
+
+</body>
+</html>
