@@ -1,6 +1,6 @@
 # CodeArts IDE Design
 
-CodeArts IDE / 码道代码智能体的体验设计材料集,统一托管。单色极简风格(参考 dousanmiao.com),左侧目录按类型浏览,支持搜索与深浅模式切换。
+CodeArts IDE / 码道代码智能体的体验设计材料集,统一托管。单色极简风格,左侧目录按类型浏览,支持搜索与深浅模式切换。
 
 **在线访问:** https://vinniechenyu.github.io/codearts-ide-design/
 
