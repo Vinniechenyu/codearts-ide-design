@@ -106,8 +106,15 @@
   .side{position:sticky;top:26px}
   @media(max-width:820px){.side{position:static}}
   .side .cap{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--ink3);padding:0 4px 12px;border-bottom:1px solid var(--line);margin-bottom:8px}
+    color:var(--ink3);padding:0 4px 12px;border-bottom:1px solid var(--line);margin-bottom:10px}
+  .dimtabs{display:flex;gap:3px;padding:3px;margin-bottom:10px;border-radius:11px;background:var(--panel)}
+  .dimtab{flex:1;padding:6px 8px;border:0;border-radius:8px;background:transparent;font-family:var(--mono);
+    font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--ink2);transition:.18s var(--ease)}
+  .dimtab:hover{color:var(--ink)}
+  .dimtab.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1),inset 0 1px 0 var(--glass-hi)}
   .navlist{display:flex;flex-direction:column;gap:2px}
+  .navitem.zero{opacity:.5}
+  .navitem.zero .lab::after{content:" · 待更新";font-family:var(--mono);font-size:10px;color:var(--ink3)}
   .navitem{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
     padding:9px 12px;border:0;border-radius:10px;background:transparent;text-align:left;
     font-size:13.5px;font-weight:600;color:var(--ink2);transition:background .18s var(--ease),color .18s var(--ease)}
@@ -191,8 +198,12 @@
   <div class="layout">
     <aside class="side">
       <div class="cap">目录 · Catalog</div>
+      <div class="dimtabs" id="dimtabs">
+        <button class="dimtab on" data-dim="type">按类型</button>
+        <button class="dimtab" data-dim="product">按产品</button>
+      </div>
       <div class="navlist" id="nav"></div>
-      <div class="hint">□ 分类持续扩展<br>□ 点击可筛选</div>
+      <div class="hint">□ 两种视角:类型 / 产品<br>□ 点击可筛选</div>
     </aside>
 
     <main>
@@ -223,6 +234,7 @@ const STATUS = {
   doc:     { label:"可阅读",   dot:"#9A8CFF" }
 };
 
+// 维度一:按材料类型
 const CATEGORIES = [
   { id:"all",  label:"全部",            ac:"#9A9DA3" },
   { id:"专项", label:"专项分析",         ac:"#7C5CFC" },
@@ -230,12 +242,23 @@ const CATEGORIES = [
   { id:"原型", label:"交互原型",         ac:"#17A398" },
   { id:"组件", label:"组件·规范",         ac:"#3B6FE0" }
 ];
+// 维度二:按产品形态(跨产品/产品无关的材料归入「通用」)
+const PRODUCTS = [
+  { id:"all",        label:"全部",         ac:"#9A9DA3" },
+  { id:"IDE",        label:"CodeArts IDE", ac:"#7C5CFC" },
+  { id:"ADE",        label:"CodeArts ADE", ac:"#17A398" },
+  { id:"AgentSpace", label:"AgentSpace",   ac:"#E0872E" },
+  { id:"CLI",        label:"CLI",          ac:"#3B6FE0" },
+  { id:"通用",       label:"通用 · 跨产品", ac:"#8A8F96" }
+];
+// 每个维度:取值 key + 目录列表
+const DIMS = { type:{ key:"cat", list:CATEGORIES }, product:{ key:"product", list:PRODUCTS } };
 const catOf = id => CATEGORIES.find(c => c.id === id) || {};
 
 const ITEMS = [
   {
     title: "码道 · 生成响应体验优化专项",
-    cat: "专项", status: "live",
+    cat: "专项", product: "IDE", status: "live",
     desc: "把用户一句“感觉慢”拆成可证明的证据链:五款产品同题实测、码道输出结构拆解、根因机制归因,最终落到五阶段主干 + 异常旁路 + 状态动效的设计方案。",
     preview: "assets/preview-madao-response-deck.png",
     tags: ["五产品实测", "根因拆解", "设计方案"],
@@ -243,7 +266,7 @@ const ITEMS = [
   },
   {
     title: "拆透 ADE,重构 AI 时代的开发工作流",
-    cat: "洞察", status: "doc",
+    cat: "洞察", product: "ADE", status: "doc",
     desc: "AI 时代的开发工作流,什么该变、什么该留?从 ADE 逐层拆解到竞品横比,提出把“验收”做成新流程心脏的设计主张,并给出可落地的演进路线。",
     preview: "assets/preview-codearts-ade-vision.png",
     tags: ["ADE 拆解", "设计主张", "验收中心"],
@@ -251,7 +274,7 @@ const ITEMS = [
   },
   {
     title: "CodeArts ADE · IDE 工作台交互原型",
-    cat: "原型", status: "proto",
+    cat: "原型", product: "ADE", status: "proto",
     desc: "把设计主张落成可点的高保真原型:任务网格 + 三种工作姿态(亲手写 / 盯过程 / 发包验收)+ 验收中心(流水线 · 证据 · 门禁),用 PTO Design System 搭在 IDE 框架上。",
     preview: "assets/preview-codearts-ade-prototype.png",
     tags: ["高保真", "验收中心", "三态切换"],
@@ -259,7 +282,7 @@ const ITEMS = [
   },
   {
     title: "当 IDE 遇见 Agent,体验如何被重新定义",
-    cat: "洞察", status: "doc",
+    cat: "洞察", product: "通用", status: "doc",
     desc: "以用户体验五要素为标尺,系统拆解 Claude、Cursor 3、Codex、TRAE SOLO、WorkBuddy 五款产品,从战略层到表现层的设计取舍与竞争差异。",
     preview: "assets/preview-agentspace-insight.png",
     tags: ["UX 五要素", "5 款横评", "行业格局"],
@@ -267,7 +290,7 @@ const ITEMS = [
   },
   {
     title: "Agent Team 模式的 UX 解剖",
-    cat: "洞察", status: "doc",
+    cat: "洞察", product: "通用", status: "doc",
     desc: "当“一个 Agent 打天下”变成“一支 Agent 协同作战”——用五要素框架,解构 Claude Code、Qoder 专家团、Kimi Agent Swarm 三种截然不同的设计哲学。",
     preview: "assets/preview-agent-team-analysis.png",
     tags: ["Agent Team", "3 款横评", "多智能体"],
@@ -275,7 +298,7 @@ const ITEMS = [
   },
   {
     title: "Agent Space · IDE 内的智能体协同",
-    cat: "原型", status: "proto",
+    cat: "原型", product: "AgentSpace", status: "proto",
     desc: "IDE 里 Agent Team 的全链路高保真原型:从需求下达,到多 Agent 的并行 / 串行编排、实时任务监控、交付物生成,一路贯通到代码落地。",
     preview: "assets/preview-agent-space-prototype.png",
     tags: ["高保真", "Agent 编排", "任务监控"],
@@ -283,7 +306,7 @@ const ITEMS = [
   },
   {
     title: "Agent 对话式交互指南",
-    cat: "组件", status: "doc",
+    cat: "组件", product: "通用", status: "doc",
     desc: "过程要透明,但别淹没结果。把 chat / code 全过程拆成 4 层结构、28 张可复用组件、6 组状态机,沉淀为一套可直接落地的对话流交互规范。",
     preview: "assets/preview-ai-dialogflow-components.png",
     tags: ["组件库", "28 组件", "状态机"],
@@ -298,7 +321,8 @@ const emptyEl = document.getElementById('empty');
 const emptyTitle = document.getElementById('emptyTitle');
 const emptyDesc = document.getElementById('emptyDesc');
 const countEl = document.getElementById('count');
-const state = { cat:'all', q:'' };
+// dim: 当前维度 type|product;sel: 当前维度下选中的分类 id
+const state = { dim:'type', sel:'all', q:'' };
 
 // split UX DESIGN into per-letter animated spans (staggered shine wave)
 (function(){
@@ -333,22 +357,40 @@ document.getElementById('themeBtn').onclick = () => {
     requestAnimationFrame(loop); })();
 })();
 
-CATEGORIES.forEach(c => {
-  const n = c.id === 'all' ? ITEMS.length : ITEMS.filter(i => i.cat === c.id).length;
-  const b = document.createElement('button');
-  b.className = 'navitem' + (c.id === 'all' ? ' on' : '');
-  b.style.setProperty('--ac', c.ac);
-  b.innerHTML = `<span class="lab">${c.id==='all'?'':'<span class="dot"></span>'}${c.label}</span><span class="n">${String(n).padStart(2,'0')}</span>`;
-  b.onclick = () => { state.cat = c.id; [...navEl.children].forEach(x => x.classList.toggle('on', x === b)); render(); };
-  navEl.appendChild(b);
+// 按当前维度重建左侧目录
+function buildNav(){
+  const { key, list } = DIMS[state.dim];
+  navEl.innerHTML = '';
+  list.forEach(c => {
+    const n = c.id === 'all' ? ITEMS.length : ITEMS.filter(i => i[key] === c.id).length;
+    const b = document.createElement('button');
+    b.className = 'navitem' + (c.id === state.sel ? ' on' : '') + (c.id !== 'all' && n === 0 ? ' zero' : '');
+    b.style.setProperty('--ac', c.ac);
+    b.innerHTML = `<span class="lab">${c.id==='all'?'':'<span class="dot"></span>'}${c.label}</span><span class="n">${String(n).padStart(2,'0')}</span>`;
+    b.onclick = () => { state.sel = c.id; [...navEl.children].forEach(x => x.classList.toggle('on', x === b)); render(); };
+    navEl.appendChild(b);
+  });
+}
+
+// 维度切换
+document.querySelectorAll('#dimtabs .dimtab').forEach(t => {
+  t.onclick = () => {
+    if (state.dim === t.dataset.dim) return;
+    state.dim = t.dataset.dim; state.sel = 'all';
+    document.querySelectorAll('#dimtabs .dimtab').forEach(x => x.classList.toggle('on', x === t));
+    buildNav(); render();
+  };
 });
 
 function match(it){
-  if (state.cat !== 'all' && it.cat !== state.cat) return false;
+  const key = DIMS[state.dim].key;
+  if (state.sel !== 'all' && it[key] !== state.sel) return false;
   const q = state.q.trim().toLowerCase();
   if (!q) return true;
-  return (it.title+' '+it.desc+' '+(it.tags||[]).join(' ')+' '+(catOf(it.cat).label||'')).toLowerCase().includes(q);
+  return (it.title+' '+it.desc+' '+(it.tags||[]).join(' ')+' '+(catOf(it.cat).label||'')+' '+(it.product||'')).toLowerCase().includes(q);
 }
+
+const selLabel = () => (DIMS[state.dim].list.find(c => c.id === state.sel) || {}).label || state.sel;
 
 function render(){
   const list = ITEMS.filter(match);
@@ -367,8 +409,9 @@ function render(){
       </div>
     </a>`;
   }).join('');
-  const zeroCat = state.cat !== 'all' && ITEMS.filter(i => i.cat === state.cat).length === 0;
-  if (zeroCat){ emptyTitle.textContent = 'COMING SOON'; emptyDesc.textContent = '「' + (catOf(state.cat).label) + '」分类的材料即将上线。'; }
+  const key = DIMS[state.dim].key;
+  const zeroCat = state.sel !== 'all' && ITEMS.filter(i => i[key] === state.sel).length === 0;
+  if (zeroCat){ emptyTitle.textContent = 'COMING SOON'; emptyDesc.textContent = '「' + selLabel() + '」的材料即将上线。'; }
   else { emptyTitle.textContent = 'NO MATCH'; emptyDesc.textContent = '换个关键词,或查看全部材料。'; }
   emptyEl.classList.toggle('show', list.length === 0);
   grid.appendChild(emptyEl);
@@ -376,7 +419,8 @@ function render(){
 }
 
 qEl.oninput = () => { state.q = qEl.value; render(); };
-document.getElementById('clear').onclick = () => { state.cat='all'; state.q=''; qEl.value=''; [...navEl.children].forEach((c,i)=>c.classList.toggle('on', i===0)); render(); };
+document.getElementById('clear').onclick = () => { state.sel='all'; state.q=''; qEl.value=''; buildNav(); render(); };
+buildNav();
 render();
 </script>
 </body>
