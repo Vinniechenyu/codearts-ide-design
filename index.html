@@ -154,6 +154,25 @@
     padding:4px 10px 4px 8px;backdrop-filter:blur(10px) saturate(1.5);-webkit-backdrop-filter:blur(10px) saturate(1.5);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px -8px rgba(0,0,0,.4)}
   .pill .d{width:6px;height:6px;border-radius:50%;background:var(--sd);box-shadow:0 0 8px var(--sd)}
+  /* 置顶徽标(所有人可见) */
+  .badge-top{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:5px;
+    font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:#fff;
+    background:linear-gradient(96deg,#6E4CF0,#A98BFF);border:1px solid rgba(255,255,255,.3);
+    border-radius:999px;padding:4px 10px;box-shadow:0 6px 16px -8px rgba(110,76,240,.85)}
+  /* 编辑模式:置顶控件(仅你可见) */
+  .pinctl{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;z-index:5}
+  .pinctl button{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);cursor:pointer;
+    background:var(--glass-bg);border:1px solid var(--glass-brd);border-radius:999px;padding:5px 11px;
+    backdrop-filter:blur(10px) saturate(1.5);-webkit-backdrop-filter:blur(10px) saturate(1.5);box-shadow:var(--glass-sh)}
+  .pinctl button.act{background:linear-gradient(96deg,#6E4CF0,#A98BFF);color:#fff;border-color:transparent}
+  .pinctl button.mini{padding:5px 9px}
+  .edit-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9000;
+    display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px}
+  .edit-bar b{font-size:12.5px}
+  .edit-bar .cnt{font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+  .edit-bar button{font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+    background:var(--card);color:var(--ink);cursor:pointer}
+  .edit-bar button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
   .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
   .clab{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:600;
@@ -316,6 +335,20 @@ const ITEMS = [
   }
 ];
 
+// ★ 置顶配置(线上唯一可信来源):按顺序填入要置顶卡片的 href。编辑模式导出后粘贴到这里并提交,即对所有访客生效。
+const PINS = [];
+
+// 编辑模式:仅访问 ?edit=<口令> 才出现置顶控件(仅你可见)。
+// 别人即使解锁,改动也只存在他自己浏览器,无法影响线上——线上永远以已提交的 PINS 为准。
+const EDIT_KEY = 'ucd2026';   // ← 想改口令就改这里
+const editMode = new URLSearchParams(location.search).get('edit') === EDIT_KEY;
+let pins = [...PINS];
+if (editMode) { try { const d = JSON.parse(localStorage.getItem('ide-pins-draft')||'null'); if (Array.isArray(d)) pins = d; } catch(e){} }
+const effPins = () => editMode ? pins : PINS;
+const isPinned = href => effPins().includes(href);
+const pinRank = href => { const i = effPins().indexOf(href); return i < 0 ? Infinity : i; };
+const savePins = () => { if (editMode) { try { localStorage.setItem('ide-pins-draft', JSON.stringify(pins)); } catch(e){} } };
+
 const navEl = document.getElementById('nav');
 const grid = document.getElementById('grid');
 const qEl = document.getElementById('q');
@@ -395,14 +428,20 @@ function match(it){
 const selLabel = () => (DIMS[state.dim].list.find(c => c.id === state.sel) || {}).label || state.sel;
 
 function render(){
-  const list = ITEMS.filter(match);
+  const list = ITEMS.filter(match).slice().sort((a,b) => pinRank(a.href) - pinRank(b.href));
   grid.innerHTML = list.map((it, i) => {
     const c = catOf(it.cat);
     const s = STATUS[it.status] || { label: it.status, dot:"#9A9DA3" };
     const tags = (it.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
     const thumb = it.preview ? `<img src="${it.preview}" alt="${it.title}" loading="lazy">` : '';
+    const pinned = isPinned(it.href);
+    const badge = pinned ? `<span class="badge-top">📌 置顶</span>` : '';
+    const ctl = editMode ? `<div class="pinctl" data-href="${it.href}">
+        <button data-act="toggle" class="${pinned?'act':''}">${pinned?'取消置顶':'置顶'}</button>
+        ${pinned?`<button data-act="up" class="mini" title="上移">↑</button><button data-act="down" class="mini" title="下移">↓</button>`:''}
+      </div>` : '';
     return `<a class="card" href="${it.href}" style="--ac:${c.ac};--sd:${s.dot};animation-delay:${i*55}ms">
-      <div class="shot">${thumb}<span class="pill"><span class="d"></span>${s.label}</span></div>
+      <div class="shot">${thumb}${badge}<span class="pill"><span class="d"></span>${s.label}</span>${ctl}</div>
       <div class="body">
         <div class="clab"><span class="cd"></span>${c.label}</div>
         <h2>${it.title}</h2>
@@ -422,8 +461,39 @@ function render(){
 
 qEl.oninput = () => { state.q = qEl.value; render(); };
 document.getElementById('clear').onclick = () => { state.sel='all'; state.q=''; qEl.value=''; buildNav(); render(); };
+
+// 编辑模式:置顶控件交互 + 底部工具条
+function updateBar(){ const c = document.getElementById('pinCnt'); if (c) c.textContent = '已置顶 ' + pins.length + ' 张'; }
+if (editMode){
+  grid.addEventListener('click', e => {
+    const btn = e.target.closest('.pinctl button'); if (!btn) return;
+    e.preventDefault(); e.stopPropagation();
+    const href = btn.parentElement.dataset.href, act = btn.dataset.act, i = pins.indexOf(href);
+    if (act === 'toggle'){ if (i < 0) pins.push(href); else pins.splice(i,1); }
+    else if (act === 'up' && i > 0){ [pins[i-1],pins[i]] = [pins[i],pins[i-1]]; }
+    else if (act === 'down' && i >= 0 && i < pins.length-1){ [pins[i+1],pins[i]] = [pins[i],pins[i+1]]; }
+    savePins(); render(); updateBar();
+  });
+  const bar = document.createElement('div');
+  bar.className = 'edit-bar glass';
+  bar.innerHTML = `<b>编辑模式</b><span class="cnt" id="pinCnt"></span>
+    <button class="primary" id="pinExport">导出置顶配置</button>
+    <button id="pinReset">重置为线上</button>`;
+  document.body.appendChild(bar);
+  document.getElementById('pinExport').onclick = async () => {
+    const txt = 'const PINS = ' + JSON.stringify(pins) + ';';
+    try { await navigator.clipboard.writeText(txt); } catch(e){}
+    alert('已复制置顶配置到剪贴板:\n\n' + txt + '\n\n把 index.html 里的「const PINS = [...]」整行替换成它,提交并 push,即对所有访客生效。');
+  };
+  document.getElementById('pinReset').onclick = () => {
+    pins = [...PINS]; try { localStorage.removeItem('ide-pins-draft'); } catch(e){}
+    render(); updateBar();
+  };
+}
+
 buildNav();
 render();
+updateBar();
 </script>
 </body>
 </html>
