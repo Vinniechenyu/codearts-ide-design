@@ -1,4 +1,4 @@
-# CodeArts IDE Design · 材料启动台
+# CodeArts IDE Design · 启动台
 
 CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管。像素编辑风启动台,左侧目录按类型浏览。
 
