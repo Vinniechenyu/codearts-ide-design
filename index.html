@@ -4,108 +4,148 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeArts IDE Design · 材料启动台</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B5BD6'/%3E%3Cpath d='M20 44V20h9c6 0 10 5 10 12s-4 12-10 12h-9Zm6-6h3c2 0 4-2 4-6s-2-6-4-6h-3v12Z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23141414'/%3E%3Crect x='14' y='14' width='12' height='12' fill='%23B7A2F2'/%3E%3Crect x='26' y='26' width='12' height='12' fill='%23F3D24E'/%3E%3Crect x='38' y='38' width='12' height='12' fill='%23141414'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F4F6F9;--panel:#FFFFFF;--card:#FFFFFF;--line:#E4E8EF;--line2:#EEF1F6;
-    --ink:#161A20;--ink2:#565E6B;--ink3:#8992A0;
-    --accent:#5B5BD6;--accent2:#7C3AED;--accent-soft:#ECECFB;
-    --live:#16A34A;--live-soft:rgba(22,163,74,.12);
-    --proto:#B45309;--proto-soft:rgba(245,158,11,.14);
-    --doc:#4F6BED;--doc-soft:rgba(79,107,237,.12);
-    --shadow:0 1px 2px rgba(16,24,40,.04),0 12px 32px -20px rgba(30,40,70,.22);
-  }
-  @media (prefers-color-scheme:dark){
-    :root{--bg:#0A0B0F;--panel:#111318;--card:#15171D;--line:#262A33;--line2:#1D2027;
-      --ink:#ECEEF2;--ink2:#A4ABB6;--ink3:#6C7480;--accent-soft:rgba(91,91,214,.16);
-      --live-soft:rgba(22,163,74,.18);--proto-soft:rgba(245,158,11,.16);--doc-soft:rgba(79,107,237,.2);
-      --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px -24px rgba(0,0,0,.7);}
+    --paper:#F6F4EE;--card:#FFFFFF;--ink:#141414;--ink2:#4B4B47;--ink3:#8A897F;
+    --line:#141414;--rule:#DAD7CD;
+    --pixel:"Press Start 2P",ui-monospace,monospace;
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    --sans:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;line-height:1.6;
-    background-image:
-      radial-gradient(circle at 12% 4%,rgba(124,58,237,.10),transparent 32%),
-      radial-gradient(circle at 92% 2%,rgba(79,172,254,.10),transparent 30%);
-    background-attachment:fixed;min-height:100vh}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(var(--rule) 1px,transparent 1px);background-size:22px 22px;background-attachment:fixed}
   a{color:inherit;text-decoration:none}
   button{font:inherit;cursor:pointer}
-  .wrap{max-width:1120px;margin:0 auto;padding:56px 28px 80px}
+  .wrap{max-width:1200px;margin:0 auto;padding:34px 30px 80px}
 
-  .brand{font:800 12.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--ink3);text-transform:uppercase}
-  .brand b{color:var(--accent)}
-  h1{margin:16px 0 10px;font-size:clamp(28px,4.4vw,42px);font-weight:900;letter-spacing:-.015em}
-  h1 span{background:linear-gradient(102deg,var(--ink) 8%,var(--accent) 66%,var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .lead{color:var(--ink2);font-size:15.5px;max-width:40em;margin:0}
+  .top{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--line);padding-bottom:16px}
+  .logo{font-family:var(--pixel);font-size:15px;letter-spacing:.02em}
+  .logo .dot{color:#7C5CFC}
+  .top .meta{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
 
-  .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:34px 0 22px}
-  .search{position:relative;flex:1;min-width:220px}
-  .search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);border-radius:11px;
-    background:var(--panel);color:var(--ink);font-size:14px;outline:none;transition:border-color .15s,box-shadow .15s}
-  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--ink3);fill:none;stroke-width:2}
-  .cats{display:flex;gap:8px;flex-wrap:wrap}
-  .cat{padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink2);font-size:13px;font-weight:600;transition:all .15s}
-  .cat:hover{border-color:#CFD5DF;color:var(--ink)}
-  .cat.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .hero{padding:46px 0 26px}
+  .kick{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.16em;color:var(--ink3);text-transform:uppercase;margin-bottom:20px}
+  .htitle{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .htitle h1{margin:0;font-family:var(--pixel);font-size:clamp(30px,6vw,58px);line-height:1.06;letter-spacing:.01em}
+  .htitle .cnt{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink3)}
+  .sticker{font-family:var(--sans);font-weight:800;font-size:15px;background:#F3D024;color:#141414;
+    padding:7px 14px;border:2px solid var(--line);box-shadow:3px 3px 0 var(--line);transform:rotate(-3.5deg)}
+  .zh{margin:22px 0 0;font-size:23px;font-weight:800;letter-spacing:-.01em}
+  .lead{margin:12px 0 0;color:var(--ink2);font-size:15px;max-width:46em}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-  .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;
-    overflow:hidden;box-shadow:var(--shadow);transition:transform .16s ease,box-shadow .16s ease,border-color .16s}
-  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 20px 46px -22px rgba(91,91,214,.42)}
-  .thumb{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#EEF0FB,#E4ECFB);overflow:hidden;border-bottom:1px solid var(--line2)}
-  .thumb img{width:100%;height:100%;object-fit:cover;object-position:top center}
-  .badge{position:absolute;top:11px;left:11px;display:inline-flex;align-items:center;gap:5px;
-    padding:4px 10px;border-radius:999px;font:700 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.02em}
-  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-  .badge.live{color:var(--live);background:var(--live-soft)}
-  .badge.proto{color:var(--proto);background:var(--proto-soft)}
-  .badge.doc{color:var(--doc);background:var(--doc-soft)}
-  .body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
-  .body h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.01em}
-  .body .sub{font:600 12px/1.3 ui-monospace,Menlo,monospace;color:var(--ink3);margin-top:4px}
-  .body p{margin:10px 0 0;color:var(--ink2);font-size:13.5px;flex:1}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-  .tag{font:600 11px/1 ui-monospace,Menlo,monospace;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:5px 8px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--line2)}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:700;transition:all .15s}
-  .btn.primary{background:var(--accent);color:#fff}
-  .btn.primary:hover{background:#4A4AC4}
-  .btn.ghost{border:1px solid var(--line);color:var(--ink2)}
-  .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
-  .btn .ar{transition:transform .15s}
-  .btn:hover .ar{transform:translateX(3px)}
+  /* two-column layout: sidebar + main */
+  .layout{display:grid;grid-template-columns:236px 1fr;gap:34px;align-items:start;margin-top:26px}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}}
 
-  .empty{display:none;text-align:center;padding:70px 20px;color:var(--ink3)}
+  .side{position:sticky;top:22px}
+  @media(max-width:860px){.side{position:static}}
+  .box{border:2px solid var(--line);background:var(--card);box-shadow:4px 4px 0 var(--line)}
+  .box h3{margin:0;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink3);padding:13px 14px;border-bottom:2px solid var(--line)}
+  .navlist{display:flex;flex-direction:column}
+  .navitem{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    padding:12px 14px;border:0;border-bottom:1px solid var(--rule);background:transparent;text-align:left;
+    font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink);transition:background .1s,color .1s}
+  .navitem:last-child{border-bottom:0}
+  .navitem:hover{background:var(--paper)}
+  .navitem.on{background:var(--ink);color:#fff}
+  .navitem .n{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);flex:none}
+  .navitem.on .n{color:rgba(255,255,255,.72)}
+  .navitem.zero{color:var(--ink3)}
+  .navitem.zero .lab::after{content:" · 待更新";font-size:11px;color:var(--ink3)}
+  .side .hint{font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--ink3);padding:12px 4px 0}
+
+  .search{position:relative;margin-bottom:22px}
+  .search input{width:100%;padding:12px 14px 12px 40px;border:2px solid var(--line);background:var(--card);color:var(--ink);
+    font-family:var(--mono);font-size:13px;outline:none;box-shadow:3px 3px 0 var(--line);transition:box-shadow .1s,transform .1s}
+  .search input:focus{box-shadow:4px 4px 0 #7C5CFC;transform:translate(-1px,-1px)}
+  .search input::placeholder{color:var(--ink3)}
+  .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:2.2}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:34px 28px}
+  .card{display:flex;flex-direction:column;transition:transform .12s ease}
+  .card:hover{transform:translateY(-3px)}
+  .frame{border:2px solid var(--line);background:var(--card);box-shadow:5px 5px 0 var(--line);transition:box-shadow .12s}
+  .card:hover .frame{box-shadow:8px 8px 0 var(--ac)}
+  .term{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:2px solid var(--line);
+    font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
+  .term .go{color:var(--ink3)}
+  .card:hover .term .go{color:#7C5CFC}
+  .shot{position:relative;aspect-ratio:16/9;overflow:hidden;background:repeating-linear-gradient(45deg,#EEEBE3,#EEEBE3 8px,#E7E3DA 8px,#E7E3DA 16px)}
+  .shot img{width:100%;height:100%;object-fit:cover;object-position:center top}
+  .cat-lab{position:absolute;top:10px;left:10px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+    background:var(--card);color:var(--ink);border:2px solid var(--line);padding:4px 9px}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-top:2px solid var(--line);
+    background:var(--ac);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;color:#141414}
+  .bar .st{display:inline-flex;align-items:center;gap:6px}
+  .bar .st::before{content:"";width:7px;height:7px;background:#141414}
+
+  .card h2{margin:18px 0 0;font-size:18px;font-weight:800;letter-spacing:-.01em;line-height:1.35}
+  .card .sub{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ink3);margin-top:5px;letter-spacing:.02em}
+  .card p{margin:10px 0 0;color:var(--ink2);font-size:13.5px}
+  .role{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+  .role b{color:var(--ink3);font-weight:700;letter-spacing:.08em}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .tag{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--tk);background:var(--tbg);
+    border:1.5px solid var(--tbd);border-radius:999px;padding:5px 10px}
+
+  .empty{display:none;text-align:center;padding:64px 20px;color:var(--ink3);grid-column:1/-1;
+    border:2px dashed var(--rule);background:rgba(255,255,255,.5)}
   .empty.show{display:block}
-  .empty h3{margin:0 0 6px;color:var(--ink2);font-size:16px}
-  .clear{margin-top:14px;padding:8px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink2);font-size:13px}
+  .empty h3{margin:0 0 6px;color:var(--ink2);font-size:15px;font-family:var(--mono);letter-spacing:.06em}
+  .clear{margin-top:16px;padding:9px 16px;border:2px solid var(--line);background:var(--card);color:var(--ink);
+    font-family:var(--mono);font-size:12px;font-weight:700;box-shadow:3px 3px 0 var(--line)}
 
-  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--ink3);font:12px/1.7 ui-monospace,Menlo,monospace;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  footer{margin-top:64px;padding-top:20px;border-top:2px solid var(--line);color:var(--ink3);
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="brand">CodeArts <b>IDE Design</b> · UCD Center</div>
-    <h1><span>设计材料启动台</span></h1>
-    <p class="lead">CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管——汇报 deck、可交互原型、评测证据与文档。点击卡片进入,新材料持续更新。</p>
-  </header>
-
-  <div class="toolbar">
-    <div class="search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="q" type="search" placeholder="搜索材料 / 标签 / 关键词…" autocomplete="off">
-    </div>
-    <div class="cats" id="cats"></div>
+  <div class="top">
+    <div class="logo">CODEARTS<span class="dot">.</span>DESIGN</div>
+    <div class="meta">UCD CENTER · 2026</div>
   </div>
 
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty">
-    <h3>没有匹配的材料</h3>
-    <div>换个关键词,或清空筛选试试。</div>
-    <button class="clear" id="clear">清空筛选</button>
+  <header class="hero">
+    <div class="kick">CodeArts IDE Design · 设计材料</div>
+    <div class="htitle">
+      <h1>MATERIALS</h1>
+      <span class="cnt" id="hcnt"></span>
+      <span class="sticker">启动台 ·</span>
+    </div>
+    <div class="zh">设计材料启动台</div>
+    <p class="lead">CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管——专项分析、概念探索、交互原型、竞品分析与文档。左侧目录按类型浏览,新材料持续更新。</p>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <div class="box">
+        <h3>目录 · CATALOG</h3>
+        <div class="navlist" id="nav"></div>
+      </div>
+      <div class="hint">□ 新分类 / 材料持续扩展<br>□ 点击分类可筛选</div>
+    </aside>
+
+    <main>
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="搜索材料 / 标签 / 关键词…" autocomplete="off">
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty">
+        <h3 id="emptyTitle">NO MATCH</h3>
+        <div id="emptyDesc">换个关键词,或清空筛选试试。</div>
+        <button class="clear" id="clear">查看全部</button>
+      </div>
+    </main>
   </div>
 
   <footer>
@@ -115,77 +155,116 @@
 </div>
 
 <script>
-const STATUS = {
-  "live": { label: "可体验", cls: "live" },
-  "proto": { label: "原型", cls: "proto" },
-  "doc": { label: "文档", cls: "doc" }
+const STATUS = { live:"可体验", proto:"原型", concept:"概念探索", doc:"文档" };
+const ACCENTS = {
+  purple: { bar:"#B7A2F2", tbg:"#EFEAFD", tbd:"#D3C6F7", tk:"#5A32C6" },
+  amber:  { bar:"#F3D24E", tbg:"#FBF2D3", tbd:"#EBD99C", tk:"#7A5600" },
+  green:  { bar:"#8FD98A", tbg:"#E4F5E1", tbd:"#B9E5B2", tk:"#1E7A34" },
+  teal:   { bar:"#8FE0D6", tbg:"#DFF6F2", tbd:"#B5E7DF", tk:"#0E7367" },
+  pink:   { bar:"#F4A9C8", tbg:"#FCE3EE", tbd:"#F2BFD5", tk:"#A93468" }
 };
 
-// ★ 添加新材料:在这里复制一个对象,填 folder / 标题 / 描述即可
+// ★ 分类目录:未来加类型 → 在这里加一行(id 唯一,label 显示名),空分类也会占位
+const CATEGORIES = [
+  { id:"all",  label:"全部材料" },
+  { id:"专项", label:"系统化专项分析" },
+  { id:"概念", label:"概念方案探索" },
+  { id:"原型", label:"产品交互原型" },
+  { id:"竞品", label:"竞品分析" },
+  { id:"文档", label:"设计文档 / 规范" }
+];
+
+// ★ 添加新材料:复制一个对象,cat 填上面的分类 id,填 标题/desc/preview/tags/href
 const ITEMS = [
   {
     title: "码道 · 生成响应体验优化专项",
     sub: "CodeArts Agent · Response Experience",
-    group: "汇报 Deck",
+    cat: "专项",
     status: "live",
+    type: "系统化专项分析 · 40 页",
     desc: "把“感觉慢”拆成可证明的证据链:五产品同题实测、码道输出结构拆解、根因机制(执行编排×信息呈现×环境)与设计方案——五阶段主干 + 异常旁路 + 状态动效原则。",
     preview: "assets/preview-madao-response-deck.png",
     tags: ["评测", "响应体验", "40 页", "GLM-5.1 对照"],
-    actions: [
-      { label: "打开 Deck", href: "madao-response-deck/", primary: true }
-    ]
+    href: "madao-response-deck/",
+    meta: "40 页",
+    accent: "purple"
+  },
+  {
+    title: "CodeArts ADE · 拆透 ADE,重构工作流",
+    sub: "AI-Native Workflow · Design Vision",
+    cat: "概念",
+    status: "concept",
+    type: "概念方案探索 · 长文页",
+    desc: "从产品拆解到设计主张:AI 时代开发工作流里什么该变、什么该留——把“验收”做成新流程的心脏。含 ADE 速写、演进坐标、竞品横比、能力矩阵、设计洞察与落地路线。",
+    preview: "assets/preview-codearts-ade-vision.png",
+    tags: ["ADE 拆解", "设计主张", "工作流重构", "验收中心"],
+    href: "codearts-ade-vision/",
+    meta: "8 节",
+    accent: "green"
   }
 ];
 
+const catLabel = id => (CATEGORIES.find(c => c.id === id) || {}).label || id;
+const navEl = document.getElementById('nav');
 const grid = document.getElementById('grid');
-const catsEl = document.getElementById('cats');
 const qEl = document.getElementById('q');
 const emptyEl = document.getElementById('empty');
+const emptyTitle = document.getElementById('emptyTitle');
+const emptyDesc = document.getElementById('emptyDesc');
 const countEl = document.getElementById('count');
-const state = { cat: 'all', q: '' };
+document.getElementById('hcnt').textContent = '(' + String(ITEMS.length).padStart(2,'0') + ')';
+const state = { cat:'all', q:'' };
 
-const groups = ['all', ...[...new Set(ITEMS.map(i => i.group))]];
-groups.forEach(g => {
+// build sidebar nav
+CATEGORIES.forEach(c => {
+  const n = c.id === 'all' ? ITEMS.length : ITEMS.filter(i => i.cat === c.id).length;
   const b = document.createElement('button');
-  b.className = 'cat' + (g === 'all' ? ' on' : '');
-  b.textContent = g === 'all' ? '全部' : g;
-  b.onclick = () => { state.cat = g; [...catsEl.children].forEach(c => c.classList.toggle('on', c === b)); render(); };
-  catsEl.appendChild(b);
+  b.className = 'navitem' + (c.id === 'all' ? ' on' : '') + (n === 0 ? ' zero' : '');
+  b.innerHTML = `<span class="lab">${c.label}</span><span class="n">${String(n).padStart(2,'0')}</span>`;
+  b.onclick = () => { state.cat = c.id; [...navEl.children].forEach(x => x.classList.toggle('on', x === b)); render(); };
+  navEl.appendChild(b);
 });
 
-function match(it) {
-  if (state.cat !== 'all' && it.group !== state.cat) return false;
+function match(it){
+  if (state.cat !== 'all' && it.cat !== state.cat) return false;
   const q = state.q.trim().toLowerCase();
   if (!q) return true;
-  return (it.title + ' ' + (it.sub||'') + ' ' + it.desc + ' ' + (it.tags||[]).join(' ') + ' ' + it.group).toLowerCase().includes(q);
+  return (it.title+' '+(it.sub||'')+' '+it.desc+' '+(it.tags||[]).join(' ')+' '+catLabel(it.cat)).toLowerCase().includes(q);
 }
 
-function render() {
+function render(){
   const list = ITEMS.filter(match);
-  grid.innerHTML = list.map(it => {
-    const s = STATUS[it.status] || { label: it.status, cls: '' };
+  grid.innerHTML = list.map((it) => {
+    const idx = ITEMS.indexOf(it);
+    const ac = ACCENTS[it.accent] || ACCENTS.purple;
+    const code = 'MATERIAL_' + String(idx+1).padStart(2,'0');
+    const st = STATUS[it.status] || it.status;
+    const metaR = it.meta || ((it.tags||[]).length + ' TAGS');
     const tags = (it.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
-    const acts = (it.actions||[]).map(a =>
-      `<a class="btn ${a.primary ? 'primary' : 'ghost'}" href="${a.href}">${a.label}<span class="ar">→</span></a>`
-    ).join('');
     const thumb = it.preview ? `<img src="${it.preview}" alt="${it.title}" loading="lazy">` : '';
-    return `<article class="card">
-      <div class="thumb">${thumb}<span class="badge ${s.cls}">${s.label}</span></div>
-      <div class="body">
-        <h2>${it.title}</h2>
-        ${it.sub ? `<div class="sub">${it.sub}</div>` : ''}
-        <p>${it.desc}</p>
-        <div class="tags">${tags}</div>
-        <div class="actions">${acts}</div>
+    return `<a class="card" href="${it.href}" style="--ac:${ac.bar};--tbg:${ac.tbg};--tbd:${ac.tbd};--tk:${ac.tk}">
+      <div class="frame">
+        <div class="term"><span>${code}</span><span class="go">OPEN ↗</span></div>
+        <div class="shot"><span class="cat-lab">${catLabel(it.cat)}</span>${thumb}</div>
+        <div class="bar"><span class="st">${st}</span><span>${metaR}</span></div>
       </div>
-    </article>`;
+      <h2>${it.title}</h2>
+      ${it.sub ? `<div class="sub">${it.sub}</div>` : ''}
+      <p>${it.desc}</p>
+      ${it.type ? `<div class="role"><b>TYPE</b> / ${it.type}</div>` : ''}
+      <div class="tags">${tags}</div>
+    </a>`;
   }).join('');
+  const zeroCat = state.cat !== 'all' && ITEMS.filter(i => i.cat === state.cat).length === 0;
+  if (zeroCat){ emptyTitle.textContent = 'COMING SOON'; emptyDesc.textContent = '「' + catLabel(state.cat) + '」分类的材料即将上线,敬请期待。'; }
+  else { emptyTitle.textContent = 'NO MATCH'; emptyDesc.textContent = '换个关键词,或查看全部材料。'; }
   emptyEl.classList.toggle('show', list.length === 0);
+  grid.appendChild(emptyEl);
   countEl.textContent = list.length + ' / ' + ITEMS.length + ' 份材料';
 }
 
 qEl.oninput = () => { state.q = qEl.value; render(); };
-document.getElementById('clear').onclick = () => { state.cat = 'all'; state.q = ''; qEl.value = ''; [...catsEl.children].forEach((c,i) => c.classList.toggle('on', i === 0)); render(); };
+document.getElementById('clear').onclick = () => { state.cat='all'; state.q=''; qEl.value=''; [...navEl.children].forEach((c,i)=>c.classList.toggle('on', i===0)); render(); };
 render();
 </script>
 </body>
