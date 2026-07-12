@@ -87,7 +87,8 @@
   /* ---- hero ---- */
   .hero{margin-bottom:4px}
   .hero h1{margin:0;font-size:clamp(32px,5.4vw,52px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
-  .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66;max-width:64em}
+  .hero .lead{margin:16px 0 0;color:var(--ink2);font-size:15px;line-height:1.66;white-space:nowrap}
+  @media(max-width:1180px){.hero .lead{white-space:normal}}
   .hero .lead b{color:var(--ink);font-weight:700;
     background:linear-gradient(180deg,transparent 62%,color-mix(in srgb,var(--shine) 26%,transparent) 62%)}
   /* UX DESIGN wordmark — flowing purple gradient */
