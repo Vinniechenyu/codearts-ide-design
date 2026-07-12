@@ -1,6 +1,6 @@
-# CodeArts IDE Design · 材料启动台
+# CodeArts IDE Design · 启动台
 
-CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管。
+CodeArts IDE / 码道代码智能体相关的体验设计材料、设计原型等统一托管。
 
 **在线启动台:** https://vinniechenyu.github.io/codearts-ide-design/
 
