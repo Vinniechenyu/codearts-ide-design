@@ -6,7 +6,7 @@ CodeArts IDE / 码道代码智能体相关的体验设计材料统一托管。
 
 | 材料 | 说明 | 链接 |
 |---|---|---|
-| `madao-response-deck/` | 码道·生成响应体验优化专项(40 页汇报 deck) | [在线预览](https://vinniechenyu.github.io/CodeArts-IDE-Design/madao-response-deck/) |
+| `madao-response-deck/` | 码道·生成响应体验优化专项(40 页汇报 deck) | [在线预览](https://vinniechenyu.github.io/codearts-ide-design/madao-response-deck/) |
 
 ## 添加新材料
 
