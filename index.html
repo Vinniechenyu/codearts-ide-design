@@ -142,6 +142,7 @@
   .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--hair);
     border-radius:18px;overflow:hidden;transition:transform .34s var(--ease),box-shadow .34s var(--ease),border-color .34s var(--ease);
     opacity:0;transform:translateY(12px);animation:cardin .55s var(--ease) forwards}
+  .card.versioned{position:relative}
   @keyframes cardin{to{opacity:1;transform:none}}
   @media(prefers-reduced-motion:reduce){.card{animation:none;opacity:1;transform:none}}
   .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--line)}
@@ -187,7 +188,13 @@
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
   .tag{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink2);
     background:var(--panel);border:1px solid var(--hair);border-radius:6px;padding:3px 8px}
-  .version-picker{margin:0 18px 18px;padding-top:14px;border-top:1px solid var(--line)}
+  .version-picker{position:absolute;left:12px;right:12px;bottom:12px;z-index:6;margin:0;padding:11px;
+    border:1px solid var(--glass-brd);border-radius:13px;background:var(--glass-bg);
+    backdrop-filter:blur(18px) saturate(1.55);-webkit-backdrop-filter:blur(18px) saturate(1.55);
+    box-shadow:var(--glass-sh),inset 0 1px 0 var(--glass-hi);opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateY(8px);transition:opacity .2s var(--ease),transform .2s var(--ease),visibility .2s}
+  .card.versioned:hover .version-picker,.card.versioned:focus-within .version-picker,.card.versioned.show-versions .version-picker{
+    opacity:1;visibility:visible;pointer-events:auto;transform:none}
   .version-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
     font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase}
   .version-label span:last-child{font-size:9px;letter-spacing:.04em;text-transform:none}
@@ -301,8 +308,8 @@ const ITEMS = [
     tags: ["六产品实测", "根因判断", "设计方案"],
     href: "madao-response-deck/",
     versions: [
-      { label: "汇报精简版-0713", note: "默认 · 最新", href: "madao-response-deck/", current: true },
-      { label: "全量版分析-0713", note: "历史版本", href: "madao-response-deck/full-0713.html" }
+      { label: "汇报精简版-0713", note: "默认 · 最新", href: "madao-response-deck/?v=brief-0713-2", current: true },
+      { label: "全量版分析-0713", note: "历史版本", href: "madao-response-deck/full-0713.html?v=full-0713" }
     ]
   },
   {
@@ -484,11 +491,12 @@ function render(){
         <div class="tags">${tags}</div>
       </div>`;
     if (it.versions){
+      const primaryHref = (it.versions.find(v => v.current) || it.versions[0]).href;
       const versions = it.versions.map(v => `<a class="version-option${v.current?' is-default':''}" href="${v.href}" aria-label="打开${v.label}">
           <b>${v.label}</b><small>${v.note}</small>
         </a>`).join('');
       return `<article class="card versioned" style="--ac:${c.ac};--sd:${s.dot};animation-delay:${i*55}ms">
-        <a class="card-link" href="${it.href}" aria-label="打开${it.title}默认版本">${cardContent}</a>
+        <a class="card-link" href="${primaryHref}" aria-label="打开${it.title}默认版本">${cardContent}</a>
         <div class="version-picker"><div class="version-label"><span>版本管理</span><span>选择打开版本</span></div><div class="version-options">${versions}</div></div>
       </article>`;
     }
@@ -504,6 +512,15 @@ function render(){
   grid.appendChild(emptyEl);
   countEl.textContent = list.length + ' / ' + ITEMS.length + ' 份材料';
 }
+
+grid.addEventListener('mouseover', e => {
+  const card = e.target.closest('.card.versioned');
+  if (card) card.classList.add('show-versions');
+});
+grid.addEventListener('mouseout', e => {
+  const card = e.target.closest('.card.versioned');
+  if (card && !card.contains(e.relatedTarget)) card.classList.remove('show-versions');
+});
 
 qEl.oninput = () => { state.q = qEl.value; render(); };
 document.getElementById('clear').onclick = () => { state.sel='all'; state.q=''; qEl.value=''; buildNav(); render(); };
