@@ -952,7 +952,7 @@
   <div class="toc">
     <div class="toc-row"><div class="toc-num">01</div><div class="toc-main"><b>背景与问题</b><span>“慢”不是单一耗时，而是等待中的不确定</span></div></div>
     <div class="toc-row"><div class="toc-num">02</div><div class="toc-main"><b>评测方法与结果分析</b><span>证据：码道会做，但有效结果出现太晚——不是代码能力问题</span></div></div>
-    <div class="toc-row"><div class="toc-num">03</div><div class="toc-main"><b>设计策略与方向</b><span>四个体验策略 + 两个支撑机制：结果前置、状态可见、详情折叠、验证收尾</span></div></div>
+    <div class="toc-row"><div class="toc-num">03</div><div class="toc-main"><b>设计策略与方向</b><span>四个体验策略 + 两个支撑机制：有效信息前置、状态可见、详情折叠、验证收尾</span></div></div>
     <div class="toc-row"><div class="toc-num">04</div><div class="toc-main"><b>设计方案</b><span>一条正常生成主干 + 一个随时可触发的异常诊断旁路</span></div></div>
     <div class="toc-row"><div class="toc-num">05</div><div class="toc-main"><b>结论与落地</b><span>收束成两件 P0：优先级与责任边界</span></div></div>
   </div>
@@ -1143,15 +1143,15 @@
   <div class="div-tag">SECTION · 03</div>
   <div class="div-idx">03</div>
   <h2 class="div-title">设计策略与方向</h2>
-  <p class="div-sub">从“慢感”到体验策略：结果前置、状态可见、详情折叠、验证收尾——并划清体验设计与 Agent / 模型 / 平台的责任边界。</p>
+  <p class="div-sub">从“慢感”到体验策略：有效信息前置、状态可见、详情折叠、验证收尾——并划清体验设计与 Agent / 模型 / 平台的责任边界。</p>
 </section><section class="slide deriv-slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计策略与方向</span><span class="brand-dot">·</span><span class="brand-pg">03-1 策略总纲</span></div><h2 class="title">从等待失控到<span class="kw">持续可判断</span>：主线策略回应确定问题，支撑机制覆盖条件性风险。</h2><p class="subtitle">四项体验策略定义信息如何呈现与交互；轻路径判定与异常自愈由 Agent 和平台提供支撑。其中环境摩擦在本轮三档任务中均有出现，但稳定发生率仍需复测。</p></div><div class="page-no">20 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计策略与方向</span><span class="brand-dot">·</span><span class="brand-pg">03-1 策略总纲</span></div><h2 class="title">从等待失控到<span class="kw">持续可判断</span>：主线策略回应确定问题，支撑机制覆盖条件性风险。</h2><p class="subtitle">有效信息前置、状态可见与详情折叠共同构成 P0-B 主线，验证收尾作为 P1 完整体验要求；轻路径判定与异常自愈由 Agent 和平台提供支撑。</p></div><div class="page-no">20 / 39</div></div>
 
-<div class="deriv-heads"><div class="dh"><em>WHY · 问题与风险</em><b>2 个确定问题 + 1 个风险项</b></div><div class="dh"><em>WHAT · 体验目标</em><b>4 个体验目标</b></div><div class="dh"><em>HOW · 落地方式</em><b>4 个体验策略 + 2 个支撑机制</b></div></div><div class="deriv"><svg class="deriv-svg" viewBox="0 0 1000 600" preserveAspectRatio="none"><path d="M292,100 C314,100 314,75 336,75"/><path d="M292,300 C314,300 314,225 336,225"/><path d="M292,300 C314,300 314,375 336,375"/><path d="M292,500 C314,500 314,525 336,525"/><path d="M628,75 C640,75 640,50 650,50"/><path d="M628,75 C640,75 640,350 650,350"/><path d="M628,225 C640,225 640,150 650,150"/><path d="M628,225 C640,225 640,450 650,450"/><path d="M628,375 C640,375 640,250 650,250"/><path d="M628,525 C640,525 640,550 650,550"/><circle cx="292" cy="100" r="3.2"/><circle cx="292" cy="300" r="3.2"/><circle cx="292" cy="500" r="3.2"/><circle cx="336" cy="75" r="3.2"/><circle cx="336" cy="225" r="3.2"/><circle cx="336" cy="375" r="3.2"/><circle cx="336" cy="525" r="3.2"/><circle cx="628" cy="75" r="3.2"/><circle cx="628" cy="225" r="3.2"/><circle cx="628" cy="375" r="3.2"/><circle cx="628" cy="525" r="3.2"/><circle cx="650" cy="50" r="3.2"/><circle cx="650" cy="150" r="3.2"/><circle cx="650" cy="250" r="3.2"/><circle cx="650" cy="350" r="3.2"/><circle cx="650" cy="450" r="3.2"/><circle cx="650" cy="550" r="3.2"/></svg><div class="deriv-col c1"><div class="dc-item"><svg class="dc-ic"><use href="#ic-target"/></svg><div><b>有效结果后置</b><p>TTFMP 迟到——先看到子代理 / 长分析 / 日志</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-layers"/></svg><div><b>过程负担过重</b><p>信息密度过高 + 子代理绕路，小任务也走重流程</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-puzzle"/></svg><div><b>环境摩擦进入主线</b><p>本轮三档任务均有观察；发生率与普遍性待复测</p></div></div></div><div class="deriv-col c2"><div class="dc-item"><svg class="dc-ic"><use href="#ic-eye"/></svg><div><b>更早看到有用结果</b><p>提交后尽快出现可判断、可审阅的产物</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-clock"/></svg><div><b>更强的等待控制感</b><p>当前阶段、下一步与可介入时机均可识别</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-layers"/></svg><div><b>更低的阅读负担</b><p>关键判断优先呈现，完整过程按需展开</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-puzzle"/></svg><div><b>异常优先无感恢复</b><p>系统先自愈；仅在阻塞或需授权时请求介入</p></div></div></div><div class="deriv-col c3"><div class="dc-item"><div><b><span class="dc-idx">①</span>结果前置<span class="dc-tags"><i>旅程 01 / 04</i></span></b><p>任务复述 / 关键判断 / diff 与审阅入口前移</p></div></div><div class="dc-item"><div><b><span class="dc-idx">②</span>状态可见<span class="dc-tags"><i>旅程 03</i></span></b><p>当前步骤 / 下一步 / 可暂停可修改</p></div></div><div class="dc-item"><div><b><span class="dc-idx">③</span>详情折叠<span class="dc-tags"><i>旅程 04</i></span></b><p>长分析 / 日志 / 子代理报告默认收起</p></div></div><div class="dc-item"><div><b><span class="dc-idx">④</span>验证收尾<span class="dc-tags"><i>旅程 05</i></span></b><p>可审阅产物先交付，完整验证状态持续补齐</p></div></div><div class="dc-item"><div><b><span class="dc-idx">⑤</span>轻路径判定<span class="dc-tags"><i class="mech">支撑机制</i><i>旅程 02</i></span></b><p>Agent 编排分流：轻 / 完整路径 + 显性升级</p></div></div><div class="dc-item"><div><b><span class="dc-idx">⑥</span>异常自愈<span class="dc-tags"><i class="mech">支撑机制</i><i>按需升级</i></span></b><p>后台恢复优先；阻塞或需授权时才显性求助</p></div></div></div></div>
+<div class="deriv-heads"><div class="dh"><em>WHY · 问题与风险</em><b>2 个确定问题 + 1 个风险项</b></div><div class="dh"><em>WHAT · 体验目标</em><b>4 个体验目标</b></div><div class="dh"><em>HOW · 落地方式</em><b>4 个体验策略 + 2 个支撑机制</b></div></div><div class="deriv"><svg class="deriv-svg" viewBox="0 0 1000 600" preserveAspectRatio="none"><path d="M292,100 C314,100 314,75 336,75"/><path d="M292,300 C314,300 314,225 336,225"/><path d="M292,300 C314,300 314,375 336,375"/><path d="M292,500 C314,500 314,525 336,525"/><path d="M628,75 C640,75 640,50 650,50"/><path d="M628,75 C640,75 640,350 650,350"/><path d="M628,225 C640,225 640,150 650,150"/><path d="M628,225 C640,225 640,450 650,450"/><path d="M628,375 C640,375 640,250 650,250"/><path d="M628,525 C640,525 640,550 650,550"/><circle cx="292" cy="100" r="3.2"/><circle cx="292" cy="300" r="3.2"/><circle cx="292" cy="500" r="3.2"/><circle cx="336" cy="75" r="3.2"/><circle cx="336" cy="225" r="3.2"/><circle cx="336" cy="375" r="3.2"/><circle cx="336" cy="525" r="3.2"/><circle cx="628" cy="75" r="3.2"/><circle cx="628" cy="225" r="3.2"/><circle cx="628" cy="375" r="3.2"/><circle cx="628" cy="525" r="3.2"/><circle cx="650" cy="50" r="3.2"/><circle cx="650" cy="150" r="3.2"/><circle cx="650" cy="250" r="3.2"/><circle cx="650" cy="350" r="3.2"/><circle cx="650" cy="450" r="3.2"/><circle cx="650" cy="550" r="3.2"/></svg><div class="deriv-col c1"><div class="dc-item"><svg class="dc-ic"><use href="#ic-target"/></svg><div><b>有效信息后置</b><p>TTFMP 迟到——先看到子代理 / 长分析 / 日志</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-layers"/></svg><div><b>过程负担过重</b><p>信息密度过高 + 子代理绕路，小任务也走重流程</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-puzzle"/></svg><div><b>环境摩擦进入主线</b><p>本轮三档任务均有观察；发生率与普遍性待复测</p></div></div></div><div class="deriv-col c2"><div class="dc-item"><svg class="dc-ic"><use href="#ic-eye"/></svg><div><b>更早看到有效信息</b><p>提交后尽快出现任务理解、关键判断与可审阅产物</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-clock"/></svg><div><b>更强的等待控制感</b><p>当前阶段、下一步与可介入时机均可识别</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-layers"/></svg><div><b>更低的阅读负担</b><p>关键判断优先呈现，完整过程按需展开</p></div></div><div class="dc-item"><svg class="dc-ic"><use href="#ic-puzzle"/></svg><div><b>异常优先系统恢复</b><p>系统先自愈；影响进程时说明状态，无法继续时请求介入</p></div></div></div><div class="deriv-col c3"><div class="dc-item"><div><b><span class="dc-idx">①</span>有效信息前置<span class="dc-tags"><i class="mech">P0-B</i><i>旅程 01 / 04</i></span></b><p>任务复述 / 关键判断 / diff 与审阅入口前移</p></div></div><div class="dc-item"><div><b><span class="dc-idx">②</span>状态可见<span class="dc-tags"><i class="mech">P0-B</i><i>旅程 03</i></span></b><p>当前步骤 / 下一步 / 可暂停可修改</p></div></div><div class="dc-item"><div><b><span class="dc-idx">③</span>详情折叠<span class="dc-tags"><i class="mech">P0-B</i><i>旅程 04</i></span></b><p>长分析 / 日志 / 子代理报告默认收起</p></div></div><div class="dc-item"><div><b><span class="dc-idx">④</span>验证收尾<span class="dc-tags"><i class="mech">P1</i><i>旅程 05</i></span></b><p>可审阅产物先交付，完整验证状态持续补齐</p></div></div><div class="dc-item"><div><b><span class="dc-idx">⑤</span>轻路径判定<span class="dc-tags"><i class="mech">支撑机制</i><i>旅程 02</i></span></b><p>Agent 编排分流：轻 / 完整路径 + 显性升级</p></div></div><div class="dc-item"><div><b><span class="dc-idx">⑥</span>异常自愈<span class="dc-tags"><i class="mech">支撑机制</i><i>按需升级</i></span></b><p>后台恢复优先；影响进程时说明状态，无法继续时显性求助</p></div></div></div></div>
 <style>.deriv .c3 .dc-tags i.mech{background:rgba(245,158,11,.34);color:#FFDCA8}</style>
   <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>证据边界：</b>同为 GLM-5.1，TRAE 三档均未出现依赖重装且 L1/L3 明显短于码道，进一步支持环境与编排是独立变量；但单人单次样本仍不足以判断稳定发生率，因此定位为<b>高影响风险项</b>。</div>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计策略与方向</span><span class="brand-dot">·</span><span class="brand-pg">03-2 范畴边界</span></div><h2 class="title">体验设计定义<span class="kw">感知与交互</span>，系统能力保障执行质量与恢复能力。</h2><p class="subtitle">体验设计定义用户可见状态、信息层级与介入方式；技术侧保证阶段事件、执行能力与恢复动作真实可用。责任错配会使方案无法实现或验收。</p></div><div class="page-no">21 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计策略与方向</span><span class="brand-dot">·</span><span class="brand-pg">03-2 边界判断原则</span></div><h2 class="title">设计不替代系统能力，系统也不替用户表达<span class="kw">可理解的体验</span>。</h2><p class="subtitle">本页只定义判断原则：体验设计负责用户看见什么、何时介入；Agent、模型与平台负责状态事件和恢复动作真实发生。具体责任与交付物在 05 章落地。</p></div><div class="page-no">21 / 39</div></div>
   <style>
   .bdw{position:relative;z-index:2;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:.6cqh}
   .bd-head,.bd-row{display:grid;grid-template-columns:1fr 6.5cqw 1fr;gap:.7cqw;align-items:stretch}
@@ -1172,7 +1172,7 @@
   </style>
   <div class="bdw">
     <div class="bd-head"><div class="bh des">体验设计能解的<em>用户如何理解</em></div><div class="bd-pill" style="background:transparent;border:none">问题</div><div class="bh tec">要 Agent / 模型 / 平台解的<em>能力如何发生</em></div></div>
-    <div class="bd-row"><div class="bc des"><span><b>结果前置</b>：关键判断 / diff / 审阅入口前移到主线</span><em class="bd-lead">主解</em></div><div class="bd-pill">有效结果后置</div><div class="bc tec">Agent 尽早输出接收 / 候选 / diff 阶段事件</div></div>
+    <div class="bd-row"><div class="bc des"><span><b>有效信息前置</b>：任务理解 / 关键判断 / diff / 审阅入口前移到主线</span><em class="bd-lead">主解</em></div><div class="bd-pill">有效信息后置</div><div class="bc tec">Agent 尽早输出接收 / 候选 / diff 阶段事件</div></div>
     <div class="bd-row"><div class="bc des">让路径选择与升级原因<b>可理解、可切换</b></div><div class="bd-pill">小任务走重流程</div><div class="bc tec"><span><b>轻 / 完整路径判定</b>与显性升级（Agent 编排）</span><em class="bd-lead">主解</em></div></div>
     <div class="bd-row"><div class="bc des"><span><b>四层信息架构</b>：详情默认折叠，主线只留决策所需</span><em class="bd-lead">主解</em></div><div class="bd-pill">过程铺满主线</div><div class="bc tec">日志与事件数据可结构化消费</div></div>
     <div class="bd-row"><div class="bc des"><span><b>状态机表达</b>：当前步骤 / 下一步 + 介入动作</span><em class="bd-lead">主解</em></div><div class="bd-pill">长任务黑盒</div><div class="bc tec">Agent 持续输出阶段事件；暂停 / 修改能真实执行</div></div>
@@ -1442,7 +1442,7 @@
   </style>
   <div class="jmap">
     <div></div>
-    <div class="jm-st"><b>① 接收与定界</b><span>结果前置</span></div>
+    <div class="jm-st"><b>① 接收与定界</b><span>有效信息前置</span></div>
     <div class="jm-st"><b>② 路径判断</b><span>轻路径机制</span></div>
     <div class="jm-st"><b>③ 执行生成</b><span>状态可见</span></div>
     <div class="jm-st"><b>④ 可审阅产出</b><span>前置+详情折叠</span></div>
@@ -1472,14 +1472,14 @@
     <div class="jm-cell amb"><b>diff / 写文件失败</b>可触发</div>
     <div class="jm-cell amb"><b>端口 / 预览 / build 异常</b>可触发</div>
   </div>
-  <div class="pd-band" style="margin-top:1.2cqh"><h3 style="margin-bottom:0">异常不是旅程的一站，而是按影响逐级升级的状态层：<em>任意阶段触发 → 后台静默自愈 → 恢复中且不阻塞时仅显示临时状态 → 只有阻塞任务或需要授权时才请求用户介入 → 技术诊断按需展开。</em></h3></div>
+  <div class="pd-band" style="margin-top:1.2cqh"><h3 style="margin-bottom:0">异常不是旅程的一站，而是按影响逐级升级的状态层：<em>任意阶段触发 → 系统优先自愈 → 影响进程时说明临时状态 → 无法继续或需要授权时请求用户介入 → 技术诊断按需展开。</em></h3></div>
 </section><section class="slide dark-slide divider">
   <div class="div-tag">SECTION · 04</div>
   <div class="div-idx">04</div>
   <h2 class="div-title">设计方案</h2>
   <p class="div-sub">一条正常生成主干 + 一个异常诊断旁路：用同一条 L2 任务贯穿全章，逐站说明用户看到什么、能判断什么、能做什么。</p>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">设计对象 · 整条对话流</span></div><h2 class="title">优化对象不是单页，而是从<span class="kw">意图确认到结果验收</span>的端到端生成旅程。</h2><p class="subtitle">L2 录屏显示，长分析、工程状态误判、diff 后置、端口重试和降级收尾分布在不同阶段；因此优化对象应覆盖从意图确认到结果验收的完整生成旅程。</p></div><div class="page-no">24 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">设计对象 · 整条对话流</span></div><h2 class="title">优化对象不是单页，而是从<span class="kw">意图确认到结果验收</span>的端到端生成旅程。</h2><p class="subtitle">04 章先定位组件病灶，再重排信息架构并定义响应模式，随后沿五阶段旅程逐站展开；三类铺垫分别回答“问题在哪、结构怎么变、控制权怎么给”。</p></div><div class="page-no">24 / 39</div></div>
   <style>
   .fluxwrap{position:relative;z-index:2;display:grid;grid-template-columns:1fr 27cqw;gap:1.6cqw;flex:1 1 auto;min-height:0;align-items:start}
   .flux{display:flex;gap:1.1cqw;align-items:flex-start}
@@ -1523,7 +1523,7 @@
     </div>
   </div>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">04-2 组件级病灶</span></div><h2 class="title">六类组件过载共同放大慢感：<span class="kw">反馈延迟、过程噪声与收尾负担</span>叠加。</h2><p class="subtitle"><span class="dim-chip dv">实测近景</span>组件级截图取自 L2 实测录屏（新增「添加任务」，12′49″）；每格右下角标注该问题在旅程哪一站被解决，可放大查看原图。</p></div><div class="page-no">25 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">04-2 组件级病灶</span></div><h2 class="title">六类组件过载共同放大慢感：<span class="kw">反馈延迟、过程噪声与收尾负担</span>叠加。</h2><p class="subtitle"><span class="dim-chip dv">实测近景</span>本页只回答“问题发生在哪个组件”，并把六类病灶映射到对应旅程站点；下一页再回答信息结构如何重排。</p></div><div class="page-no">25 / 39</div></div>
   <style>
   .pz-grid{position:relative;z-index:2;flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:1.1cqw}
   .pz-tile{min-height:0;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:14px;padding:.9cqh .8cqw;box-shadow:0 14px 34px -30px rgba(23,23,58,.35)}
@@ -1552,7 +1552,7 @@
   <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>对应 02：</b>呈现层根因的组件级证据　<b>回收位置：</b>② 报告折叠 · ③ 聚合行 / 计划推进 · ④ 轻量行 / 增删量前置 · ⑤ 耗时与产物汇总　<b>指标：</b>volume ↓ · 控制感 ↑ · 峰终体验</div>
 </section>
 <section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">04-3 总体 Before / After</span></div><h2 class="title">重排信息优先级，让<span class="kw">可判断产物</span>早于完整过程暴露。</h2><p class="subtitle"><span class="dim-chip dv">界面呈现</span>优化后按判断价值重新组织信息：主线呈现阶段与关键结论，增量产物持续进入审阅层，完整过程保留在详情层。</p></div><div class="page-no">26 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">04-3 总体 Before / After</span></div><h2 class="title">重排信息优先级，让<span class="kw">可判断产物</span>早于完整过程暴露。</h2><p class="subtitle"><span class="dim-chip dv">界面呈现</span>本页只回答“信息如何重新分层”：主线给判断、产物层供审阅、详情层保留追溯；下一页定义 Auto 路由与用户覆盖。</p></div><div class="page-no">26 / 39</div></div>
   <style>
   .dk-band{position:relative;z-index:2;display:grid;grid-template-columns:12.5cqw 1fr 26cqw;gap:1.3cqw;align-items:stretch;flex:1 1 auto;min-height:0;overflow:hidden}
   .dk-band>*{min-height:0}
@@ -1670,7 +1670,7 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
     </div>
   </div>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">响应模式选择</span></div><h2 class="title">同一套流程不该固定：让用户按任务与信任度选择<span class="kw">响应模式</span>。</h2><p class="subtitle"><span class="dim-chip di">交互机制</span>系统默认 Auto 按任务复杂度自动选档，用户可随时锁定；过程可见度与推理深度绑定——越深的模式越要把等待变成看得见的进展。</p></div><div class="page-no">27 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">控制策略 · 响应模式</span></div><h2 class="title">系统自动匹配执行深度，用户保留<span class="kw">可解释、可覆盖</span>的控制权。</h2><p class="subtitle"><span class="dim-chip di">交互机制</span>Auto 是默认路径：系统依据任务复杂度自动选档并解释原因；用户仅在明确偏好、风险边界或信任程度变化时手动锁定，不需要预判系统该怎么工作。</p></div><div class="page-no">27 / 39</div></div>
   <style>
   .mode-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:1cqw;flex:1 1 auto;min-height:0;align-items:stretch;margin-top:1.3cqh}
   .mode-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 16px 40px -34px rgba(30,40,70,.42)}
@@ -1701,17 +1701,17 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
   .mode-view p{margin:0;font-size:var(--fs-sm);line-height:1.5;color:var(--ink-1)}
   .mode-view b{color:#4D49C8;font-size:var(--fs-md);font-weight:900}
   </style>
-  <div class="mode-view"><span class="mv-ic">⟳</span><p><b>为什么要分模式 —— 信息展示应随信任演进：</b>现在把过程平铺、全展示，是用户对 Agent 信任仍在建立期的必要设计；随着信任提升，默认模式可更快、过程可更省，把“默认全展示”逐步变成“按需展开”。响应模式正是这一演进的落地开关——用户信任到哪一步，就用哪一档。</p></div>
+  <div class="mode-view"><span class="mv-ic">⟳</span><p><b>为什么保留模式 —— 不是让用户替系统决策：</b>轻 / 完整路径判定仍由 Agent 自动完成；响应模式把自动路由结果解释给用户，并提供必要的覆盖权。模式只改变执行深度、自主度与过程可见度，不改变后续五阶段主干。</p></div>
   <div class="mode-grid">
-    <div class="mode-card m1"><div class="mode-hd"><span class="mi">⚡</span><b>快速模式</b><span class="tag">Instant</span></div><div class="mode-def">直奔结果，不展开推理过程</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>明确、低风险小改：改文案 / 注释 / lint / 单文件微调</span></div><div class="mode-r"><i>过程</i><span>极简——只出结果 + 一句改动摘要，折叠中间步骤</span></div><div class="mode-r"><i>等待</i><span>秒级（&lt;5s）</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">极简</span><span class="dots"><i class="on"></i><i></i><i></i></span></div></div>
-    <div class="mode-card m2"><div class="mode-hd"><span class="mi">🧠</span><b>思考模式</b><span class="tag">Thinking</span></div><div class="mode-def">展示分步推理后再作答</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>需先诊断的复杂任务：定位 bug、跨模块逻辑、方案权衡</span></div><div class="mode-r"><i>过程</i><span>“思考中”实时流 + 可点开的推理摘要，给等待正反馈</span></div><div class="mode-r"><i>等待</i><span>十秒 ~ 分钟级</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">全展示</span><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span></div></div>
-    <div class="mode-card m3"><div class="mode-hd"><span class="mi">📋</span><b>规划模式</b><span class="tag">Plan</span></div><div class="mode-def">先出结构化计划，确认后再执行</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>高风险 / 大范围：重构、跨文件改、涉及数据或权限</span></div><div class="mode-r"><i>过程</i><span>计划清单可见 + 确认闸门，改动前可预览 diff</span></div><div class="mode-r"><i>等待</i><span>出计划快，执行按批准分步</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">计划可见</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span></div></div>
-    <div class="mode-card m4"><div class="mode-hd"><span class="mi">🤖</span><b>自主模式</b><span class="tag">Agent</span></div><div class="mode-def">自主规划 + 执行 + 迭代到完成</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>端到端、可放手的批量任务</span></div><div class="mode-r"><i>过程</i><span>实时任务流（正在做 / 已完成几步）+ 危险命令二次确认</span></div><div class="mode-r"><i>等待</i><span>分钟级，异步可离开</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">任务流</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span></div></div>
+    <div class="mode-card m1"><div class="mode-hd"><span class="mi">⚡</span><b>快速模式</b><span class="tag">Instant</span></div><div class="mode-def">关键结论先行，过程默认折叠</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>明确、低风险小改：改文案 / 注释 / lint / 单文件微调</span></div><div class="mode-r"><i>过程</i><span>只给结果、改动摘要与必要验证；中间步骤按需展开</span></div><div class="mode-r"><i>等待</i><span>秒级（&lt;5s）</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">极简</span><span class="dots"><i class="on"></i><i></i><i></i></span></div></div>
+    <div class="mode-card m2"><div class="mode-hd"><span class="mi">🧠</span><b>思考模式</b><span class="tag">Thinking</span></div><div class="mode-def">关键判断可见，完整过程按需展开</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>需先诊断的复杂任务：定位 bug、跨模块逻辑、方案权衡</span></div><div class="mode-r"><i>过程</i><span>阶段状态流 + 可点开的判断摘要与验证线索</span></div><div class="mode-r"><i>等待</i><span>十秒 ~ 分钟级</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">判断可见</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span></div></div>
+    <div class="mode-card m3"><div class="mode-hd"><span class="mi">📋</span><b>规划模式</b><span class="tag">Plan</span></div><div class="mode-def">先给计划与风险点，确认边界后执行</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>高风险 / 大范围：重构、跨文件改、涉及数据或权限</span></div><div class="mode-r"><i>过程</i><span>计划、关键检查点与确认闸门可见，执行后增量给 diff</span></div><div class="mode-r"><i>等待</i><span>先快速给计划，执行按批准分步</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">计划可见</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span></div></div>
+    <div class="mode-card m4"><div class="mode-hd"><span class="mi">🤖</span><b>自主模式</b><span class="tag">Agent</span></div><div class="mode-def">自主推进到完成，关键风险才请求确认</div><div class="mode-rows"><div class="mode-r"><i>适用</i><span>端到端、可放手且验收口径明确的任务</span></div><div class="mode-r"><i>过程</i><span>里程碑任务流 + 增量产物；权限或高风险动作才请求介入</span></div><div class="mode-r"><i>等待</i><span>分钟级，可离开后回看</span></div></div><div class="mode-foot"><span class="lab">过程可见度</span><span class="lv">里程碑</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span></div></div>
   </div>
   <div class="mode-axis">
-    <div class="mx"><b>两条主轴</b>推理深度（快速 ↔ 思考）× 自主度（问答 ↔ 自主执行）——对齐 Cursor Ask/Agent、Claude Thinking/Plan、ChatGPT Instant/Thinking 的业界切分。</div>
-    <div class="mx"><b>默认 Auto 路由</b>系统按任务复杂度自动选档（对齐 GPT-5 / Cursor Auto），用户可随时手动锁定——降低选择成本又保留控制权。</div>
-    <div class="mx"><b>过程可见度绑定深度</b>越深的模式越把等待变成“看得见的进展”；过程展开多少，本身就是一档可调的设计。</div>
+    <div class="mx"><b>两条主轴</b>执行深度（快速 ↔ 深入）× 自主度（确认后执行 ↔ 自主完成）；四种模式是同一主干的不同控制参数。</div>
+    <div class="mx"><b>默认 Auto 路由</b>系统先按任务复杂度自动选档并说明原因；用户可手动锁定或切换，降低选择成本又保留覆盖权。</div>
+    <div class="mx"><b>与旅程的关系</b>模式决定每一站展示多少、何时确认；五阶段主干和异常升级规则保持一致，下一页从接收与定界开始展开。</div>
   </div>
 </section>
 <section class="slide">
@@ -1745,9 +1745,9 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
       </div>
     </div>
   </div>
-  <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>策略承接：</b>结果前置　<b>设计收益：</b>首屏确认任务被接住，减少无反馈空窗与理解偏差　<b>对应指标：</b>TTFR ↓ · TTFR 质量 ↑　<b>技术依赖：</b>Agent 输出任务摘要事件</div>
+  <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>策略承接：</b>有效信息前置 + 状态可见　<b>设计收益：</b>首屏确认任务被接住，减少无反馈空窗与理解偏差　<b>对应指标：</b>TTFR ↓ · TTFR 质量 ↑　<b>技术依赖：</b>Agent 输出任务摘要事件</div>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">旅程 02 · 路径判断</span></div><h2 class="title">先判断任务路径，再匹配<span class="kw">执行深度与信息成本</span>：小任务不走大流程。</h2><p class="subtitle"><span class="dim-chip di">交互机制</span>Agent 先判断轻量 / 完整路径：轻任务快速收敛到关键文件，不先通读全库并输出完整理解文档；体验设计负责表达路径结论、范围与变化。</p></div><div class="page-no">29 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">旅程 02 · 路径判断</span></div><h2 class="title">响应模式确定后，再判断<span class="kw">实际执行路径</span>：小任务不走大流程。</h2><p class="subtitle"><span class="dim-chip di">交互机制</span>响应模式决定交互深度与自主度，路径判断决定探索和执行范围；Auto 下两者由系统协同完成，手动锁定模式也不跳过轻量 / 完整路径判断。</p></div><div class="page-no">29 / 39</div></div>
   <div class="jny"><span><i>1</i>接收与定界</span><em></em><span class="on"><i>2</i>路径判断</span><em></em><span><i>3</i>执行生成</span><em></em><span><i>4</i>可审阅产出</span><em></em><span><i>5</i>验证收尾</span></div>
   <div class="jm-band jba">
     <div class="dk-col"><div class="fx-h">Before · 实测<em>t≈160s</em></div><div class="fx-row" style="flex:1;min-height:0"><div class="fx-shot" style="height:100%" data-full="flowstrips/jny-before-02.jpg"><img src="flowstrips/jny-before-02.jpg" alt="码道 L2 实测 t≈160s" style="height:100%;object-fit:cover;object-position:top"><button class="zoom-btn" type="button">⤢ 放大</button><div class="fx-fade">⋯</div></div></div><div class="fx-cap">t120 起长篇分析报告刷屏——没有路径概念，大小任务都走全库通读</div></div>
@@ -1829,7 +1829,7 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
       </div>
     </div>
   </div>
-  <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>策略承接：</b>结果前置 + 详情折叠　<b>设计收益：</b>生成中即可开始审阅，价值点从结尾搬到中段　<b>对应指标：</b>TTV ↓ · TTFMP ↓ · volume ↓　<b>技术依赖：</b>工具链生成 diff · Agent 前置关键判断</div>
+  <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>策略承接：</b>有效信息前置 + 详情折叠　<b>设计收益：</b>生成中即可开始审阅，价值点从结尾搬到中段　<b>对应指标：</b>TTV ↓ · TTFMP ↓ · volume ↓　<b>技术依赖：</b>工具链生成 diff · Agent 前置关键判断</div>
 </section><section class="slide">
   <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">旅程 05 · 验证收尾</span></div><h2 class="title">用<span class="kw">验证证据</span>完成信任闭环，用下一步动作延续任务链。</h2><p class="subtitle"><span class="dim-chip dv">界面呈现</span>可审阅产物形成后应立即提供入口，不等待全部浏览器验证结束；验证状态持续补齐，完成后再形成可信收尾，完整日志仅在追溯或失败时展开。</p></div><div class="page-no">32 / 39</div></div>
   <div class="jny"><span><i>1</i>接收与定界</span><em></em><span><i>2</i>路径判断</span><em></em><span><i>3</i>执行生成</span><em></em><span><i>4</i>可审阅产出</span><em></em><span class="on"><i>5</i>验证收尾</span></div>
@@ -1859,7 +1859,7 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
   </div>
   <div class="caption-note" style="background:rgba(91,91,214,.08);border-color:rgba(91,91,214,.22);color:#4D49C8"><b>策略承接：</b>验证收尾　<b>设计收益：</b>结果可信、交付清楚、下一步行动连续　<b>对应指标：</b>可信度 ↑ · 接受率 ↑　<b>技术依赖：</b>测试 / build / 预览状态真实可用</div>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">异常机制 · 自愈与按需升级</span></div><h2 class="title">异常默认由系统<span class="kw">静默自愈</span>，只有无法继续时才请求用户介入。</h2><p class="subtitle"><span class="dim-chip di">交互机制</span><span class="dim-chip dv">界面呈现</span>可自动解决的异常不进入主线；恢复中且不影响任务时仅显示临时状态；只有任务受阻或需要权限、外部操作时，才出现紧凑求助提示。原因、尝试记录与日志放入按需展开的详情层。</p></div><div class="page-no">33 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">设计方案</span><span class="brand-dot">·</span><span class="brand-pg">异常机制 · 自愈与按需升级</span></div><h2 class="title">系统优先自愈；影响进程时说明状态，<span class="kw">无法继续</span>时才请求介入。</h2><p class="subtitle"><span class="dim-chip di">交互机制</span><span class="dim-chip dv">界面呈现</span>可自动解决且不影响任务的异常不进入主线；影响进程时显示一行临时状态；只有任务受阻或需要权限、外部操作时，才出现紧凑求助提示。原因、尝试记录与日志放入按需展开的详情层。</p></div><div class="page-no">33 / 39</div></div>
   <div class="jny"><span><i>1</i>接收与定界</span><em></em><span><i>2</i>路径判断</span><em></em><span><i>3</i>执行生成</span><em></em><span><i>4</i>可审阅产出</span><em></em><span><i>5</i>验证收尾</span><em></em><span class="br on"><i>⚠</i>异常自愈 · 必要时升级</span></div>
   <div class="jm-band jba">
     <div class="dk-col"><div class="fx-h">Before · 实测<em>t≈660s</em></div><div class="fx-row" style="flex:1;min-height:0"><div class="fx-shot" style="height:100%" data-full="flowstrips/jny-before-04.jpg"><img src="flowstrips/jny-before-04.jpg" alt="码道 L2 实测 t≈660s" style="height:100%;object-fit:cover;object-position:top"><button class="zoom-btn" type="button">⤢ 放大</button><div class="fx-fade">⋯</div></div></div><div class="fx-cap">t660 起端口 5173→8080 连环重试，五种方案铺满主线</div></div>
@@ -2023,21 +2023,21 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
   <div class="div-tag">SECTION · 05</div>
   <div class="div-idx">05</div>
   <h2 class="div-title">结论与落地</h2>
-  <p class="div-sub">两项 P0 并行：环境隔离降低客观等待，结果前置降低主观等待——明确优先级、责任方与复测口径。</p>
+  <p class="div-sub">两项 P0 并行：环境隔离降低客观等待，有效信息前置降低主观等待——明确优先级、责任方与复测口径。</p>
 </section><section class="slide">
   <div class="head"><div><div class="brand"><span class="brand-ch">结论与落地</span><span class="brand-dot">·</span><span class="brand-pg">核心结论</span></div><h2 class="title">本轮核心体验矛盾不是“能不能生成”，而是<span class="kw">高质量结果能否被及时看见与判断</span>。</h2><p class="subtitle">TRAE 与码道的 L3 结果证明最终质量可以很高；专项应在保留规划、工程拆分与验证能力的前提下，优化<span class="copy-key">环境、编排与信息呈现</span>。</p></div><div class="page-no">36 / 39</div></div>
   
 <div class="hero-layout">
     <div class="hl-hero"><div class="hl-q">把等待<br>产品化</div><p class="hl-sub">本轮三档任务中，码道均完成关键验收。<span class="copy-key">主要可观察损耗集中在环境处理、重流程编排和信息层级</span>；因此应优先把等待设计成<b style="color:#fff">可预期、可审阅、可恢复</b>的过程。</p></div>
-    <div class="hl-list sm"><div><div class="hl-k">证据 · 02 章</div><b>最终质量可信，但质量价值显现偏晚</b><p>TRAE 与码道 L3 均完成三页应用、工程分层与真实运行；问题集中于可审阅产物和验证证据出现偏晚。</p></div><div><div class="hl-k">根因 · 02 章</div><b>慢感 = 执行编排 × 信息呈现 × 环境</b><p>高质量产物后置、过程占据主线和环境异常外露共同放大慢感；总耗时不能直接代表生成质量。</p></div><div><div class="hl-k">策略 · 03 章</div><b>主线给判断、产物前置、详情折叠、异常按需升级</b><p>保留规划与验证能力，将高质量结果从结尾前移到生成过程，使用户更早判断和审阅。</p></div><div><div class="hl-k">方案 · 04 章</div><b>正常主干五阶段 + 异常自愈机制</b><p>接收与定界 → 路径判断 → 执行生成 → 可审阅产出 → 验证收尾；异常先由系统恢复，阻塞或需授权时才请求用户介入。</p></div></div>
+    <div class="hl-list sm"><div><div class="hl-k">证据 · 02 章</div><b>最终质量可信，但质量价值显现偏晚</b><p>TRAE 与码道 L3 均完成三页应用、工程分层与真实运行；问题集中于可审阅产物和验证证据出现偏晚。</p></div><div><div class="hl-k">根因 · 02 章</div><b>慢感 = 执行编排 × 信息呈现 × 环境</b><p>高质量产物后置、过程占据主线和环境异常外露共同放大慢感；总耗时不能直接代表生成质量。</p></div><div><div class="hl-k">策略 · 03 章</div><b>有效信息前置、状态可见、详情折叠、验证收尾</b><p>轻 / 完整路径判定与异常自愈作为支撑机制；保留规划和验证能力，让用户更早判断、审阅并完成验收。</p></div><div><div class="hl-k">方案 · 04 章</div><b>响应模式控制 + 正常主干五阶段 + 异常旁路</b><p>Auto 默认选档、用户可覆盖；接收与定界 → 路径判断 → 执行生成 → 可审阅产出 → 验证收尾，异常按影响逐级升级。</p></div></div>
   </div>
-  <div class="hl-band" style="background:rgba(91,91,214,.08);border:1px solid rgba(91,91,214,.22);color:#4D49C8"><b>关键口径：</b>先控制环境、编排与信息呈现变量，再评估模型速率——<b>环境隔离</b>降低客观等待，<b>结果前置</b>降低主观等待。<span style="color:var(--ink-3)">（基于单人同题实测与录屏证据链，后续按同协议扩展复测。）</span></div>
+  <div class="hl-band" style="background:rgba(91,91,214,.08);border:1px solid rgba(91,91,214,.22);color:#4D49C8"><b>关键口径：</b>先控制环境、编排与信息呈现变量，再评估模型速率——<b>环境隔离</b>降低客观等待，<b>有效信息前置</b>降低主观等待。<span style="color:var(--ink-3)">（基于单人同题实测与录屏证据链，后续按同协议扩展复测。）</span></div>
 </section><section class="slide">
-  <div class="head"><div><div class="brand"><span class="brand-ch">结论与落地</span><span class="brand-dot">·</span><span class="brand-pg">落地优先级</span></div><h2 class="title">双 P0 同时降低<span class="kw">客观等待与主观等待</span>：环境隔离 × 结果前置。</h2><p class="subtitle">按影响 × 成本 × 是否依赖模型排序——<span class="copy-key">环境隔离与结果前置同步推进</span>；其中结果前置由 Agent 编排与结构化展示共同完成。</p></div><div class="page-no">37 / 39</div></div>
+  <div class="head"><div><div class="brand"><span class="brand-ch">结论与落地</span><span class="brand-dot">·</span><span class="brand-pg">落地优先级</span></div><h2 class="title">双 P0 同时降低<span class="kw">客观等待与主观等待</span>：环境隔离 × 有效信息前置。</h2><p class="subtitle">按影响 × 成本 × 是否依赖模型排序——<span class="copy-key">环境隔离与 P0-B 主线同步推进</span>；P0-B 包含有效信息前置、状态可见、详情折叠及其结构化展示。</p></div><div class="page-no">37 / 39</div></div>
   
 <div class="evidence-table" style="grid-template-columns:.62fr 1fr 1.9fr .75fr 1.35fr;min-height:66cqh;grid-template-rows:auto repeat(6,1fr)"><div class="th">优先级</div><div class="th">主线</div><div class="th">具体动作</div><div class="th">牵头</div><div class="th">收益</div>
-  <div class="good"><b>P0-A</b></div><div><b>环境隔离</b><br>降低客观等待</div><div>依赖复用、端口恢复、目录预检、预览兜底；建立静默自愈、阻塞判断、按需求助与诊断详情 API。</div><div>环境 / 平台</div><div>提高自动恢复率，减少环境等待和不必要的用户介入。</div>
-  <div class="good"><b>P0-B</b></div><div><b>结果前置</b><br>降低主观等待</div><div>即时提供接收反馈；形成探索结论后尽早给出文件候选与路径判断，并在生成中段持续提供 diff 与验证入口。</div><div>Agent 编排</div><div>缩短首个有效信息和可审阅产物的出现时间。</div>
+  <div class="good"><b>P0-A</b></div><div><b>环境隔离</b><br>降低客观等待</div><div>依赖复用、端口恢复、目录预检、预览兜底；建立优先自愈、影响状态说明、阻塞判断、按需求助与诊断详情 API。</div><div>环境 / 平台</div><div>提高自动恢复率，减少环境等待和不必要的用户介入。</div>
+  <div class="good"><b>P0-B</b></div><div><b>有效信息前置</b><br>降低主观等待</div><div>即时提供接收反馈；形成探索结论后尽早给出文件候选与路径判断，并在生成中段持续提供 diff 与验证入口。</div><div>Agent 编排</div><div>缩短首个有效信息和可审阅产物的出现时间。</div>
   <div class="good"><b>P0-B 支撑</b></div><div><b>结构化展示</b></div><div>主线 / 产物 / 详情 / 诊断四层组件落地；长分析与日志默认折叠，命令通过只留摘要。</div><div>设计 + 前端</div><div>降低主线信息量与阅读成本，减少过程噪声对慢感的放大。</div>
   <div class="warn"><b>P1</b></div><div><b>状态动效</b></div><div>阶段推进、产物出现、异常降级、完成反馈——按四原则只服务状态变化。</div><div>前端</div><div>状态变化由真实事件驱动，减少无意义循环动画。</div>
   <div class="warn"><b>P1</b></div><div><b>验证收尾</b></div><div>验证结果呈现、预览入口、接受 / 继续动作、下一步建议。</div><div>前端 + Agent</div><div>提高完成态可信度，并支持接受、继续或修正。</div>
@@ -2047,9 +2047,9 @@ components/TaskItem.tsx  components/ProgressBar.tsx</pre></div></div>
 </section><section class="slide">
   <div class="head"><div><div class="brand"><span class="brand-ch">结论与落地</span><span class="brand-dot">·</span><span class="brand-pg">责任边界</span></div><h2 class="title">体验设计定义<span class="kw">认知与交互契约</span>，技术侧交付状态事件与恢复能力。</h2><p class="subtitle">推进顺序由依赖关系决定：先定义体验规格与状态协议，再完成组件和恢复能力，最后按同一评测协议复测。</p></div><div class="page-no">38 / 39</div></div>
   <div class="evidence-table c5" style="grid-template-columns:.72fr .95fr 1.75fr 1.5fr .9fr;min-height:64cqh;grid-template-rows:auto repeat(6,1fr)"><div class="th">责任方</div><div class="th">牵头主线</div><div class="th">负责内容</div><div class="th">关键交付物</div><div class="th">依赖</div>
-    <div><b>设计侧</b></div><div class="good"><b style="display:inline;font-size:inherit">配合</b> P0-B 结果前置</div><div>主干五阶段与异常升级阈值；四层信息架构规范；状态、求助提示、完成态交互与视觉规格；动效四原则。</div><div class="emph">对话流交互规格（阶段状态 / 求助提示 / 结果卡）+ 五阶段高保真</div><div>—</div>
+    <div><b>设计侧</b></div><div class="good"><b style="display:inline;font-size:inherit">配合</b> P0-B 有效信息前置</div><div>响应模式控制、主干五阶段与异常升级阈值；四层信息架构规范；状态、求助提示、完成态交互与视觉规格。</div><div class="emph">对话流交互规格（模式 / 阶段状态 / 求助提示 / 结果卡）+ 五阶段高保真</div><div>—</div>
     <div><b>前端侧</b></div><div>配合两件 P0 主线</div><div>主线 / 详情层折叠容器、diff 卡、验证结果、轻量求助提示、流式动效与状态持久化。</div><div class="emph">对话流组件库落地 + 会话状态持久化</div><div>设计规格</div>
-    <div><b>Agent 编排侧</b></div><div class="good"><b style="display:inline;font-size:inherit">牵头</b> P0-B 结果前置</div><div>轻 / 完整路径判定与显性升级；阶段事件流；结果前置策略；异常是否阻塞的判断。</div><div class="emph">接收 / 候选 / 执行 / diff / 验证事件协议——前端渲染主线的数据源</div><div>与设计对齐状态机</div>
+    <div><b>Agent 编排侧</b></div><div class="good"><b style="display:inline;font-size:inherit">牵头</b> P0-B 有效信息前置</div><div>Auto 模式路由、轻 / 完整路径判定与显性升级；阶段事件流；有效信息前置策略；异常是否阻塞的判断。</div><div class="emph">模式 / 接收 / 候选 / 执行 / diff / 验证事件协议——前端渲染主线的数据源</div><div>与设计对齐状态机</div>
     <div><b>环境 / 平台侧</b></div><div class="good"><b style="display:inline;font-size:inherit">牵头</b> P0-A 环境隔离</div><div>环境耗时与异常恢复：依赖复用、端口恢复、目录权限预检、预览代理与 build 产物兜底。</div><div class="emph">自动恢复、阻塞判断与诊断详情 API</div><div>—</div>
     <div><b>模型侧</b></div><div>P2 · 输出质量</div><div>结论优先、少冗余、结构化输出、减少无效解释；速率在体验问题修完后评估。</div><div class="emph">输出格式遵循 + 速率档位评估</div><div>编排事件定义</div>
     <div><b>验证侧</b></div><div class="warn">P1 · 复测验收</div><div>同题复测 L1/L2/L3、录屏逐帧标注 TTFR / TTFMP / TTV、行为指标与主观量表。</div><div class="emph">指标看板；达标结果回填优先级表</div><div>全部产出</div>
@@ -2308,7 +2308,14 @@ document.addEventListener('click',function(e){var r=e.target.closest?e.target.cl
 </script>
 <script>
 (function(){
-  var slides=[].slice.call(document.querySelectorAll('#deck>.slide'));
+  var deck=document.getElementById('deck');
+  var originalSlides=[].slice.call(deck.querySelectorAll(':scope>.slide'));
+  function slideBySection(label){return originalSlides.find(function(slide){var section=slide.querySelector('.brand-pg');return section&&section.textContent.trim()===label;});}
+  var synthesisSlides=[slideBySection('六产品体感画像'),slideBySection('横向对比总览')].filter(Boolean);
+  var evidenceConclusion=slideBySection('02 章结论 · 执行 × 呈现 × 环境');
+  if(evidenceConclusion)synthesisSlides.forEach(function(slide){deck.insertBefore(slide,evidenceConclusion);});
+  var slides=[].slice.call(deck.querySelectorAll(':scope>.slide'));
+  slides.forEach(function(slide,i){var pageNo=slide.querySelector('.page-no');if(pageNo)pageNo.textContent=(i+1)+' / '+slides.length;});
   document.querySelectorAll('.case-slide .evidence-table.eq').forEach(function(table){var first=table.querySelector('.th');if(first)first.textContent='产品 / 本轮模型';});
   var nav=document.querySelector('.deck-navigator'),navList=nav.querySelector('.nav-list');
   var lighttable=document.querySelector('.deck-lighttable'),ltGrid=lighttable.querySelector('.lt-grid');
