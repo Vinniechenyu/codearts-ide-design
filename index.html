@@ -145,6 +145,7 @@
   @keyframes cardin{to{opacity:1;transform:none}}
   @media(prefers-reduced-motion:reduce){.card{animation:none;opacity:1;transform:none}}
   .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--line)}
+  .card-link{display:flex;flex-direction:column;flex:1;min-height:0}
   .shot{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--panel)}
   .shot img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .5s var(--ease)}
   .card:hover .shot img{transform:scale(1.04)}
@@ -186,6 +187,19 @@
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
   .tag{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink2);
     background:var(--panel);border:1px solid var(--hair);border-radius:6px;padding:3px 8px}
+  .version-picker{margin:0 18px 18px;padding-top:14px;border-top:1px solid var(--line)}
+  .version-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+    font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase}
+  .version-label span:last-child{font-size:9px;letter-spacing:.04em;text-transform:none}
+  .version-options{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .version-option{display:flex;flex-direction:column;gap:2px;min-width:0;padding:9px 10px;border:1px solid var(--line);
+    border-radius:9px;background:var(--panel);transition:border-color .18s var(--ease),background .18s var(--ease),transform .18s var(--ease)}
+  .version-option:hover{transform:translateY(-1px);border-color:var(--ink3)}
+  .version-option.is-default{border-color:color-mix(in srgb,var(--shine) 42%,var(--line));
+    background:color-mix(in srgb,var(--shine) 8%,var(--panel))}
+  .version-option b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;line-height:1.35}
+  .version-option small{font-family:var(--mono);font-size:9px;line-height:1.2;color:var(--ink3)}
+  .version-option.is-default small{color:var(--shine)}
 
   .empty{display:none;text-align:center;padding:72px 20px;color:var(--ink3);grid-column:1/-1;
     border:1px dashed var(--line);border-radius:18px}
@@ -282,10 +296,14 @@ const ITEMS = [
   {
     title: "码道 · 生成响应体验优化专项",
     cat: "专项", product: "IDE", status: "live",
-    desc: "把用户一句“感觉慢”拆成可证明的证据链:五款产品同题实测、码道输出结构拆解、根因机制归因,最终落到五阶段主干 + 异常旁路 + 状态动效的设计方案。",
+    desc: "把用户一句“感觉慢”拆成可证明的证据链:六款产品同题实测、码道输出结构拆解、根因机制归因,最终落到响应策略、交互机制与状态动效的设计方案。",
     preview: "assets/preview-madao-response-deck.png",
-    tags: ["五产品实测", "根因拆解", "设计方案"],
-    href: "madao-response-deck/"
+    tags: ["六产品实测", "根因判断", "设计方案"],
+    href: "madao-response-deck/",
+    versions: [
+      { label: "汇报精简版-0713", note: "默认 · 最新", href: "madao-response-deck/", current: true },
+      { label: "全量版分析-0713", note: "历史版本", href: "madao-response-deck/full-0713.html" }
+    ]
   },
   {
     title: "拆透 ADE,重构 AI 时代的开发工作流",
@@ -458,14 +476,24 @@ function render(){
         <button data-act="toggle" class="${pinned?'act':''}">${pinned?'取消置顶':'置顶'}</button>
         ${pinned?`<button data-act="up" class="mini" title="上移">↑</button><button data-act="down" class="mini" title="下移">↓</button>`:''}
       </div>` : '';
-    return `<a class="card" href="${it.href}" style="--ac:${c.ac};--sd:${s.dot};animation-delay:${i*55}ms">
-      <div class="shot">${thumb}${badge}<span class="pill"><span class="d"></span>${s.label}</span>${ctl}</div>
+    const cardContent = `<div class="shot">${thumb}${badge}<span class="pill"><span class="d"></span>${s.label}</span>${ctl}</div>
       <div class="body">
         <div class="clab"><span class="cd"></span>${c.label}</div>
         <h2>${it.title}</h2>
         <p class="desc">${it.desc}</p>
         <div class="tags">${tags}</div>
-      </div>
+      </div>`;
+    if (it.versions){
+      const versions = it.versions.map(v => `<a class="version-option${v.current?' is-default':''}" href="${v.href}" aria-label="打开${v.label}">
+          <b>${v.label}</b><small>${v.note}</small>
+        </a>`).join('');
+      return `<article class="card versioned" style="--ac:${c.ac};--sd:${s.dot};animation-delay:${i*55}ms">
+        <a class="card-link" href="${it.href}" aria-label="打开${it.title}默认版本">${cardContent}</a>
+        <div class="version-picker"><div class="version-label"><span>版本管理</span><span>选择打开版本</span></div><div class="version-options">${versions}</div></div>
+      </article>`;
+    }
+    return `<a class="card" href="${it.href}" style="--ac:${c.ac};--sd:${s.dot};animation-delay:${i*55}ms">
+      ${cardContent}
     </a>`;
   }).join('');
   const key = DIMS[state.dim].key;
