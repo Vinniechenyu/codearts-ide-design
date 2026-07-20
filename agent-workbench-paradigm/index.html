@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>从对话助手到任务驱动型 Agent 工作台 · 汇报材料</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@master/css/harmonyos_sans_sc.css">
+<style>
+/* ===== 设计 token ===== */
+:root{
+  --accent:#8B5CF6; --accent-deep:#6D45E0; --accent-soft:#F1EBFE;
+  --d1:#8B5CF6; --d1-soft:#F1EBFE;   /* 左·任务记录域 */
+  --d2:#2E9BE0; --d2-soft:#E8F4FD;   /* 中·任务控制域 */
+  --d3:#FF9440; --d3-soft:#FFF1E6;   /* 右·工作对象域 */
+  --grad:linear-gradient(92deg,#FF9A3E 0%,#F857C1 52%,#8B5CF6 100%);
+  --grad-v:linear-gradient(180deg,#FFA24B 0%,#FF7AD9 55%,#7FB6F8 100%);
+  --ink:#0C0D10; --ink-1:#33363D; --ink-2:#54585F; --ink-3:#8B8F98;
+  --line:#E5E5E5; --card:#FFFFFF;
+  --g-ink:linear-gradient(150deg,#17181B 0%,#0A0B0D 100%);
+  --good:#10835E; --warn:#A56403; --bad:#D82E47;
+  --sans:"HarmonyOS Sans SC",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+  --fs-h1:clamp(26px,2.5cqw,44px); --fs-h2:clamp(20px,1.55cqw,28px);
+  --fs-h3:clamp(17px,1.24cqw,23px); --fs-body:clamp(15px,1.05cqw,19px);
+  --fs-sm:clamp(14px,.94cqw,17px);  --fs-xs:clamp(12.5px,.82cqw,14.5px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:#0c0d10;
+  scroll-snap-type:y mandatory;overflow-y:auto;height:100vh}
+
+/* ===== 画布 ===== */
+.slide{
+  position:relative;overflow:hidden;
+  width:min(100vw,177.78vh);height:min(56.25vw,100vh);
+  container-type:size;margin:0 auto;scroll-snap-align:center;scroll-snap-stop:always;
+  padding:5.2cqh 6cqw 5.2cqh;display:flex;flex-direction:column;
+  background:#FFFFFF;
+}
+/* llama 风格：顶部渐变条 + 页面细线框 */
+.slide::before{content:"";position:absolute;top:0;left:0;right:0;height:.7cqh;background:var(--grad);z-index:3}
+.slide::after{content:"";position:absolute;inset:2.4cqh 2cqw 2cqh;border:1px solid #EBEBEB;border-radius:18px;pointer-events:none;z-index:0}
+.blob{display:none}
+.slide>*:not(.blob):not(.dark-fx){position:relative;z-index:1}
+
+.slide.dark{background:#07080D;color:#fff}
+.slide.dark::after{display:none}
+.slide>.dark-fx{display:block;position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.dark-fx .glow1{position:absolute;width:56cqw;height:56cqw;right:-18cqw;top:-28cqw;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.24) 0%,rgba(139,92,246,0) 68%)}
+.dark-fx .glow2{position:absolute;width:48cqw;height:48cqw;left:-18cqw;bottom:-30cqw;border-radius:50%;background:radial-gradient(circle,rgba(255,148,64,.17) 0%,rgba(255,148,64,0) 70%)}
+.dark-fx .gridfx{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:3.2cqw 3.2cqw;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 78%)}
+.section-dark .head-c .subtitle{color:rgba(255,255,255,.62)}
+.section-dark .def-hero .dq,.section-dark .prin b,.section-dark .gram b,.section-dark .infer b{color:#fff}
+.section-dark .def-hero .en,.section-dark .prin .no{color:rgba(255,255,255,.42)}
+.section-dark .prin,.section-dark .gram,.section-dark .infer>div{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.14);box-shadow:none}
+.section-dark .prin .yes,.section-dark .gram p,.section-dark .infer>div{color:rgba(255,255,255,.68)}
+.section-dark .def-div i{background:rgba(255,255,255,.14)}
+.section-dark .g-viz{border-color:rgba(255,255,255,.14)}
+.section-dark .gc.gray{background:rgba(255,255,255,.10);color:rgba(255,255,255,.72)}
+.section-dark .gc.line{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.78)}
+/* 封面：渐变阶梯 + 抽象工作台线框 */
+.g-steps{position:absolute;left:-8%;right:-8%;bottom:15%;height:112%;display:flex;align-items:flex-end;gap:1.8%;z-index:0}
+.g-steps i{flex:1;background:var(--grad-v);border-radius:2px;display:block}
+.cov-wf{position:relative;z-index:1;width:100%;aspect-ratio:16/9;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.22);border-radius:20px;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.34);overflow:hidden}
+.cov-wf .wf-top{display:flex;gap:.45cqw;padding:.9cqh 1cqw;border-bottom:1px solid #ECECEC}
+.cov-wf .wf-top i{width:.55cqw;height:.55cqw;border-radius:50%;background:#DEDEDE;display:block}
+.cov-wf .wf-b{display:grid;grid-template-columns:24fr 42fr 34fr;flex:1;min-height:0}
+.cov-wf .wcol{padding:1.2cqh 1cqw;display:flex;flex-direction:column;gap:.9cqh;min-height:0}
+.cov-wf .wcol+.wcol{border-left:1px solid #ECECEC}
+.cov-wf .wbar{height:1.7cqh;border-radius:3px;background:#EFEFEF;flex:0 0 auto}
+.cov-wf .wbar.c1{background:linear-gradient(90deg,#9F6BFF,#8B5CF6)}
+.cov-wf .wbar.c2{background:linear-gradient(90deg,#63B5EC,#2E9BE0)}
+.cov-wf .wbar.c3{background:linear-gradient(90deg,#FFA75E,#FF9440)}
+.cov-lab{position:relative;z-index:1;display:grid;grid-template-columns:24fr 42fr 34fr;width:100%;margin:1.6cqh 0 0;text-align:center}
+.cov-lab b{display:block;color:var(--ink);font-size:var(--fs-sm)}
+.cov-lab span{font-family:var(--mono);font-size:calc(var(--fs-xs)*.9);color:var(--ink-3);letter-spacing:.18em}
+/* 收束页域胶囊 */
+.close-tri{display:flex;gap:1.2cqw;margin-top:4.2cqh;justify-content:center}
+.close-tri span{border:1px solid #D8D8D8;border-radius:3px;padding:.8cqh 1.8cqw;font-size:var(--fs-sm);color:var(--ink);background:#fff;display:inline-flex;align-items:baseline;gap:.7cqw;font-weight:700}
+.close-tri span i{font-style:normal;font-family:var(--mono);font-size:calc(var(--fs-xs)*.85);color:var(--ink-3);letter-spacing:.14em}
+
+/* ===== 顶栏 / 页头（居中 keynote 版式） ===== */
+.topbar{display:flex;justify-content:space-between;align-items:center;flex:0 0 auto;margin-bottom:2.4cqh}
+.brand{font-family:var(--mono);font-size:calc(var(--fs-xs)*.92);color:var(--ink-2);font-weight:700;letter-spacing:.14em}
+.brand::before,.brand::after{content:"▪";margin:0 .7em;color:#C4C4C4;font-size:.72em;vertical-align:.12em}
+.dark .brand{color:rgba(255,255,255,.70)}
+.page-no{font-family:var(--mono);font-size:var(--fs-xs);color:var(--ink-3)}
+.dark .page-no{color:rgba(255,255,255,.44)}
+.head-c{text-align:left;flex:0 0 auto;margin-bottom:2.8cqh}
+.head-c .title{margin:0;font-size:var(--fs-h1);font-weight:900;line-height:1.28;letter-spacing:-.005em}
+.kw{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+.head-c .subtitle{margin:1.1cqh 0 0;font-size:var(--fs-sm);color:var(--ink-2);line-height:1.7;max-width:64em}
+.content{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+
+/* ===== 通用卡 ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;min-height:0}
+.soft-shadow{box-shadow:0 14px 38px rgba(27,38,74,.07)}
+
+/* 域色标签 */
+.dtag{display:inline-flex;align-items:center;gap:.45cqw;font-size:var(--fs-xs);font-weight:800;padding:.4cqh .8cqw;border-radius:99px}
+.dtag .dot{width:.6cqw;height:.6cqw;border-radius:50%;background:currentColor}
+.dtag.t1{background:var(--d1-soft);color:var(--d1)}
+.dtag.t2{background:var(--d2-soft);color:var(--d2)}
+.dtag.t3{background:var(--d3-soft);color:var(--d3)}
+
+/* 线性图标 */
+.ic{width:1.35em;height:1.35em;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== S1 / S16 深色页 ===== */
+.cover{justify-content:center}
+.cov-row{display:flex;align-items:center;gap:4.5cqw;position:relative;z-index:1}
+.cov-l{flex:1.02;min-width:0}
+.cov-r{flex:.98;min-width:0;display:flex;flex-direction:column;position:relative}
+.c-kicker{font-family:var(--mono);font-size:var(--fs-xs);letter-spacing:.3em;color:rgba(255,255,255,.58);text-transform:uppercase;font-weight:700}
+.c-kicker::before,.c-kicker::after{content:"▪";margin:0 .7em;color:#C4C4C4;font-size:.8em}
+.cover .c-title{font-size:clamp(36px,3.7cqw,62px);font-weight:900;line-height:1.18;margin:2.4cqh 0 0;letter-spacing:-.01em;color:#fff}
+.cover .c-sub{font-size:var(--fs-h3);color:rgba(255,255,255,.68);margin:2.2cqh 0 0;font-weight:400}
+.cover .cov-lab b{color:#fff}
+.cover .cov-lab span{color:rgba(255,255,255,.46)}
+.cov-cta{display:flex;gap:1cqw;margin-top:3.6cqh}
+.cov-cta span{font-family:var(--mono);font-size:var(--fs-xs);font-weight:700;letter-spacing:.12em;padding:1cqh 1.8cqw;border-radius:3px}
+.cov-cta .b1{background:#0C0D10;color:#fff}
+.cov-cta .b2{background:#fff;color:var(--ink);border:1px solid #D8D8D8}
+.cover .tri{display:flex;gap:0;margin-top:5.5cqh;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}
+.cover .tri>div{padding:2.6cqh 3.4cqw;display:flex;flex-direction:column;gap:.6cqh;align-items:center;min-width:0}
+.cover .tri>div+div{border-left:1px solid rgba(255,255,255,.14)}
+.cover .tri b{font-size:var(--fs-h3)}
+.cover .tri span{font-size:var(--fs-xs);color:rgba(255,255,255,.45);font-family:var(--mono);letter-spacing:.08em}
+
+/* ===== S2 两个时代 ===== */
+.era-row{display:grid;grid-template-columns:1.05fr 9cqw 1.2fr;align-items:stretch;flex:0 0 auto}
+.era{min-width:0;border-radius:16px;padding:2cqh 1.8cqw}
+.era .e-tag{font-family:var(--mono);font-size:var(--fs-xs);font-weight:700;letter-spacing:.12em}
+.era .e-line{font-size:var(--fs-h3);font-weight:800;line-height:1.5;margin-top:.8cqh}
+.era.past{background:#fff;border:1px solid var(--line);color:var(--ink-2)}
+.era.past .e-tag{color:var(--ink-3)}
+.era.now{background:#0C0D10;color:#fff;position:relative;overflow:hidden}
+.era.now::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--grad)}
+.era.now .e-tag{color:rgba(255,255,255,.6)}
+.era-arrow{align-self:center;color:var(--ink-3);flex:0 0 auto}
+.vs{flex:1 1 auto;min-height:0;display:grid;grid-template-rows:repeat(5,1fr);gap:1.3cqh;margin-top:2cqh}
+.vs-row{display:grid;grid-template-columns:1.05fr 9cqw 1.2fr;align-items:stretch;min-height:0}
+.vs-a,.vs-b{border-radius:12px;display:flex;align-items:center;gap:.9cqw;padding:1cqh 1.4cqw;font-size:var(--fs-sm);line-height:1.5;min-width:0}
+.vs-a{background:#fff;border:1px solid var(--line);color:var(--ink-2)}
+.vs-b{background:var(--accent-soft);border:1px solid rgba(139,92,246,.3);color:var(--ink);font-weight:700}
+.vs-a .ic{color:var(--ink-3)}
+.vs-b .ic{color:var(--accent)}
+.vs-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3cqh;min-width:0}
+.vs-mid em{font-style:normal;font-size:var(--fs-xs);color:var(--ink-3);font-weight:700}
+.vs-mid .ic{color:var(--accent)}
+
+/* ===== S3 三模式色卡 ===== */
+.mode-row{display:flex;gap:1.8cqw;flex:1 1 auto;min-height:0}
+.mode{position:relative;overflow:hidden;flex:1;min-width:0;border:1px solid rgba(92,74,116,.10);border-radius:20px;padding:2.6cqh 1.9cqw;color:var(--ink);display:flex;flex-direction:column;min-height:0}
+.mode::before{content:"";position:absolute;left:0;right:0;top:0;height:.55cqh;background:var(--grad)}
+.mode.m1{background:linear-gradient(145deg,#FFF1E8 0%,#F7DCE9 54%,#E8DDF8 100%)}
+.mode.m2{background:linear-gradient(145deg,#EAF5FC 0%,#E7E8F8 54%,#F5DCEB 100%)}
+.mode.m3{background:linear-gradient(145deg,#F7F2EF 0%,#FFE3D9 54%,#F6DBE8 100%)}
+.mode h3{margin:1.4cqh 0 .4cqh;font-size:var(--fs-h2)}
+.m-fig{aspect-ratio:16/9;width:100%;border:1px solid;border-radius:14px;padding:.9cqh .7cqw;display:flex;gap:.5cqw;margin:auto 0;position:relative;box-shadow:none}
+.m-fig .fa{border:1px solid;border-radius:8px;min-width:0;min-height:0;box-shadow:none}
+.m-fig .hi{border:1px solid;border-radius:8px;box-shadow:none}
+.m-fig .fcaption{position:absolute;left:0;right:0;bottom:-2.6cqh;text-align:center;font-size:calc(var(--fs-xs)*.9);color:var(--ink-1);opacity:.9;font-weight:700}
+.mode.m1 .m-fig{background:#EEEAFB;border-color:#C7BDEC}
+.mode.m1 .m-fig .fa{background:#F7F5FD;border-color:#CFC7ED}
+.mode.m1 .m-fig .hi{background:#9486DD;border-color:#8071D0}
+.mode.m2 .m-fig{background:#E8F4EE;border-color:#B5D8C5}
+.mode.m2 .m-fig .fa{background:#F4FAF7;border-color:#BEDDCC}
+.mode.m2 .m-fig .hi{background:#72B391;border-color:#5DA37D}
+.mode.m3 .m-fig{background:#FCEDE7;border-color:#E8C1B2}
+.mode.m3 .m-fig .fa{background:#FFF8F5;border-color:#EBC9BC}
+.mode.m3 .m-fig .hi{background:#E99677;border-color:#D98262}
+.mode .en{font-family:var(--mono);font-size:var(--fs-xs);color:var(--ink-2);opacity:.72;letter-spacing:.08em}
+.mode p{margin:.4cqh 0 0;font-size:var(--fs-sm);line-height:1.65;color:var(--ink-1);opacity:.82}
+.mode .gap{margin-top:auto;padding-top:1.4cqh;border-top:1px dashed rgba(12,13,16,.18);font-size:var(--fs-xs);line-height:1.6;color:var(--ink-2)}
+.mode .gap b{display:block;font-size:var(--fs-xs);letter-spacing:.06em;color:var(--accent);margin-bottom:.3cqh}
+.newq{margin-top:2cqh;flex:0 0 auto;background:var(--g-ink);color:#fff;border-radius:14px;padding:1.6cqh 2cqw;display:flex;gap:1.2cqw;align-items:center}
+.newq .q-chip{flex:0 0 auto;font-family:var(--mono);font-size:var(--fs-xs);font-weight:800;background:rgba(255,255,255,.12);padding:.5cqh .8cqw;border-radius:8px}
+.newq p{margin:0;font-size:var(--fs-sm);line-height:1.6;color:rgba(255,255,255,.92)}
+.mode-dark .mode{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(139,92,246,.055));border-color:rgba(196,181,253,.18);color:#fff}
+.mode-dark .mode::before{background:linear-gradient(90deg,#6D45E0,#A78BFA)}
+.mode-dark .mode h3{color:#fff}
+.mode-dark .mode .en{color:rgba(255,255,255,.46)}
+.mode-dark .mode p{color:rgba(255,255,255,.7)}
+.mode-dark .mode .gap{color:rgba(255,255,255,.58);border-top-color:rgba(255,255,255,.14)}
+.mode-dark .mode .gap b{color:#C4B5FD}
+.mode-dark .m-fig,.mode-dark .mode.m1 .m-fig,.mode-dark .mode.m2 .m-fig,.mode-dark .mode.m3 .m-fig{background:rgba(139,92,246,.075);border-color:rgba(196,181,253,.28)}
+.mode-dark .m-fig .fa,.mode-dark .mode.m1 .m-fig .fa,.mode-dark .mode.m2 .m-fig .fa,.mode-dark .mode.m3 .m-fig .fa{background:rgba(8,9,14,.52);border-color:rgba(196,181,253,.22)}
+.mode-dark .m-fig .hi,.mode-dark .mode.m1 .m-fig .hi,.mode-dark .mode.m2 .m-fig .hi,.mode-dark .mode.m3 .m-fig .hi{background:var(--grad);border-color:rgba(255,255,255,.22)}
+.mode-dark .m-fig .fa>div:not(.hi){background:rgba(196,181,253,.42)!important}
+.mode-dark .mode.m3 .m-fig .fa>div:nth-child(3){background:rgba(139,92,246,.07)!important;border-color:rgba(196,181,253,.55)!important}
+.mode-dark .m-fig .fcaption{color:rgba(255,255,255,.72)}
+.mode-dark .newq{background:#fff;border:1px solid rgba(255,255,255,.72);box-shadow:0 14px 34px rgba(0,0,0,.24)}
+.mode-dark .newq .q-chip{background:var(--grad);color:#fff}
+.mode-dark .newq p{color:var(--ink)}
+.mode-dark .mode.m1 .m-fig{background:var(--grad);border-color:rgba(255,255,255,.26);padding:1cqh .75cqw}
+.immersive-chat{flex:1;min-width:0;display:flex;flex-direction:column;gap:.6cqh;padding:.65cqh .55cqw;border:1px solid rgba(255,255,255,.28);border-radius:9px;background:rgba(11,8,20,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+.immersive-chat .imsg{height:13%;border-radius:6px;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.16)}
+.immersive-chat .imsg.ai{width:76%;background:rgba(255,255,255,.28)}
+.immersive-chat .imsg.user{width:58%;align-self:flex-end;background:rgba(255,255,255,.24)}
+.immersive-chat .composer{height:17%;margin-top:auto;border-radius:7px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.18)}
+
+/* ===== S4 收敛图 ===== */
+.conv{display:grid;grid-template-columns:1.12fr 9cqw .95fr;flex:1 1 auto;min-height:0;align-items:stretch}
+.conv-left{display:grid;grid-template-rows:repeat(3,1fr);gap:0;align-items:center;min-height:0}
+.sig{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.6cqh 1.4cqw;display:flex;align-items:center;gap:1.2cqw;min-height:0;align-self:center;width:100%}
+.sig .sig-tx{display:flex;flex-direction:column;gap:.35cqh;min-width:0}
+.sig b{font-size:var(--fs-sm)}
+.sig span{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.55}
+.sig-fig{flex:0 0 9.5cqw;aspect-ratio:16/9;border:1px solid var(--line);border-radius:8px;background:#F8FAFC;display:flex;gap:3px;padding:4px;overflow:hidden}
+.sig-fig i{display:block;border-radius:4px;background:#E6EAF2;min-width:0;min-height:0}
+.sig-fig .p{background:var(--accent-soft);border:1px solid rgba(139,92,246,.35)}
+.conv-mid{position:relative}
+.conv-mid .tick{position:absolute;left:0;width:46%;height:2px;background:#E5DAF8;transform:translateY(-1px)}
+.conv-mid .bus{position:absolute;left:46%;top:12.5%;bottom:12.5%;width:2px;background:#E5DAF8}
+.conv-mid .arr{position:absolute;left:46%;top:50%;right:0;height:2px;background:#E5DAF8;transform:translateY(-1px)}
+.conv-mid .arr::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-left:9px solid #E5DAF8;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.conv-right{min-width:0;display:flex;align-items:center}
+.conv-card{width:100%;background:linear-gradient(150deg,#8B5CF6,#6D45E0);color:#fff;border-radius:20px;padding:3cqh 2cqw;display:flex;flex-direction:column;gap:1.2cqh}
+.conv-card h3{margin:0;font-size:var(--fs-h3);line-height:1.5}
+.conv-card .objs{display:flex;flex-wrap:wrap;gap:.7cqh .6cqw;margin-top:.6cqh}
+.conv-card .objs span{font-size:var(--fs-xs);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);padding:.45cqh .8cqw;border-radius:99px}
+.evidence-line{margin-top:1.8cqh;flex:0 0 auto;font-size:var(--fs-xs);color:var(--ink-3);line-height:1.6;text-align:center}
+.evidence-line b{color:var(--ink-2)}
+
+/* ===== S5 技术卡 ===== */
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqh 1.5cqw;flex:0 0 auto;margin:auto 0}
+.tech{background:#fff;border:1px solid var(--line);border-radius:16px;padding:2.2cqh 1.5cqw;display:flex;flex-direction:column;gap:.8cqh;min-height:20cqh;justify-content:center}
+.tech .t-ic{width:2.6cqw;height:2.6cqw;min-width:30px;min-height:30px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.tech b{font-size:var(--fs-sm);line-height:1.4}
+.tech p{margin:0;font-size:var(--fs-xs);color:var(--ink-2);line-height:1.6}
+.tech p .q{color:var(--accent);font-weight:700}
+
+/* ===== S6 角色转变（横向流程） ===== */
+.role-board{flex:0 0 auto;min-height:0;margin:auto 0;background:#F7F8FB;border:1px solid var(--line);border-radius:20px;padding:2cqh 1.5cqw;display:flex;flex-direction:column;gap:1.45cqh}
+.role-old{display:flex;align-items:center;gap:1.1cqw;justify-content:center;flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:99px;padding:1.1cqh 2.4cqw;margin:0 auto;color:var(--ink-2);font-size:var(--fs-sm);width:fit-content}
+.role-board .role-old{width:100%;margin:0;padding:0 0 1.25cqh;justify-content:flex-start;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.role-old .rtag{font-family:var(--mono);font-size:var(--fs-xs);font-weight:800;color:var(--ink-3);letter-spacing:.1em;margin-right:.6cqw}
+.role-old .sep{color:#C4CBD6}
+.role-old .cyc{font-size:var(--fs-xs);color:var(--ink-3);margin-left:.8cqw}
+.role-shift{display:flex;align-items:center;justify-content:flex-start;gap:.7cqw;margin:0;color:var(--accent);background:var(--accent-soft);border-radius:12px;padding:1cqh 1.1cqw;font-weight:800;font-size:var(--fs-sm);flex:0 0 auto}
+.role-new{position:relative;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:1fr;gap:1cqw;align-items:stretch;flex:0 0 30cqh;min-height:0;margin:0}
+.role-new::before{display:block;content:"";position:absolute;left:6%;right:6%;top:2.15cqh;height:2px;background:#D9D1F4;z-index:0}
+.rn{position:relative;z-index:1;grid-column:auto;min-width:0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.45cqh 1.15cqw;display:flex;flex-direction:column;gap:.6cqh;justify-content:flex-start;min-height:0;overflow:hidden;box-shadow:0 10px 28px rgba(27,38,74,.05)}
+.rn:nth-child(n+4){grid-column:auto}
+.rn .n{width:2.4cqw;height:2.4cqw;min-width:30px;min-height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;font-family:var(--mono);font-size:var(--fs-xs);font-weight:800;box-shadow:0 0 0 5px #F7F8FB}
+.rn b{font-size:var(--fs-sm)}
+.rn span{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.55}
+.rn .bg-ic{position:absolute;right:.55cqw;bottom:.6cqh;width:6.8cqw;height:6.8cqw;min-width:84px;min-height:84px;color:var(--accent);opacity:.105;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.rn b,.rn>span{position:relative;z-index:1}
+.rn b,.rn>span:not(.n){max-width:88%}
+.rn-ar{flex:0 0 auto;align-self:center;color:#B7C0D2;padding:0 .55cqw}
+.duty-row{display:flex;gap:1.2cqw;margin-top:0;flex:0 0 auto}
+.duty{flex:1;min-width:0;min-height:8cqh;background:#fff;border:1px solid var(--line);border-radius:12px;padding:1.2cqh 1.2cqw;display:flex;gap:.8cqw;align-items:center}
+.duty b{font-size:var(--fs-sm);color:var(--accent)}
+.duty span{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.5}
+
+/* ===== S7 定义 + 原则（精致版） ===== */
+.def-hero{flex:0 0 auto;text-align:center;position:relative;padding:0 4cqw}
+.def-hero .qmark{position:absolute;font-size:clamp(60px,7cqw,120px);font-weight:900;color:var(--accent-soft);line-height:1;user-select:none}
+.def-hero .qmark.ql{left:1cqw;top:-2cqh}
+.def-hero .qmark.qr{right:1cqw;bottom:-4cqh}
+.def-hero .dq{position:relative;font-size:clamp(19px,1.8cqw,32px);line-height:2;font-weight:700;max-width:44em;margin:0 auto;color:var(--ink)}
+.def-hero .dq .hl{color:var(--accent);border-bottom:3px solid rgba(139,92,246,.28);padding-bottom:.15em}
+.def-hero .en{position:relative;margin:2cqh auto 0;font-family:var(--mono);font-size:var(--fs-xs);color:var(--ink-3);max-width:72em;line-height:1.85}
+.def-div{display:flex;align-items:center;justify-content:center;gap:1cqw;flex:0 0 auto}
+.def-div i{display:block;width:10cqw;height:1px;background:var(--line)}
+.def-div span{width:.6cqw;height:.6cqw;background:var(--accent);transform:rotate(45deg);display:block}
+.prin-row{display:flex;gap:1.2cqw;flex:0 0 auto}
+.prin{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:14px;padding:1.7cqh 1.3cqw;display:flex;flex-direction:column;gap:.75cqh;min-height:0;box-shadow:0 10px 28px rgba(27,38,74,.05)}
+.prin .num{font-family:var(--mono);font-size:var(--fs-xs);color:var(--accent);font-weight:800;letter-spacing:.12em}
+.prin b{font-size:var(--fs-h3);color:var(--ink)}
+.prin .no{font-size:var(--fs-xs);color:var(--ink-3);line-height:1.55;text-decoration:line-through;text-decoration-color:rgba(216,46,71,.5)}
+.prin .yes{font-size:var(--fs-xs);color:var(--ink-1);line-height:1.55}
+.prin .yes b{font-size:var(--fs-xs);color:var(--good)}
+
+/* ===== S8 三域工作台总图 ===== */
+.wb-wrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:0}
+.wb-tags{display:grid;grid-template-columns:24fr 38fr 38fr;gap:1.2cqw;margin-bottom:1.1cqh;flex:0 0 auto}
+.wb-tags>div{display:flex;flex-direction:column;align-items:center;gap:.3cqh}
+.wb-tags .en{font-family:var(--mono);font-size:var(--fs-xs);color:var(--ink-3)}
+.wb{flex:1 1 auto;min-height:0;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 55px rgba(27,38,74,.10);display:flex;flex-direction:column;overflow:hidden}
+.wb-chrome{flex:0 0 auto;display:flex;align-items:center;gap:.5cqw;padding:.9cqh 1.2cqw;border-bottom:1px solid var(--line);background:#FAFBFD}
+.wb-chrome i{width:.65cqw;height:.65cqw;border-radius:50%;background:#D9DEE8;display:block}
+.wb-body{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:24fr 38fr 38fr}
+.wb-col{min-width:0;min-height:0;padding:1.2cqh 1cqw;display:flex;flex-direction:column;gap:.8cqh;overflow:hidden;justify-content:space-evenly}
+.wb-col+.wb-col{border-left:1px solid var(--line)}
+/* 左：任务列表 */
+.task{border:1px solid var(--line);border-radius:10px;padding:.75cqh .8cqw;display:flex;flex-direction:column;gap:.25cqh;background:#fff}
+.task.active{border-color:var(--d1);background:var(--d1-soft)}
+.task .t-top{display:flex;align-items:center;gap:.5cqw;font-size:var(--fs-xs);font-weight:700;color:var(--ink-1)}
+.task .t-top i{width:.55cqw;height:.55cqw;min-width:7px;min-height:7px;border-radius:50%;display:block;flex:0 0 auto}
+.task .t-sub{font-size:calc(var(--fs-xs)*.88);color:var(--ink-3);display:flex;gap:.6cqw}
+.st-run i{background:var(--d1);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+.st-wait i{background:var(--warn)}
+.st-done i{background:var(--good)}
+.st-fail i{background:var(--bad)}
+.badge{font-size:calc(var(--fs-xs)*.82);font-weight:800;padding:.1cqh .45cqw;border-radius:6px;margin-left:auto}
+.badge.b-wait{background:#FBF1DD;color:var(--warn)}
+.badge.b-acc{background:#E5F4EC;color:var(--good)}
+/* 中：对话 + 概览 */
+.bub{max-width:86%;border-radius:10px;padding:.7cqh .9cqw;font-size:var(--fs-xs);line-height:1.5}
+.bub.user{align-self:flex-end;background:var(--d2);color:#fff;border-bottom-right-radius:3px}
+.bub.agent{align-self:flex-start;background:#F3F5F9;color:var(--ink-1);border-bottom-left-radius:3px}
+.ovv{border:1px solid var(--d2);border-radius:12px;background:#fff;padding:.9cqh 1cqw;display:flex;flex-direction:column;gap:.5cqh}
+.ovv .o-head{display:flex;align-items:center;gap:.5cqw;font-size:var(--fs-xs);font-weight:800;color:var(--d2)}
+.ovv .o-step{display:flex;align-items:center;gap:.6cqw;font-size:calc(var(--fs-xs)*.92);color:var(--ink-2)}
+.ovv .o-step i{width:.5cqw;height:.5cqw;min-width:6px;min-height:6px;border-radius:50%;display:block;flex:0 0 auto}
+.ovv .ok i{background:var(--good)}
+.ovv .doing i{background:var(--d2);box-shadow:0 0 0 3px rgba(46,155,224,.18)}
+.ovv .todo i{background:#D6DBE4}
+.ovv .o-step.warn-s{color:var(--warn);font-weight:700}
+.ovv .o-step.warn-s i{background:var(--warn)}
+/* 右：产物 */
+.art-tabs{display:flex;gap:.4cqw;flex:0 0 auto}
+.art-tabs span{font-size:calc(var(--fs-xs)*.9);padding:.35cqh .8cqw;border-radius:8px 8px 0 0;background:#F3F5F9;color:var(--ink-3);font-weight:700}
+.art-tabs span.on{background:var(--d3-soft);color:var(--d3)}
+.art-pane{flex:1 1 auto;min-height:0;border:1px solid var(--line);border-radius:0 10px 10px 10px;padding:.9cqh 1cqw;display:flex;flex-direction:column;justify-content:space-evenly;background:#fff;overflow:hidden}
+.cl{height:.85cqh;border-radius:4px;background:#EDF0F6}
+.cl.add{background:rgba(16,131,94,.16);border-left:3px solid var(--good)}
+.cl.del{background:rgba(216,46,71,.12);border-left:3px solid var(--bad)}
+.art-foot{flex:0 0 auto;display:flex;gap:.6cqw;margin-top:.4cqh}
+.art-foot span{font-size:calc(var(--fs-xs)*.9);font-weight:800;padding:.4cqh .9cqw;border-radius:8px}
+.art-foot .acc{background:var(--good);color:#fff}
+.art-foot .rej{background:#fff;border:1px solid var(--line);color:var(--ink-2)}
+.wb-qs{display:grid;grid-template-columns:24fr 38fr 38fr;gap:1.2cqw;margin-top:1.1cqh;flex:0 0 auto;text-align:center}
+.wb-qs>div{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.5}
+.wb-qs b{color:var(--ink)}
+.wb-sync{margin-top:1.2cqh;flex:0 0 auto;background:var(--g-ink);color:#fff;border-radius:12px;padding:1.1cqh 1.6cqw;display:flex;align-items:center;justify-content:center;gap:1cqw;font-size:var(--fs-sm);font-weight:700}
+.wb-sync .mono{font-family:var(--mono);font-size:var(--fs-xs);color:#A9A6FF;font-weight:400}
+
+/* ===== S8 抽象框架 + 概览联动状态 ===== */
+.wb-stage-row{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);gap:1.4cqw;flex:1 1 auto;min-height:0}
+.frame{width:100%;aspect-ratio:16/9;align-self:center;min-height:0;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 55px rgba(27,38,74,.10);display:grid;grid-template-columns:24fr 42fr 34fr;overflow:hidden}
+.fcol{padding:1.4cqh 1.2cqw;display:flex;flex-direction:column;gap:1cqh;min-height:0;min-width:0;position:relative}
+.fcol+.fcol{border-left:1px solid var(--line)}
+.sk-lab{font-family:var(--mono);font-size:calc(var(--fs-xs)*.9);color:var(--ink-3);letter-spacing:.08em;flex:0 0 auto}
+.sk-item{display:flex;align-items:center;gap:.6cqw;border:1px solid var(--line);border-radius:8px;padding:.8cqh .7cqw;flex:0 0 auto}
+.sk-item i{width:.55cqw;height:.55cqw;min-width:7px;min-height:7px;border-radius:50%;display:block;flex:0 0 auto}
+.sk-item em{display:block;height:1.2cqh;border-radius:4px;background:#E8ECF3;flex:1}
+.sk-item.on{border-color:var(--d1);background:var(--d1-soft)}
+.sk-msg{border-radius:8px;background:#F1F4F9;height:2.6cqh;width:64%;flex:0 0 auto}
+.sk-msg.me{align-self:flex-end;background:rgba(46,155,224,.18)}
+.sk-ovv{border:1.5px solid var(--d2);border-radius:10px;padding:.8cqh .8cqw;display:flex;flex-direction:column;gap:.55cqh;background:#fff;width:70%;align-self:flex-end;flex:0 0 auto;box-shadow:0 8px 22px rgba(46,155,224,.14)}
+.sk-ovv .sk-lab{color:var(--d2);font-weight:800}
+.sk-row{display:flex;align-items:center;gap:.5cqw}
+.sk-row i{width:.5cqw;height:.5cqw;min-width:6px;min-height:6px;border-radius:50%;display:block}
+.sk-row em{display:block;height:1cqh;border-radius:3px;background:#E8ECF3;flex:1}
+.sk-input{height:3cqh;border:1px solid var(--line);border-radius:8px;margin-top:auto;flex:0 0 auto}
+.sk-tabs{display:flex;gap:.4cqw;flex:0 0 auto}
+.sk-tabs i{display:block;height:1.9cqh;border-radius:6px;background:#F1F4F9;flex:0 0 4.5cqw}
+.sk-tabs i.on{background:var(--d3-soft);border:1px solid rgba(255,148,64,.4)}
+.sk-pane{flex:1;min-height:0;border:1px solid var(--line);border-radius:8px;padding:.9cqh .8cqw;display:flex;flex-direction:column;justify-content:space-evenly;overflow:hidden}
+.ovv-states{display:flex;flex-direction:column;gap:1.2cqh;min-height:0}
+.ost{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.2cqh 1.3cqw;display:flex;gap:1.3cqw;align-items:center;min-height:0}
+.ost .fig{flex:0 0 12cqw;align-self:stretch;border:1px solid var(--line);border-radius:14px;position:relative;background:#F8FAFC;overflow:hidden;display:flex;gap:3px;padding:4px}
+.ost .fig i{display:block;border-radius:5px;min-width:0}
+.ost .fig .f-mid{flex:1;background:#EBEFF5}
+.ost .fig .f-ovv{flex:0 0 34%;background:var(--d2-soft);border:1.5px solid var(--d2)}
+.ost .fig .f-art{position:absolute;right:6%;top:12%;width:52%;height:76%;z-index:2;background:var(--d3-soft);border:1.5px solid var(--d3);border-radius:12px;box-shadow:0 12px 26px rgba(80,48,20,.22)}
+.ost .fig .f-chip{position:absolute;left:8%;top:9%;width:14%;height:12%;border-radius:99px;background:var(--d2);box-shadow:0 0 0 3px rgba(46,155,224,.2)}
+.ost .txt b{display:block;font-size:var(--fs-sm);margin-bottom:.3cqh}
+.ost .txt b .stag{font-family:var(--mono);color:var(--d2);margin-right:.5cqw}
+.ost .txt span{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.6}
+
+/* ===== S8 基于真实产品状态的三态框架 ===== */
+.wb-domain-key{display:flex;justify-content:center;gap:1cqw;flex:0 0 auto;margin-bottom:1.25cqh}
+.wb-domain-key span{display:inline-flex;align-items:center;gap:.45cqw;font-size:var(--fs-xs);color:var(--ink-2);font-weight:700;padding:.45cqh .85cqw;border-radius:999px;background:#F5F6F9}
+.wb-domain-key i{width:.55cqw;height:.55cqw;min-width:7px;min-height:7px;border-radius:50%;display:block}
+.wb-state-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25cqw;flex:0 0 auto;min-height:0;align-items:start}
+.wb-state{min-width:0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.15cqh 1cqw;display:flex;flex-direction:column;gap:.9cqh}
+.ws-meta{display:grid;grid-template-columns:auto 1fr;column-gap:.7cqw;align-items:center;min-height:5.2cqh}
+.ws-meta .num{grid-row:1 / 3;width:2.2cqw;height:2.2cqw;min-width:28px;min-height:28px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:var(--fs-xs);font-weight:800}
+.ws-meta b{font-size:var(--fs-sm)}
+.ws-meta span:last-child{font-size:calc(var(--fs-xs)*.9);line-height:1.4;color:var(--ink-3)}
+.ws-screen{position:relative;width:100%;aspect-ratio:16/9;background:#121315;border:1px solid #24262B;border-radius:14px;overflow:hidden;display:grid;grid-template-rows:12% 1fr;box-shadow:0 12px 28px rgba(10,12,18,.14)}
+.ws-top{display:flex;align-items:center;gap:4px;padding:0 .65cqw;border-bottom:1px solid #2A2C30;background:#151619}
+.ws-top i{width:5px;height:5px;border-radius:50%;background:#6D7077;display:block}
+.ws-top em{margin-left:auto;width:16%;height:34%;border-radius:99px;background:#24262A;border:1px solid #3A3D44}
+.ws-body{display:grid;min-height:0}
+.state-overview .ws-body{grid-template-columns:18fr 52fr 30fr}
+.state-artifact .ws-body,.state-popover .ws-body{grid-template-columns:18fr 34fr 48fr}
+.ws-col{min-width:0;min-height:0;padding:6px;display:flex;flex-direction:column;gap:5px;position:relative}
+.ws-col+.ws-col{border-left:1px solid #2A2C30}
+.ws-line{height:5px;border-radius:4px;background:#2C2E33;display:block}
+.ws-task .ws-line{height:11px;border:1px solid #303238;background:#1A1B1E}
+.ws-task .ws-line.on{border-color:var(--d1);background:rgba(139,92,246,.18)}
+.ws-chat .bubble{height:12px;border-radius:5px;background:#2C2E33;width:76%;display:block}
+.ws-chat .bubble.me{align-self:flex-end;background:#3A3C42;width:62%}
+.ws-chat .input{height:18%;margin-top:auto;border:1px solid #34363C;border-radius:6px;background:#18191C}
+.ws-overview{background:#17181B}
+.ws-section{border-bottom:1px solid #2E3035;padding-bottom:5px;display:flex;flex-direction:column;gap:5px}
+.ws-section b{font-size:7px;color:#E5E7EB}
+.ws-check{height:5px;border-radius:4px;background:#2A2C31;position:relative;margin-left:8px}
+.ws-check::before{content:"";position:absolute;left:-8px;top:0;width:5px;height:5px;border-radius:50%;background:var(--good)}
+.ws-tabs{display:flex;gap:4px;flex:0 0 auto}
+.ws-tabs i{height:8px;border-radius:3px;background:#24262B;flex:0 0 24%}
+.ws-tabs i.on{background:rgba(255,148,64,.35);border:1px solid var(--d3)}
+.ws-code{flex:1;border:1px solid #2C2E34;border-radius:5px;padding:6px;display:flex;flex-direction:column;gap:5px;background:#151619}
+.ws-code .ws-line:nth-child(2),.ws-code .ws-line:nth-child(3){background:rgba(139,92,246,.28)}
+.ws-overview-entry{position:absolute;right:7px;top:4px;z-index:4;width:18px;height:18px;border-radius:6px;border:1px solid #4B4E56;background:#202226;color:#C9CCD4;display:flex;align-items:center;justify-content:center}
+.ws-overview-entry svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ws-resource{display:flex;gap:3px;flex-wrap:wrap}
+.ws-resource i{width:18px;height:7px;border-radius:3px;background:#2A2C31;border:1px solid #383B42;display:block}
+.ws-token{height:5px;border-radius:99px;background:#2A2C31;overflow:hidden}
+.ws-token::after{content:"";display:block;width:42%;height:100%;background:var(--grad)}
+.ws-pop{position:absolute;z-index:5;left:34%;top:9%;width:38%;height:74%;border:1px solid #484B53;border-radius:10px;background:#202124;box-shadow:0 14px 34px rgba(0,0,0,.46);padding:8px;display:flex;flex-direction:column;gap:7px}
+.ws-pop b{font-size:8px;color:#fff}
+.ws-pop .ws-section:last-child{border-bottom:0}
+.wb-state-rule{margin-top:1.2cqh;flex:0 0 auto;background:var(--g-ink);color:#fff;border-radius:14px;padding:1cqh 1.5cqw;display:flex;align-items:center;justify-content:center;gap:1cqw;font-size:var(--fs-xs);font-weight:700}
+.wb-state-rule .mono{font-family:var(--mono);color:#A9A6FF;font-weight:400}
+/* ===== S9/S11 注记页 ===== */
+.zoom-row{display:flex;gap:2cqw;flex:1 1 auto;min-height:0}
+.zoom-left{flex:.78;min-width:0;display:flex;flex-direction:column;min-height:0}
+.zoom-right{flex:1.22;min-width:0;display:flex;flex-direction:column;gap:1.1cqh;min-height:0;justify-content:center}
+.zoom-right .pt{flex:1;align-items:center}
+.pt{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1cqh 1.2cqw;display:flex;gap:.9cqw;align-items:flex-start;min-height:0}
+.pt .n{flex:0 0 auto;width:1.8cqw;height:1.8cqw;min-width:21px;min-height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:var(--fs-xs);font-weight:800;background:var(--d1-soft);color:var(--d1)}
+.pt div b{display:block;font-size:var(--fs-sm);margin-bottom:.15cqh}
+.pt div span{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.55}
+.no-more{margin-top:1.6cqh;flex:0 0 auto;font-size:var(--fs-xs);color:var(--ink-3);line-height:1.7;text-align:center}
+.no-more b{color:var(--bad);font-weight:700}
+.panel-mock{flex:1;min-height:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 44px rgba(27,38,74,.09);padding:1.4cqh 1.1cqw;display:flex;flex-direction:column;justify-content:space-evenly;overflow:hidden}
+.pm-head{display:flex;gap:.5cqw;flex:0 0 auto}
+.pm-head span{font-size:calc(var(--fs-xs)*.9);padding:.35cqh .7cqw;border-radius:99px;background:#F3F5F9;color:var(--ink-3);font-weight:700}
+.pm-head span.on{background:var(--d1);color:#fff}
+
+/* ===== S10 金字塔 ===== */
+.pyr-row{display:flex;gap:1.55cqw;flex:1 1 auto;min-height:0;align-items:stretch}
+.pyr-side{flex:.9;min-width:0;display:flex;flex-direction:column;gap:1.6cqh;justify-content:space-evenly}
+.pyr-side .side-card{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.pyr-mid{flex:1.55;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1cqh}
+.pl{color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.9cqh 1cqw;min-height:0}
+.pl b{font-size:var(--fs-sm)}
+.pl span{font-size:calc(var(--fs-xs)*.92);opacity:.85;line-height:1.45;margin-top:.2cqh}
+.pl.l1{width:56%;background:#2E9BE0;clip-path:polygon(12% 0,88% 0,100% 100%,0 100%);border-radius:6px}
+.pl.l2{width:78%;background:#63B5EC;clip-path:polygon(8% 0,92% 0,100% 100%,0 100%)}
+.pl.l3{width:100%;background:#A5D3F4;clip-path:polygon(5% 0,95% 0,100% 100%,0 100%);color:#0E4D7A}
+.pyr-cap{font-size:var(--fs-xs);color:var(--ink-3);margin-top:.8cqh}
+.attention-stack{width:100%;background:#fff;border:1px solid var(--line);border-radius:22px;padding:2.2cqh 1.45cqw 2cqh;display:flex;gap:1.15cqw;align-items:stretch;box-shadow:0 16px 38px rgba(27,38,74,.09)}
+.att-rail{flex:0 0 2.4cqw;display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:var(--ink-3);font-family:var(--mono);font-size:calc(var(--fs-xs)*.82);text-align:center}
+.att-rail i{flex:1;width:2px;margin:.5cqh 0;background:linear-gradient(to bottom,var(--accent),#E8DEF9);position:relative}
+.att-rail i::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-bottom:7px solid var(--accent);border-left:5px solid transparent;border-right:5px solid transparent}
+.att-body{flex:1;display:flex;flex-direction:column;align-items:center;gap:1cqh;min-width:0}
+.att-layer{border-radius:16px;padding:1.55cqh 1.15cqw;display:grid;grid-template-columns:auto 1fr;column-gap:.9cqw;align-items:center;min-height:0}
+.att-layer .att-tag{grid-row:1 / 3;font-family:var(--mono);font-size:calc(var(--fs-xs)*.82);font-weight:800;letter-spacing:.08em;padding:.35cqh .55cqw;border-radius:999px;background:rgba(255,255,255,.18)}
+.att-layer b{font-size:var(--fs-sm)}
+.att-layer span:last-child{font-size:calc(var(--fs-xs)*.9);line-height:1.4;opacity:.86}
+.att-layer.core{width:72%;background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(139,92,246,.18)}
+.att-layer.overview{width:87%;background:var(--accent-soft);color:#4D3473;border:1px solid rgba(139,92,246,.28)}
+.att-layer.evidence{width:100%;background:#FAFAFC;color:var(--ink-2);border:1px solid var(--line)}
+.side-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.4cqh 1.4cqw}
+.side-card h4{margin:0 0 .7cqh;font-size:var(--fs-sm);display:flex;align-items:center;gap:.6cqw}
+.side-card ul{margin:0;padding-left:1.2em;font-size:var(--fs-xs);color:var(--ink-2);line-height:1.75}
+.side-card.rule{background:linear-gradient(135deg,#F5EFFF 0%,#FFF5EC 100%);border-color:rgba(139,92,246,.28)}
+.side-card.rule p{margin:0;font-size:var(--fs-sm);line-height:1.7;color:#4D3473;font-weight:600}
+
+/* ===== S11 产物 radial 图 ===== */
+.orbit{position:relative;flex:1;min-height:0}
+.orbit svg.links{position:absolute;inset:0;width:100%;height:100%}
+.orbit .hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:11.5cqw;height:11.5cqw;border-radius:50%;background:var(--g-ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:var(--fs-sm);box-shadow:0 16px 44px rgba(15,20,30,.3);line-height:1.5}
+.orbit .hub small{font-family:var(--mono);font-size:calc(var(--fs-xs)*.85);color:rgba(255,255,255,.5);font-weight:400;letter-spacing:.1em}
+.bb{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;font-weight:700;font-size:var(--fs-xs);line-height:1.4;padding:.8cqw;transform:translate(-50%,-50%);box-shadow:0 12px 30px rgba(27,38,74,.16)}
+.bb small{display:block;font-weight:400;opacity:.85;font-size:calc(var(--fs-xs)*.85);line-height:1.35;margin-top:.2cqh}
+
+/* ===== S12 三方案 ===== */
+.opt-row{display:flex;gap:1.6cqw;flex:1 1 auto;min-height:0}
+.opt{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.8cqh 1.5cqw;display:flex;flex-direction:column;gap:1cqh;min-height:0}
+.opt.rec{border:2px solid var(--accent);box-shadow:0 16px 44px rgba(139,92,246,.13);position:relative}
+.opt .o-badge{position:absolute;top:-1.3cqh;right:1.2cqw;background:var(--accent);color:#fff;font-size:var(--fs-xs);font-weight:800;padding:.35cqh .9cqw;border-radius:99px}
+.opt h4{margin:0;font-size:var(--fs-sm)}
+.opt .mini{flex:1 1 auto;min-height:9cqh;border:1px solid var(--line);border-radius:10px;background:#F8FAFC;display:flex;gap:4px;padding:5px 5px 3.4cqh;overflow:hidden;position:relative}
+.opt .mini .m-lab{position:absolute;left:0;right:0;bottom:.8cqh;text-align:center;font-size:calc(var(--fs-xs)*.9);color:var(--ink-3);font-weight:700}
+.opt .mini i{display:block;border-radius:5px;background:#E4E8F0;flex:1;min-width:0}
+.opt .mini i.hl1{background:var(--d1-soft);border:1px solid rgba(139,92,246,.4)}
+.opt .mini i.hl2{background:var(--d2-soft);border:1px solid rgba(46,155,224,.4)}
+.opt .mini i.hl3{background:var(--d3-soft);border:1px solid rgba(255,148,64,.4)}
+.opt .pro{font-size:var(--fs-xs);color:var(--good);line-height:1.55}
+.opt .con{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.55}
+.opt .con b{color:var(--bad);font-weight:700}
+.rule-row{display:flex;gap:1cqw;margin-top:1.6cqh;flex:0 0 auto}
+.rule-chip{flex:1;min-width:0;background:var(--accent-soft);border-radius:10px;padding:.9cqh 1cqw;font-size:var(--fs-xs);color:var(--accent-deep);line-height:1.5;text-align:center;font-weight:600}
+
+/* ===== S13 泳道 ===== */
+.lane{flex:1 1 auto;min-height:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:.72fr 1fr 1.25fr 1.15fr}
+.lane>div{padding:.85cqh .9cqw;border-bottom:1px solid var(--line);font-size:var(--fs-xs);line-height:1.5;color:var(--ink-1);display:flex;align-items:center;min-width:0;min-height:0}
+.lane>div:not(:nth-child(4n+1)){border-left:1px solid var(--line)}
+.lane .lh{font-weight:800;font-size:var(--fs-xs);justify-content:center;text-align:center}
+.lane .lh.h1{background:var(--d1-soft);color:var(--d1)}
+.lane .lh.h2{background:var(--d2-soft);color:var(--d2)}
+.lane .lh.h3{background:var(--d3-soft);color:var(--d3)}
+.lane .lh.h0{background:#F6F8FC;color:var(--ink-2);font-family:var(--mono)}
+.lane .stage{font-weight:800;color:var(--ink);background:#FAFBFD;flex-direction:column;align-items:flex-start;justify-content:center;gap:.15cqh}
+.lane .stage small{font-family:var(--mono);font-weight:400;color:var(--ink-3);font-size:calc(var(--fs-xs)*.82)}
+.lane .mute{color:#C3C9D4;justify-content:center}
+.lane .span3{grid-column:2 / 5;justify-content:center;background:var(--accent-soft);color:var(--accent-deep);font-weight:700}
+.lane>div:nth-last-child(-n+2){border-bottom:0}
+.pact-row{display:flex;gap:1cqw;margin-top:1.4cqh;flex:0 0 auto}
+.pact{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.8cqh .9cqw;text-align:center}
+.pact b{display:block;font-size:var(--fs-xs);color:var(--accent)}
+.pact span{font-size:calc(var(--fs-xs)*.88);color:var(--ink-3);line-height:1.4}
+
+/* ===== S14 语法 bento ===== */
+.gram-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqh 1.4cqw;flex:0 0 auto;margin:auto 0}
+.gram{background:#fff;border:1px solid var(--line);border-radius:16px;padding:2.2cqh 1.5cqw;display:flex;flex-direction:column;gap:.6cqh;min-height:19cqh;justify-content:center}
+.gram .g-en{font-family:var(--mono);font-size:var(--fs-xs);font-weight:800;color:var(--accent);letter-spacing:.06em}
+.gram b{font-size:var(--fs-h3)}
+.gram p{margin:0;font-size:var(--fs-xs);color:var(--ink-2);line-height:1.6}
+.g-viz{margin-top:1cqh;padding-top:1cqh;border-top:1px dashed var(--line);display:flex;gap:.5cqw;flex-wrap:wrap;align-items:center}
+.gc{font-size:calc(var(--fs-xs)*.92);font-weight:700;padding:.4cqh .8cqw;border-radius:99px;display:inline-flex;align-items:center;gap:.4cqw}
+.gc i{width:.5cqw;height:.5cqw;min-width:6px;min-height:6px;border-radius:50%;background:currentColor;display:block}
+.gc.blue{background:var(--d1-soft);color:var(--d1)}
+.gc.green{background:#E5F4EC;color:var(--good)}
+.gc.amber{background:#FBF1DD;color:var(--warn)}
+.gc.red{background:rgba(216,46,71,.1);color:var(--bad)}
+.gc.gray{background:#F1F4F9;color:var(--ink-2)}
+.gc.line{background:#fff;border:1px solid var(--line);color:var(--ink-2)}
+.gc.solid{background:var(--good);color:#fff}
+.gc.mono{font-family:var(--mono);font-weight:600}
+.infer{margin-top:1.8cqh;flex:0 0 auto;display:flex;gap:1cqw}
+.infer>div{flex:1;min-width:0;font-size:var(--fs-xs);color:var(--ink-2);line-height:1.55;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.9cqh 1cqw}
+.infer b{color:var(--ink)}
+
+/* ===== S15 边界 ===== */
+.bound-row{display:flex;gap:1.8cqw;flex:1 1 auto;min-height:0}
+.bound-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.2cqh;min-height:0}
+.dev{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.2cqh 1.3cqw;display:flex;gap:1.2cqw;align-items:center;min-height:0;flex:1}
+.dev .d-fig{flex:0 0 7.5cqw;height:7.5cqh;border:1.5px solid var(--ink-3);border-radius:8px;display:flex;gap:2px;padding:3px;background:#fff}
+.dev .d-fig i{display:block;border-radius:3px;background:#E4E8F0;flex:1}
+.dev .d-fig i.a1{background:var(--d1-soft)}
+.dev .d-fig i.a2{background:var(--d2-soft);flex:1.6}
+.dev .d-fig i.a3{background:var(--d3-soft);flex:1.5}
+.dev .d-fig.phone{flex:0 0 3.4cqw;border-radius:10px}
+.dev .d-fig.solo i{background:var(--d2-soft)}
+.dev div b{display:block;font-size:var(--fs-sm);margin-bottom:.2cqh}
+.dev div span{font-size:var(--fs-xs);color:var(--ink-2);line-height:1.5}
+.anti{background:#fff;border:1px solid rgba(216,46,71,.3);border-radius:14px;padding:1.2cqh 1.3cqw;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.anti b{font-size:var(--fs-sm);color:var(--bad);display:flex;align-items:center;gap:.5cqw}
+.anti p{margin:.35cqh 0 0;font-size:var(--fs-xs);color:var(--ink-2);line-height:1.55}
+.hypo{margin-top:1.5cqh;flex:0 0 auto;background:#fff;border:1px dashed var(--ink-3);border-radius:12px;padding:1.1cqh 1.5cqw;font-size:var(--fs-xs);color:var(--ink-2);line-height:1.65}
+.hypo b{color:var(--ink)}
+
+/* ===== S16 收束 ===== */
+.close-c{justify-content:center;align-items:center;text-align:center}
+.close-c .duo{font-size:clamp(24px,2.5cqw,44px);font-weight:900;line-height:1.75;letter-spacing:-.005em}
+.close-c .duo .dim{color:rgba(255,255,255,.46)}
+.close-c .duo .lit{color:#fff}
+.close-c .final{max-width:62em;margin:3.6cqh auto 0;font-size:var(--fs-sm);line-height:2;color:rgba(255,255,255,.72)}
+.close-c .final .hl{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.close-c .last{margin-top:3.4cqh;font-size:var(--fs-body);color:rgba(255,255,255,.52)}
+.close-c .close-tri span{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#fff}
+.close-c .close-tri span i{color:rgba(255,255,255,.46)}
+
+/* ===== 柔和大圆角 + 扁平细线 ===== */
+.era,.sig,.tech,.rn,.prin,.gram,.pt,.side-card,.ost,.duty,.dev,.anti,.hypo,.frame,.panel-mock,.lane,.vs-a,.vs-b,.card,.newq,.defn,.mode,.conv-card,.wb-sync,.task,.ovv,.sk-item,.sk-ovv,.pact,.infer>div,.loop-card{border-radius:16px}
+.dtag,.badge,.gc,.role-old,.pm-head span{border-radius:999px}
+.close-tri span,.art-foot span{border-radius:12px}
+.prin,.rn{box-shadow:none}
+.frame,.panel-mock{box-shadow:0 10px 30px rgba(20,22,40,.06)}
+.conv-card{background:#0C0D10}
+.wb-sync{border-radius:14px}
+.newq .q-chip{border-radius:10px}
+.opt{border-radius:16px}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- ═══════════ 01 封面 ═══════════ -->
+<section class="slide dark cover">
+  <div class="dark-fx"><div class="glow1"></div><div class="glow2"></div><div class="gridfx"></div></div>
+  <div class="topbar" style="position:absolute;top:4.6cqh;left:6cqw;right:6cqw;z-index:2">
+    <span class="brand">开发者智慧架构</span><span class="page-no">1 / 15</span>
+  </div>
+  <div class="cov-row">
+  <div class="cov-l">
+  <div class="c-kicker">DESIGN&nbsp;PATTERN</div>
+  <h1 class="c-title">从对话助手到<br><span class="kw">任务驱动型 Agent 工作台</span></h1>
+  <p class="c-sub">定义「可监督的任务委托」交互范式</p>
+  </div>
+  <div class="cov-r">
+  <div class="cov-wf">
+    <div class="wf-top"><i></i><i></i><i></i></div>
+    <div class="wf-b">
+      <div class="wcol">
+        <div class="wbar c1" style="width:88%"></div>
+        <div class="wbar" style="width:72%"></div>
+        <div class="wbar" style="width:80%"></div>
+        <div class="wbar" style="width:64%"></div>
+      </div>
+      <div class="wcol">
+        <div class="wbar" style="width:56%"></div>
+        <div class="wbar c2" style="width:70%;align-self:flex-end"></div>
+        <div class="wbar" style="width:48%"></div>
+        <div style="margin-top:auto;height:3.2cqh;border:1px solid #DEDEDE;border-radius:6px;background:#FAFAFA;flex:0 0 auto;display:flex;align-items:center;padding:0 .6cqw"><i style="width:30%;height:.8cqh;border-radius:3px;background:#E8E8E8;display:block"></i></div>
+      </div>
+      <div class="wcol">
+        <div class="wbar c3" style="width:52%"></div>
+        <div class="wbar" style="width:92%"></div>
+        <div class="wbar" style="width:84%"></div>
+        <div class="wbar" style="width:88%"></div>
+        <div class="wbar c3" style="width:60%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="cov-lab">
+    <div><b>任务</b><span>TASK</span></div>
+    <div><b>协作</b><span>COORDINATION</span></div>
+    <div><b>产物</b><span>ARTIFACT</span></div>
+  </div>
+  </div>
+  </div>
+</section>
+
+<!-- ═══════════ 02 结论先行 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">结论先行</span><span class="page-no">2 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">变化的不是布局，而是<span class="kw">设计对象</span></h2>
+    <p class="subtitle">Assistant 时代以消息和操作为设计对象；Agent 时代以「一次持续的任务委托」为设计对象</p>
+  </div>
+  <div class="content">
+    <div class="era-row">
+      <div class="era past">
+        <div class="e-tag">ASSISTANT 时代</div>
+        <div class="e-line">围绕「这一轮如何回应」组织体验</div>
+      </div>
+      <svg class="era-arrow" style="justify-self:center" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <div class="era now">
+        <div class="e-tag">AGENT 时代</div>
+        <div class="e-line">围绕「任务如何被持续推进并可信交付」组织体验</div>
+      </div>
+    </div>
+    <div class="vs">
+      <div class="vs-row">
+        <div class="vs-a"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>消息 / 会话</div>
+        <div class="vs-mid"><em>核心对象</em><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="vs-b"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h6M7 13h10M7 17h4"/></svg>委托 / Run / 产物 / 证据</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-a"><svg class="ic" viewBox="0 0 24 24"><path d="M8 12h8M12 8v8"/><circle cx="12" cy="12" r="9"/></svg>同步、轮次式</div>
+        <div class="vs-mid"><em>交互节奏</em><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="vs-b"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>长时、异步、可并行</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-a"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>提问者、操作者</div>
+        <div class="vs-mid"><em>用户角色</em><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="vs-b"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>委托者、监督者、验收者</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-a"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/></svg>返回一段答案</div>
+        <div class="vs-mid"><em>完成证明</em><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="vs-b"><svg class="ic" viewBox="0 0 24 24"><path d="M9 7V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3"/><rect x="4" y="8" width="12" height="12" rx="1"/><path d="M7 14l2 2 4-4"/></svg>交付可检查的结果与验证证据</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-a"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>答非所问、上下文不足</div>
+        <div class="vs-mid"><em>核心风险</em><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="vs-b"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l9 16H3l9-16z"/><path d="M12 10v4M12 17.5v.5"/></svg>跑偏、越权、失联、副作用、无法恢复</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 03 三种模式不够了 ═══════════ -->
+<section class="slide dark section-dark mode-dark">
+  <div class="dark-fx"><div class="glow1"></div><div class="glow2"></div><div class="gridfx"></div></div>
+  <div class="topbar"><span class="brand">背景 · 助手时代</span><span class="page-no">3 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">沉浸、协作、情境没有失效，但都默认<span class="kw">用户始终在场</span></h2>
+    <p class="subtitle">三种模式从顶层范式降级为局部能力；Agent 时代要解决的是「用户离场后，任务如何继续并保持可控」</p>
+  </div>
+  <div class="content">
+    <div class="mode-row">
+      <div class="mode m1">
+        <div class="en">IMMERSIVE</div>
+        <h3>沉浸式交互</h3>
+        <p>对话占据整个页面，用户在单一连续对话中完成任务。隐含前提：用户始终停留在对话界面推进。</p>
+        <div class="m-fig" style="margin-bottom:3.4cqh">
+          <div class="immersive-chat">
+            <div class="imsg ai"></div>
+            <div class="imsg user"></div>
+            <div class="imsg ai" style="width:68%"></div>
+            <div class="imsg user" style="width:52%"></div>
+            <div class="composer"></div>
+          </div>
+          <div class="fcaption">全页面对话区 · 对话即操作界面</div>
+        </div>
+        <div class="gap"><b>AGENT 时代的缺口</b>会话能承载交流，却难表达长任务的执行结构与产物。</div>
+      </div>
+      <div class="mode m2">
+        <div class="en">COLLABORATIVE</div>
+        <h3>协作式交互</h3>
+        <p>保留原作业系统，在侧边对话区与 AI 协作。隐含前提：用户持续停留在当前作业现场。</p>
+        <div class="m-fig" style="margin-bottom:3.4cqh">
+          <div class="fa" style="flex:2.6;display:flex;flex-direction:column;gap:.5cqh;padding:.6cqh .5cqw">
+            <div style="height:14%;border-radius:4px"></div>
+            <div style="height:14%;width:70%;border-radius:4px"></div>
+            <div style="height:14%;width:84%;border-radius:4px"></div>
+            <div style="height:30%;width:58%;border-radius:6px;margin-top:.3cqh"></div>
+          </div>
+          <div class="hi" style="flex:1;display:flex;flex-direction:column;gap:.5cqh;padding:.65cqh .45cqw">
+            <div style="height:12%;border-radius:4px;background:rgba(255,255,255,.28)"></div>
+            <div style="height:11%;width:76%;border-radius:4px;background:rgba(255,255,255,.24)"></div>
+            <div style="height:11%;width:64%;border-radius:4px;background:rgba(255,255,255,.24);align-self:flex-end"></div>
+            <div style="height:18%;margin-top:auto;border-radius:5px;background:rgba(255,255,255,.18)"></div>
+          </div>
+          <div class="fcaption">原作业系统 · 侧边对话区协作</div>
+        </div>
+        <div class="gap"><b>AGENT 时代的缺口</b>侧边协作仍要求用户持续在场并逐轮推进。</div>
+      </div>
+      <div class="mode m3">
+        <div class="en">CONTEXTUAL</div>
+        <h3>情境式交互</h3>
+        <p>在原作业平台中，通过情境 AI 按钮按需唤起能力。隐含前提：上下文主要属于当前页面与对象。</p>
+        <div class="m-fig" style="margin-bottom:3.4cqh">
+          <div class="fa" style="flex:1;display:flex;flex-direction:column;gap:.5cqh;padding:.6cqh .5cqw;position:relative">
+            <div style="height:13%;border-radius:4px;background:#E4AD97"></div>
+            <div style="height:13%;width:80%;border-radius:4px;background:#F0CDBF"></div>
+            <div style="height:34%;width:56%;border-radius:6px;border:1.5px dashed #D9967B;background:#FBE9E2;margin-top:.4cqh"></div>
+            <div class="hi" style="position:absolute;left:7%;top:40%;width:7%;aspect-ratio:1;border-radius:50%"></div>
+          </div>
+          <div class="fcaption">原作业平台 · 情境 AI 按钮按需唤起</div>
+        </div>
+        <div class="gap"><b>AGENT 时代的缺口</b>按钮依赖当下页面，上下文难跨时间、工具与任务保留。</div>
+      </div>
+    </div>
+    <div class="newq">
+      <span class="q-chip">新问题</span>
+      <p>当用户不再盯着每一步——如何仍然知道：Agent 正在做什么、是否跑偏、何时需要我、最后交付了什么？</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 04 产品趋势 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">趋势 · 产品信号</span><span class="page-no">4 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">行业正在从 Chat 走向<span class="kw">任务系统</span></h2>
+    <p class="subtitle">视觉形态仍不一致，但底层对象正在收敛——任务开始有独立身份，过程被记录，结果进入独立审阅区</p>
+  </div>
+  <div class="content">
+    <div class="conv">
+      <div class="conv-left">
+        <div class="sig">
+          <div class="sig-fig">
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px"><i class="p" style="flex:1"></i><i style="flex:1"></i></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px"><i style="flex:1"></i><i class="p" style="flex:1"></i></div>
+          </div>
+          <div class="sig-tx"><b>OpenAI Codex app</b><span>多 Agent 并行、项目化任务线程、变更审阅、自动化结果队列 → 主界面从单会话转为多任务指挥中心</span></div>
+        </div>
+        <div class="sig">
+          <div class="sig-fig">
+            <i class="p" style="flex:1"></i>
+            <div style="flex:2.4;display:flex;flex-direction:column;gap:3px"><i style="flex:1"></i><i style="flex:2.2"></i></div>
+          </div>
+          <div class="sig-tx"><b>Cursor Background Agents</b><span>远程环境异步执行、侧边栏集中查看和搜索 Agents → 后台执行要求持久任务入口，不依赖当前对话是否打开</span></div>
+        </div>
+        <div class="sig">
+          <div class="sig-fig">
+            <div style="flex:1.1;display:flex;flex-direction:column;gap:3px"><i style="flex:1"></i><i style="flex:1"></i><i style="flex:1.4"></i></div>
+            <i class="p" style="flex:1.4"></i>
+          </div>
+          <div class="sig-tx"><b>Claude Artifacts</b><span>对话之外的独立产物窗口、持续迭代 → 结果不能永远埋在消息流里，需要独立工作对象空间</span></div>
+        </div>
+      </div>
+      <div class="conv-mid">
+        <span class="tick" style="top:16.67%"></span>
+        <span class="tick" style="top:50%"></span>
+        <span class="tick" style="top:83.33%"></span>
+        <span class="bus" style="top:16.67%;bottom:16.67%"></span>
+        <span class="arr"></span>
+      </div>
+      <div class="conv-right">
+        <div class="conv-card">
+          <h3>不同产品收敛出的同一组底层对象</h3>
+          <div class="objs">
+            <span>任务列表</span><span>后台运行</span><span>并行 Agent</span>
+            <span>过程记录</span><span>变更审阅</span><span>结果队列</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evidence-line"><b>证据边界</b>　·　以上为公开产品能力形成的趋势信号，不是普遍定律；要证明的是「设计问题正在变化」，不是「所有产品必须长得一样」</div>
+  </div>
+</section>
+
+<!-- ═══════════ 05 技术趋势 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">趋势 · 技术支撑</span><span class="page-no">5 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">新界面不是发明，而是 Agent 运行时能力<span class="kw">进入产品层的必然结果</span></h2>
+    <p class="subtitle">若产品仍只给用户一个消息流，就等于把本可管理的任务系统，重新压回不可管理的文本里</p>
+  </div>
+  <div class="content">
+    <div class="tech-grid">
+      <div class="tech">
+        <div class="t-ic"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <b>更长时间的自主执行</b>
+        <p>一次委托可持续数十分钟甚至跨设备继续。<span class="q">离开后如何恢复方向、何时需要关注？</span></p>
+      </div>
+      <div class="tech">
+        <div class="t-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M6 3v6a3 3 0 0 0 3 3h6"/><circle cx="6" cy="3" r="0.5"/><circle cx="18" cy="12" r="3"/><circle cx="6" cy="21" r="3"/><path d="M6 9v9"/></svg></div>
+        <b>多 Agent / 并行执行</b>
+        <p>同时出现多个 Run、分支、依赖和责任主体。<span class="q">如何总览、如何不被日志淹没？</span></p>
+      </div>
+      <div class="tech">
+        <div class="t-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><path d="M5 7h14v6a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5V7z"/><path d="M12 18v3"/></svg></div>
+        <b>MCP 与外部工具连接</b>
+        <p>Agent 会读数据、写文件、操作业务工具。<span class="q">权限、作用范围、动作结果如何可见可控？</span></p>
+      </div>
+      <div class="tech">
+        <div class="t-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2"/><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 13h3"/></svg></div>
+        <b>沙箱、Worktree 与远程环境</b>
+        <p>Agent 在独立环境中修改真实工作对象。<span class="q">本地 / 云端状态、冲突与可合并性如何表达？</span></p>
+      </div>
+      <div class="tech">
+        <div class="t-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <b>Trace、审批与策略控制</b>
+        <p>系统可记录工具调用、权限决策与执行结果。<span class="q">如何把可观测性转成用户可理解的信任证据？</span></p>
+      </div>
+      <div class="tech">
+        <div class="t-ic"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 10h18M10 10v11"/></svg></div>
+        <b>A2UI / MCP Apps 生成式 UI</b>
+        <p>结果可以是动态表单、图表和交互界面。<span class="q">产物需要稳定、安全、可操作的呈现区域。</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 06 用户角色转变 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">角色转变</span><span class="page-no">6 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">从「手不离场」到<span class="kw">「只在必要时介入」</span></h2>
+    <p class="subtitle">核心体验目标不是让用户更长时间留在界面里，而是让用户能够放心离开、快速回来、准确介入</p>
+  </div>
+  <div class="content">
+    <div class="role-board">
+    <div class="role-old">
+      <span class="rtag">ASSISTANT</span>
+      <span>提出问题</span><span class="sep">→</span>
+      <span>观察回答</span><span class="sep">→</span>
+      <span>继续追问</span>
+      <span class="cyc">↺ 每一轮都需要用户在场</span>
+    </div>
+    <div class="role-shift">
+      <svg class="ic" viewBox="0 0 24 24" style="width:1.2em;height:1.2em"><path d="M12 4v14M6 12l6 6 6-6"/></svg>
+      交互单位变成任务后，用户的一轮参与被拆成五个可分离的时刻
+    </div>
+    <div class="role-new">
+      <div class="rn"><span class="n">01</span><b>定义目标与边界</b><span>说明目标、约束、资源和权限边界</span><svg class="bg-ic" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="8"/><path d="M32 5v12M32 47v12M5 32h12M47 32h12"/></svg></div>
+      <div class="rn"><span class="n">02</span><b>委托执行</b><span>Agent 在边界内持续推进，用户可离场</span><svg class="bg-ic" viewBox="0 0 64 64"><rect x="10" y="11" width="44" height="42" rx="9"/><path d="M27 23l15 9-15 9zM18 6v10M46 6v10"/></svg></div>
+      <div class="rn"><span class="n">03</span><b>关注异常与节点</b><span>理解阶段、风险、依赖与待确认事项</span><svg class="bg-ic" viewBox="0 0 64 64"><path d="M7 33s9-16 25-16 25 16 25 16-9 16-25 16S7 33 7 33z"/><circle cx="32" cy="33" r="7"/><path d="M46 12l7 7M53 12l-7 7"/></svg></div>
+      <div class="rn"><span class="n">04</span><b>验收产物</b><span>查看实际产物、差异、证据与影响范围</span><svg class="bg-ic" viewBox="0 0 64 64"><path d="M16 7h23l10 10v40H16zM39 7v12h10"/><path d="M23 36l6 6 13-15"/></svg></div>
+      <div class="rn"><span class="n">05</span><b>继续迭代或交付</b><span>发起下一次 Run，或完成归档</span><svg class="bg-ic" viewBox="0 0 64 64"><path d="M49 21A21 21 0 1 0 52 43"/><path d="M49 9v12H37M42 35l10 8-10 8"/></svg></div>
+    </div>
+    <div class="duty-row">
+      <div class="duty"><b>定界</b><span>说明目标、约束、资源与权限边界</span></div>
+      <div class="duty"><b>监督</b><span>理解阶段、风险、依赖与待确认事项</span></div>
+      <div class="duty"><b>介入</b><span>在方向、权限、成本与高风险动作上做判断</span></div>
+      <div class="duty"><b>验收</b><span>查看实际产物、差异、证据与影响范围</span></div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 07 定义新范式 ═══════════ -->
+<section class="slide dark section-dark">
+  <div class="dark-fx"><div class="glow1"></div><div class="glow2"></div><div class="gridfx"></div></div>
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">范式定义</span><span class="page-no">7 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">新范式：<span class="kw">可监督的任务委托</span></h2>
+    <p class="subtitle">Supervised Delegation —— 用户无需全程参与，仍保持最终控制权</p>
+  </div>
+  <div class="content" style="justify-content:space-evenly">
+    <div class="def-hero">
+      <span class="qmark ql">「</span><span class="qmark qr">」</span>
+      <p class="dq">以<span class="hl">持久任务</span>为交互单元，让 Agent 在明确边界内持续执行；<br>系统默认提供<span class="hl">阶段可见、异常提醒、可逆介入、证据化交付</span>，<br>使用户无需全程参与，仍能保持最终控制权。</p>
+      <div class="en">Supervised Delegation: people delegate persistent tasks to agents within explicit boundaries, supervise progress through milestones and exceptions,<br>intervene when judgment is needed, and validate completion through inspectable artifacts and evidence.</div>
+    </div>
+    <div class="def-div"><i></i><span></span><i></i></div>
+    <div class="prin-row">
+      <div class="prin"><span class="num">PRINCIPLE 01</span><b>任务对象化</b><div class="no">把一次聊天改名为任务</div><div class="yes"><b>而是</b>　任务拥有状态、环境、责任、历史、产物和恢复点</div></div>
+      <div class="prin"><span class="num">PRINCIPLE 02</span><b>分层透明</b><div class="no">展示全部思考与工具日志</div><div class="yes"><b>而是</b>　默认给出决策和里程碑，细节按需下钻</div></div>
+      <div class="prin"><span class="num">PRINCIPLE 03</span><b>异常时介入</b><div class="no">每一步都让用户确认</div><div class="yes"><b>而是</b>　仅在方向、风险、权限和不可逆动作上请求判断</div></div>
+      <div class="prin"><span class="num">PRINCIPLE 04</span><b>过程—结果联动</b><div class="no">过程与产物各放一个面板</div><div class="yes"><b>而是</b>　步骤、变更、版本和证据可相互定位</div></div>
+      <div class="prin"><span class="num">PRINCIPLE 05</span><b>证据化交付</b><div class="no">Agent 宣布「已完成」</div><div class="yes"><b>而是</b>　用户能查看、比较、运行、验证并接受或退回</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 08 ★三域工作台总图 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">产品框架</span><span class="page-no">8 / 15</span></div>
+  <div class="head-c" style="margin-bottom:1.8cqh">
+    <h2 class="title">产品框架：三个逻辑域，<span class="kw">随工作状态重组空间</span></h2>
+    <p class="subtitle">参考真实产品状态：左侧任务稳定存在；中间承载对话与判断；右侧在任务概览和产物工作区之间切换</p>
+  </div>
+  <div class="content" style="justify-content:center">
+    <div class="wb-domain-key">
+      <span><i style="background:var(--d1)"></i>任务记录：始终可达</span>
+      <span><i style="background:var(--d2)"></i>对话流：保持主线</span>
+      <span><i style="background:var(--d3)"></i>概览 / 产物：按状态切换</span>
+    </div>
+    <div class="wb-state-flow">
+      <div class="wb-state">
+        <div class="ws-meta"><span class="num">01</span><b>默认态 · 概览停靠</b><span>进展、待办、产物、资源与上下文集中可扫</span></div>
+        <div class="ws-screen state-overview">
+          <div class="ws-top"><i></i><i></i><i></i><em></em></div>
+          <div class="ws-body">
+            <div class="ws-col ws-task"><span class="ws-line on"></span><span class="ws-line"></span><span class="ws-line"></span><span class="ws-line"></span></div>
+            <div class="ws-col ws-chat"><span class="bubble me"></span><span class="bubble"></span><span class="bubble" style="width:54%"></span><span class="input"></span></div>
+            <div class="ws-col ws-overview"><div class="ws-section"><b>进展 / 待办 · 4/4</b><span class="ws-check"></span><span class="ws-check"></span></div><div class="ws-section"><b>任务产物</b><span class="ws-line"></span></div><div class="ws-section"><b>资源 · Skills / MCP</b><div class="ws-resource"><i></i><i></i><i></i></div></div><div class="ws-section"><b>上下文 · 16.2%</b><span class="ws-token"></span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="wb-state">
+        <div class="ws-meta"><span class="num">02</span><b>验收态 · 产物展开</b><span>右侧切换为完整工作对象，概览压缩为图标入口</span></div>
+        <div class="ws-screen state-artifact">
+          <div class="ws-top"><i></i><i></i><i></i></div>
+          <div class="ws-overview-entry" aria-label="任务概览"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+          <div class="ws-body">
+            <div class="ws-col ws-task"><span class="ws-line on"></span><span class="ws-line"></span><span class="ws-line"></span><span class="ws-line"></span></div>
+            <div class="ws-col ws-chat"><span class="bubble me"></span><span class="bubble"></span><span class="bubble" style="width:54%"></span><span class="input"></span></div>
+            <div class="ws-col"><div class="ws-tabs"><i></i><i></i><i class="on"></i></div><div class="ws-code"><span class="ws-line" style="width:42%"></span><span class="ws-line" style="width:88%"></span><span class="ws-line" style="width:76%"></span><span class="ws-line" style="width:66%"></span><span class="ws-line" style="width:84%"></span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="wb-state">
+        <div class="ws-meta"><span class="num">03</span><b>监督态 · 概览悬浮</b><span>产物不退出，按需召回任务状态与上下文</span></div>
+        <div class="ws-screen state-popover">
+          <div class="ws-top"><i></i><i></i><i></i></div>
+          <div class="ws-overview-entry" aria-label="任务概览"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+          <div class="ws-body">
+            <div class="ws-col ws-task"><span class="ws-line on"></span><span class="ws-line"></span><span class="ws-line"></span><span class="ws-line"></span></div>
+            <div class="ws-col ws-chat"><span class="bubble me"></span><span class="bubble"></span><span class="bubble" style="width:54%"></span><span class="input"></span></div>
+            <div class="ws-col"><div class="ws-tabs"><i></i><i></i><i class="on"></i></div><div class="ws-code"><span class="ws-line" style="width:42%"></span><span class="ws-line" style="width:88%"></span><span class="ws-line" style="width:76%"></span><span class="ws-line" style="width:66%"></span><span class="ws-line" style="width:84%"></span></div></div>
+          </div>
+          <div class="ws-pop"><b>任务概览</b><div class="ws-section"><b>进展 / 待办</b><span class="ws-check"></span><span class="ws-check"></span></div><div class="ws-section"><b>任务产物</b><span class="ws-line"></span></div><div class="ws-section"><b>资源 · Skills / MCP</b><div class="ws-resource"><i></i><i></i></div></div><div class="ws-section"><b>上下文 · 16.2%</b><span class="ws-token"></span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="wb-state-rule">稳定的是 <span class="mono">Task / Conversation / Artifact</span> 的职责关系；变化的是面板占位、展开方式与注意力优先级</div>
+  </div>
+</section>
+
+<!-- ═══════════ 09 左域 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">产品框架 · <span style="color:var(--d1)">左 · 任务记录域</span></span><span class="page-no">9 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">左侧不是聊天记录，而是<span class="kw">任务组合视图</span></h2>
+    <p class="subtitle">管理多任务、跨时间恢复工作、发现待关注事项——把任务从「当前页面状态」中独立出来</p>
+  </div>
+  <div class="content">
+    <div class="zoom-row">
+      <div class="zoom-left">
+        <div class="panel-mock">
+          <div class="pm-head"><span class="on">全部</span><span>运行中</span><span>待处理</span><span>按项目</span></div>
+          <div class="task st-wait"><div class="t-top"><i></i>竞品数据周报<span class="badge b-wait">待确认</span></div><div class="t-sub"><span>权限申请：读取外部数据源</span></div></div>
+          <div class="task st-run active"><div class="t-top"><i></i>重构结算模块</div><div class="t-sub"><span>运行中 · 阶段 3/5 · Run #3</span></div></div>
+          <div class="task st-run"><div class="t-top"><i></i>接口文档同步</div><div class="t-sub"><span>后台运行 · 12 分钟</span></div></div>
+          <div class="task st-done"><div class="t-top"><i></i>登录页 A/B 实验<span class="badge b-acc">待验收</span></div><div class="t-sub"><span>2 个产物 · 含验证报告</span></div></div>
+          <div class="task st-fail"><div class="t-top"><i></i>依赖升级扫描</div><div class="t-sub"><span>失败：沙箱缺依赖 · 可重试</span></div></div>
+          <div class="task st-done"><div class="t-top"><i></i>周会纪要整理</div><div class="t-sub"><span>已完成 · 已归档</span></div></div>
+        </div>
+      </div>
+      <div class="zoom-right">
+        <div class="pt"><span class="n">1</span><div><b>每个任务拥有持久身份和生命周期</b><span>会话关闭不等于任务结束——离开界面后仍能返回原任务</span></div></div>
+        <div class="pt"><span class="n">2</span><div><b>状态优先于更新时间</b><span>「几分钟前」不能说明是否需要处理；直接显示运行、等待、失败、完成，扫视即可发现待关注任务</span></div></div>
+        <div class="pt"><span class="n">3</span><div><b>用任务属性组织，而非聊天标题</b><span>支持项目、来源、Agent、状态筛选，并行任务增加后仍可快速缩小范围</span></div></div>
+        <div class="pt"><span class="n">4</span><div><b>保留未读变化与待审批标记</b><span>用事件与责任变化触发注意，不必逐条打开检查</span></div></div>
+        <div class="pt"><span class="n">5</span><div><b>任务切换同步恢复中、右区域</b><span>三域绑定同一任务上下文，一次切换恢复完整工作现场</span></div></div>
+      </div>
+    </div>
+    <div class="no-more"><b>不应沿用：</b>只显示聊天标题 + 最后更新时间　·　无限历史混合运行中 / 失败 / 已归档　·　状态只能进详情查看　·　并行 Agent 拆成无关联的多个会话</div>
+  </div>
+</section>
+
+<!-- ═══════════ 10 中域 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">产品框架 · <span style="color:var(--d2)">中 · 任务控制域</span></span><span class="page-no">10 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">对话表达<span class="kw">意图与判断</span>，概览表达<span class="kw">执行结构与状态</span></h2>
+    <p class="subtitle">二者共同回答「Agent 正在怎样完成我的任务」——不是减少信息，而是把信息放进正确的注意层级</p>
+  </div>
+  <div class="content">
+    <div class="pyr-row">
+      <div class="pyr-side">
+        <div class="side-card">
+          <h4><svg class="ic" viewBox="0 0 24 24" style="color:var(--bad)"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>为什么不能只保留对话</h4>
+          <ul>
+            <li>对话是时间序列，无法稳定表达并行步骤与依赖</li>
+            <li>工具日志持续写入主流，会淹没真正需要理解的决策</li>
+            <li>只展示最终回复，长任务又会变成黑盒</li>
+          </ul>
+        </div>
+        <div class="side-card">
+          <h4><svg class="ic" viewBox="0 0 24 24" style="color:var(--accent)"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h6M7 13h10M7 17h4"/></svg>任务概览必须提供</h4>
+          <ul>
+            <li>任务进展、执行项与待办</li>
+            <li>任务产物与验收入口</li>
+            <li>Skills / MCP 等资源状态</li>
+            <li>上下文与 Token 消耗</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pyr-mid">
+        <div class="attention-stack">
+          <div class="att-rail"><span>高</span><i></i><span>低</span></div>
+          <div class="att-body">
+            <div class="att-layer core"><span class="att-tag">ALWAYS</span><b>主线 · 意图与关键判断</b><span>方向变化、阻塞、待确认、责任接管与用户决策</span></div>
+            <div class="att-layer overview"><span class="att-tag">STATUS</span><b>概览 · 执行结构与状态</b><span>任务进展、待办、产物、资源与上下文消耗</span></div>
+            <div class="att-layer evidence"><span class="att-tag">ON DEMAND</span><b>证据 · 按需下钻</b><span>工具调用、命令、日志、Token、上下文与 Trace</span></div>
+          </div>
+        </div>
+        <div class="pyr-cap">注意力不是按信息量分配，而是按「是否影响用户判断」分层</div>
+      </div>
+      <div class="pyr-side">
+        <div class="side-card rule">
+          <h4 style="color:var(--accent)"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>设计原则</h4>
+          <p>默认保护任务主线；只有会改变方向、风险、成本或交付结果的信息，才进入主要注意层级。</p>
+        </div>
+        <div class="side-card">
+          <h4><svg class="ic" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg>对页面的含义</h4>
+          <ul>
+            <li>阻塞与待确认在对话流按需出现，要求用户介入接管</li>
+            <li>概览保持稳定、可扫描，随任务与资源状态更新</li>
+            <li>证据入口常在，但从不抢占主注意力</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 11 右域 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">产品框架 · <span style="color:var(--d3)">右 · 工作对象域</span></span><span class="page-no">11 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">从「看回答」，转向<span class="kw">「验结果」</span></h2>
+    <p class="subtitle">右侧不是附件预览区——是用户检查 Agent 实际工作结果的工作对象域，产物远不止文件</p>
+  </div>
+  <div class="content">
+    <div class="zoom-row">
+      <div class="zoom-left" style="flex:.95">
+        <div class="orbit">
+          <svg class="links" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <g stroke="#E5DAF8" stroke-width="1.5" vector-effect="non-scaling-stroke">
+              <line x1="50" y1="50" x2="50" y2="12" vector-effect="non-scaling-stroke"/>
+              <line x1="50" y1="50" x2="17" y2="30" vector-effect="non-scaling-stroke"/>
+              <line x1="50" y1="50" x2="21" y2="78" vector-effect="non-scaling-stroke"/>
+              <line x1="50" y1="50" x2="78" y2="80" vector-effect="non-scaling-stroke"/>
+              <line x1="50" y1="50" x2="82" y2="27" vector-effect="non-scaling-stroke"/>
+            </g>
+          </svg>
+          <div class="bb" style="width:9.8cqw;height:9.8cqw;left:50%;top:12%;background:#A78BFA">运行中的应用<small>浏览器页面 · 服务</small></div>
+          <div class="bb" style="width:9.2cqw;height:9.2cqw;left:17%;top:30%;background:#63B5EC">文档 · 表格<small>幻灯片 · 设计稿</small></div>
+          <div class="bb" style="width:8.8cqw;height:8.8cqw;left:21%;top:78%;background:#A5D3F4;color:#0E4D7A">搜索证据<small>引用 · 数据分析</small></div>
+          <div class="bb" style="width:9.2cqw;height:9.2cqw;left:78%;top:80%;background:#6D45E0">生成式 UI<small>表单 · 图表</small></div>
+          <div class="bb" style="width:9.8cqw;height:9.8cqw;left:82%;top:27%;background:#FF9440">代码 · Diff<small>提交 · 测试结果</small></div>
+          <div class="hub">产物<br>≠ 文件<small>ARTIFACT</small></div>
+        </div>
+      </div>
+      <div class="zoom-right" style="flex:1.1">
+        <div class="pt"><span class="n" style="background:var(--d3-soft);color:var(--d3)">1</span><div><b>产物独立于消息流持续存在</b><span>保留位置、版本和状态，不被后续对话冲走</span></div></div>
+        <div class="pt"><span class="n" style="background:var(--d3-soft);color:var(--d3)">2</span><div><b>产物与来源步骤双向定位</b><span>关联 Task → Run → Step → Artifact，能追溯来源和责任</span></div></div>
+        <div class="pt"><span class="n" style="background:var(--d3-soft);color:var(--d3)">3</span><div><b>支持预览、Diff、运行与验证</b><span>直接观察实际结果和影响——基于证据而非话术验收</span></div></div>
+        <div class="pt"><span class="n" style="background:var(--d3-soft);color:var(--d3)">4</span><div><b>保留浏览位置和编辑上下文</b><span>监督任务时不丢失验收现场</span></div></div>
+        <div class="pt"><span class="n" style="background:var(--d3-soft);color:var(--d3)">5</span><div><b>接受、退回、继续修改形成闭环</b><span>验收动作回写任务状态，交付有明确完成条件</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 13 状态机贯穿三域 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">产品框架 · 三域联动</span><span class="page-no">12 / 15</span></div>
+  <div class="head-c" style="margin-bottom:2cqh">
+    <h2 class="title">核心不是静态分栏，而是一条<span class="kw">可离开、可恢复、可介入、可验收</span>的任务状态机</h2>
+    <p class="subtitle">同一条任务的每个状态变化，同时驱动三域给出各自的表达</p>
+  </div>
+  <div class="content">
+    <div class="lane">
+      <div class="lh h0">任务阶段</div><div class="lh h1">左 · 任务记录域</div><div class="lh h2">中 · 任务控制域</div><div class="lh h3">右 · 工作对象域</div>
+      <div class="stage">创建任务<small>CREATE</small></div><div>任务进入队列</div><div class="mute">—</div><div class="mute">—</div>
+      <div class="stage">澄清与计划<small>PLAN</small></div><div class="mute">—</div><div>对话确认范围、权限与完成标准；概览展示阶段、依赖与预计交付物</div><div class="mute">—</div>
+      <div class="stage">自主执行<small>RUN</small></div><div>后台运行状态</div><div>里程碑与关键判断</div><div>产物增量出现</div>
+      <div class="stage">异常 / 待确认<small>EXCEPTION</small></div><div>待关注标记</div><div>原因与可选动作</div><div>受影响对象与预览</div>
+      <div class="stage">交付结果<small>DELIVER</small></div><div>待验收</div><div>完成摘要与验证说明</div><div>实际产物 / Diff / 证据</div>
+      <div class="stage">接受 / 退回 / 修改<small>REVIEW</small></div><div class="span3">三域同步更新 —— 形成下一次 Run，或完成归档</div>
+    </div>
+    <div class="pact-row">
+      <div class="pact"><b>状态一致</b><span>三域同一状态语义</span></div>
+      <div class="pact"><b>位置可恢复</b><span>回到原任务原步骤原产物</span></div>
+      <div class="pact"><b>责任明确</b><span>待确认说明为何需要用户</span></div>
+      <div class="pact"><b>动作可逆</b><span>中断/拒绝/重试/回滚有后果说明</span></div>
+      <div class="pact"><b>完成可验证</b><span>完成必须关联产物与证据</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 14 交互语法 ═══════════ -->
+<section class="slide dark section-dark">
+  <div class="dark-fx"><div class="glow1"></div><div class="glow2"></div><div class="gridfx"></div></div>
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">设计语言</span><span class="page-no">13 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">新的交互语法：从轮次对话到<span class="kw">状态驱动</span></h2>
+    <p class="subtitle">设计语言不再只由气泡、输入框和快捷指令构成，而是由六个基础语法共同构成</p>
+  </div>
+  <div class="content" style="justify-content:center;gap:2.4cqh">
+    <div class="gram-grid" style="margin:0">
+      <div class="gram"><span class="g-en">TASK</span><b>任务</b><p>这是一个什么目标、由谁发起、在哪个环境执行</p>
+        <div class="g-viz"><span class="gc line"><i style="background:var(--d1)"></i>重构结算模块 · Run #3</span><span class="gc gray mono">worktree:baseline</span></div></div>
+      <div class="gram"><span class="g-en">STATE</span><b>状态</b><p>运行中、等待、阻塞、失败、待验收、已完成</p>
+        <div class="g-viz"><span class="gc blue"><i></i>运行中</span><span class="gc amber"><i></i>等待确认</span><span class="gc red"><i></i>失败</span><span class="gc green"><i></i>待验收</span></div></div>
+      <div class="gram"><span class="g-en">ATTENTION</span><b>注意</b><p>哪些变化值得用户现在回来</p>
+        <div class="g-viz"><span class="gc amber">● 待确认 · 1</span><span class="gc red">● 失败 · 1</span><span class="gc gray">未读变更 · 3</span></div></div>
+      <div class="gram"><span class="g-en">INTERVENTION</span><b>介入</b><p>用户能批准、纠偏、中断、重试或改变边界</p>
+        <div class="g-viz"><span class="gc solid">批准</span><span class="gc line">修改边界</span><span class="gc line">中断</span><span class="gc line">重试</span></div></div>
+      <div class="gram"><span class="g-en">ARTIFACT</span><b>产物</b><p>Agent 实际创建或修改的工作对象</p>
+        <div class="g-viz"><span class="gc gray mono">AddTaskModal.tsx</span><span class="gc gray mono">v3</span><span class="gc green mono">+42</span><span class="gc red mono">-8</span></div></div>
+      <div class="gram"><span class="g-en">EVIDENCE</span><b>证据</b><p>产物如何产生、验证过什么、影响范围是什么</p>
+        <div class="g-viz"><span class="gc green mono">测试 12/12 ✓</span><span class="gc gray mono">Trace · 工具调用 27</span></div></div>
+    </div>
+    <div class="infer">
+      <div><b>进度</b>优先表达阶段与里程碑，不伪造精确百分比</div>
+      <div><b>通知</b>不是「Agent 又说了一句话」，而是任务责任发生了变化</div>
+      <div><b>完成</b>不是生成停止，而是进入可验收状态</div>
+      <div><b>对话</b>不是全部界面，而是改变方向与解释判断的控制通道</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 15 边界 ═══════════ -->
+<section class="slide">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="topbar"><span class="brand">边界与验证</span><span class="page-no">14 / 15</span></div>
+  <div class="head-c">
+    <h2 class="title">范式要求<span class="kw">三个逻辑域稳定</span>，不要求永远显示三个物理栏位</h2>
+    <p class="subtitle">按设备与任务复杂度伸缩空间形态；同时警惕三个最容易发生的误读</p>
+  </div>
+  <div class="content">
+    <div class="bound-row">
+      <div class="bound-col">
+        <div class="dev">
+          <div class="d-fig"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+          <div><b>桌面大屏 · 复杂任务</b><span>多产物、高频切换：三域并行展开</span></div>
+        </div>
+        <div class="dev">
+          <div class="d-fig phone"><i class="a2"></i></div>
+          <div><b>小屏 / 移动端</b><span>左侧变任务抽屉，概览变状态页，对话流和产物全屏查看</span></div>
+        </div>
+        <div class="dev">
+          <div class="d-fig solo"><i></i></div>
+          <div><b>短任务 · 无独立产物</b><span>可退化为轻量对话；高风险任务则增加审批与审计层</span></div>
+        </div>
+      </div>
+      <div class="bound-col">
+        <div class="anti"><b>反模式 ① 把三栏当范式</b><p>只有并排，没有共享状态和联动——那只是三个信息容器</p></div>
+        <div class="anti"><b>反模式 ② 把透明等同于全日志</b><p>技术信息全部可见，用户反而更难判断</p></div>
+        <div class="anti"><b>反模式 ③ 把自动化等同于取消控制</b><p>系统替用户做了决定，却没有边界、解释和恢复</p></div>
+      </div>
+    </div>
+    <div class="hypo"><b>待验证的设计假设：</b>目标场景中，用户是否确实需要同时查看任务进度和产物？若研究证明两者大多不需并行，物理布局可以改变——但「任务控制」与「产物验收」的逻辑职责仍需保留。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 16 收束 ═══════════ -->
+<section class="slide dark close-c">
+  <div class="dark-fx"><div class="glow1"></div><div class="glow2"></div><div class="gridfx"></div></div>
+  <div class="topbar" style="position:absolute;top:4.6cqh;left:6cqw;right:6cqw;z-index:2">
+    <span class="brand">收束</span><span class="page-no">15 / 15</span>
+  </div>
+  <div class="c-kicker" style="z-index:1;margin-bottom:2.6cqh">DESIGN&nbsp;PATTERN</div>
+  <div class="duo" style="z-index:1">
+    <div class="dim">Assistant 时代，我们设计 AI 如何进入人的操作。</div>
+    <div class="lit">Agent 时代，我们要设计人如何把工作交出去，<span class="kw">又不失去控制</span>。</div>
+  </div>
+  <p class="final" style="z-index:1">新的交互范式是<span class="hl">「可监督的任务委托」</span>：以任务而非消息为核心，以阶段和异常而非全部日志建立过程透明，以真实产物和证据而非完成声明建立信任——三域由同一任务状态持续联动。</p>
+  <div class="close-tri" style="z-index:1">
+    <span><i>TASK</i>左 · 跨任务管理</span>
+    <span><i>COORDINATION</i>中 · 协作与控制</span>
+    <span><i>ARTIFACT</i>右 · 产物与验收</span>
+  </div>
+  <p class="last" style="z-index:1">Agent 工作台的价值，不是让 AI 更像一个会聊天的人，<br>而是让人能够像管理真实工作一样，管理 AI 的持续行动与交付。</p>
+</section>
+
+</div>
+
+<script>
+/* 键盘翻页 */
+(function(){
+  var deck=document.getElementById('deck'),slides=[].slice.call(deck.querySelectorAll('.slide'));
+  function cur(){var y=window.scrollY+innerHeight/2,i=0;slides.forEach(function(s,k){if(s.offsetTop<=y)i=k;});return i;}
+  function go(i){i=Math.max(0,Math.min(slides.length-1,i));slides[i].scrollIntoView({behavior:'smooth'});}
+  addEventListener('keydown',function(e){
+    if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(cur()+1);}
+    else if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur()-1);}
+    else if(e.key==='Home'){e.preventDefault();go(0);}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1);}
+  });
+})();
+</script>
+</body>
+</html>
