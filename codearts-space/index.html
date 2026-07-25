@@ -3537,6 +3537,10 @@
     .cap-tab i { font-size: 15px; }
     .cap-tab:hover { color: var(--text-primary); }
     .cap-tab.is-selected { background: var(--surface-primary); color: var(--text-primary); box-shadow: var(--elevation-1); }
+    /* 顶部大 tab:页面主导航,更明显 */
+    .cap-tabs-top { display: flex; gap: 6px; margin: 0 0 var(--sp-6); padding: 4px; }
+    .cap-tabs-top .cap-tab { height: 40px; padding: 0 22px; font-size: 15px; border-radius: 10px; }
+    .cap-tabs-top .cap-tab i { font-size: 17px; }
 
     /* 任务看板 */
     .board-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); align-items: start; }
@@ -5942,18 +5946,18 @@
           </section>
 
           <section class="resource-center-view" id="capabilityCenterView" hidden>
+            <div class="cap-tabs cap-tabs-top" id="capTabs" role="tablist" aria-label="能力中心">
+              <button class="cap-tab is-selected" data-cap-tab="skills" role="tab" aria-selected="true"><i class="ph ph-magic-wand"></i>Skills</button>
+              <button class="cap-tab" data-cap-tab="connectors" role="tab" aria-selected="false"><i class="ph ph-plugs-connected"></i>连接器</button>
+            </div>
             <div class="resource-center-head">
               <div>
                 <div class="eyebrow"><span class="brand-dot"></span><span id="capEyebrow">Skills · 标准化专业能力</span></div>
-                <h1>能力中心</h1>
-                <p id="capIntro">统一管理可复用的专业能力(Skills)与外部系统连接(MCP 连接器),供专业搭档与智囊团在授权范围内调用。</p>
+                <h1 id="capTitle">Skills</h1>
+                <p id="capIntro">Skills 是可被专业搭档和智囊团重复调用的工作方法,包含清晰输入、执行步骤和可验证输出。</p>
               </div>
               <button class="button button-primary" id="addSkillButton"><i class="ph ph-plus"></i>添加 Skill</button>
               <button class="button button-primary" id="customConnectorButton" hidden><i class="ph ph-plus-circle"></i>自定义 MCP</button>
-            </div>
-            <div class="cap-tabs" id="capTabs" role="tablist">
-              <button class="cap-tab is-selected" data-cap-tab="skills" role="tab" aria-selected="true"><i class="ph ph-magic-wand"></i>Skills</button>
-              <button class="cap-tab" data-cap-tab="connectors" role="tab" aria-selected="false"><i class="ph ph-plugs-connected"></i>连接器</button>
             </div>
             <div id="capSkillsPanel">
               <div class="resource-toolbar">
@@ -8121,7 +8125,12 @@
       if (el("capConnectorsPanel")) el("capConnectorsPanel").hidden = tab !== "connectors";
       if (el("addSkillButton")) el("addSkillButton").hidden = tab !== "skills";
       if (el("customConnectorButton")) el("customConnectorButton").hidden = tab !== "connectors";
-      if (el("capEyebrow")) el("capEyebrow").textContent = tab === "skills" ? "Skills · 标准化专业能力" : "Connectors · MCP 能力入口";
+      const isSkills = tab === "skills";
+      if (el("capEyebrow")) el("capEyebrow").textContent = isSkills ? "Skills · 标准化专业能力" : "Connectors · MCP 能力入口";
+      if (el("capTitle")) el("capTitle").textContent = isSkills ? "Skills" : "连接器（MCP）";
+      if (el("capIntro")) el("capIntro").textContent = isSkills
+        ? "Skills 是可被专业搭档和智囊团重复调用的工作方法,包含清晰输入、执行步骤和可验证输出。"
+        : "通过标准协议连接文档、研发、协作和数据系统,让搭档在授权范围内读取信息或执行操作。";
     }
 
     function showComposeView() {
