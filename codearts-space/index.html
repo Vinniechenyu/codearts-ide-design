@@ -3512,21 +3512,14 @@
     .art-tab:hover { color: var(--text-primary); }
     .art-tab.is-selected { color: var(--text-primary); border-color: var(--brand-default); background: rgba(131, 77, 240, 0.08); }
 
-    .art-stage { border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
-    .art-stage-head {
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px var(--sp-4); border-bottom: 1px solid var(--border-subtle);
-      font-size: 12px; color: var(--text-secondary); background: rgba(120, 120, 140, 0.05);
-    }
-    .art-stage-head .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text-primary); font-weight: 600; }
-    .art-stage-head .grow { flex: 1; }
-    .art-stage-body { padding: var(--sp-4); }
+    /* 产物内容直接展示,不再套卡片 */
+    .art-stage-wrap { padding: 2px; }
     .art-code {
-      margin: 0; padding: var(--sp-4);
+      margin: 0; padding: 0;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12px; line-height: 1.75; color: var(--text-primary);
+      font-size: 12.5px; line-height: 1.85; color: var(--text-primary);
       white-space: pre-wrap; word-break: break-word;
-      background: rgba(120, 120, 140, 0.05); overflow-x: auto;
+      background: transparent; overflow-x: auto;
     }
     .art-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .art-table th, .art-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
@@ -5471,22 +5464,16 @@
           <span class="window-dot"></span>
         </div>
         <div class="brand-lockup">
-          <img class="brand-logo" src="assets/logo.png" alt="CodeArts AgentSpace logo">
-          <span>CodeArts AgentSpace</span>
+          <img class="brand-logo" src="assets/logo.png" alt="码道Work logo">
+          <span>码道Work</span>
         </div>
         <button class="icon-button" id="toggleSidebarBtn" title="收起 / 展开侧栏" aria-label="收起或展开侧栏"><i class="ph ph-sidebar-simple"></i></button>
       </div>
       <div class="title-center"></div>
       <div class="title-right">
         <button class="icon-button" id="toggleArtifactBtn" title="显示 / 隐藏产物区" aria-label="显示或隐藏产物区"><i class="ph ph-sidebar-simple icon-flip-x"></i></button>
-        <button class="icon-button" id="commandButton" aria-label="打开命令面板" title="命令面板">
-          <i class="ph ph-command"></i>
-        </button>
         <button class="icon-button" id="themeButton" aria-label="切换主题" title="切换主题">
           <i class="ph ph-moon"></i>
-        </button>
-        <button class="icon-button" aria-label="通知" title="通知">
-          <i class="ph ph-bell"></i>
         </button>
       </div>
     </header>
@@ -7283,7 +7270,7 @@
       container.innerHTML = templates.map((template, index) => `
         <button class="task-template-card ${state.selectedTemplateId === template.id ? "is-selected" : ""}" data-template-id="${template.id}">
           <span class="task-template-cover has-image is-${state.selectedTemplateType} variant-${index + 1}">
-            <img class="task-template-image" src="${index % 2 === 0 ? `assets/codearts-templates/${state.selectedTemplateType}-editorial-v2.png` : `assets/template-covers/${state.selectedTemplateType}.png`}" alt="">
+            <img class="task-template-image" src="assets/template-covers/${state.selectedTemplateType}.png" alt="">
             <span class="task-template-badge">
               <i class="ph ${templateTypes.find((type) => type.id === state.selectedTemplateType)?.icon || "ph-file"}"></i>
               ${templateTypes.find((type) => type.id === state.selectedTemplateType)?.label || "模板"}
@@ -7814,10 +7801,8 @@
     function artifactStageHTML(artifact) {
       const preview = getScenario().preview;
       const t = artifact.title;
-      const head = `<div class="art-stage-head"><i class="ph ${artifact.icon}"></i><span class="path">${t}</span><span class="grow"></span><span>${artifact.statusText}</span></div>`;
-      let body;
       if (t.endsWith(".csv")) {
-        body = `<table class="art-table">
+        return `<table class="art-table">
           <thead><tr><th>问题</th><th>频次</th><th>严重度</th><th>影响范围</th></tr></thead>
           <tbody>
             <tr><td>状态反馈不足</td><td>412</td><td>高</td><td>37%</td></tr>
@@ -7825,8 +7810,9 @@
             <tr><td>入口层级过深</td><td>174</td><td>中</td><td>12%</td></tr>
             <tr><td>关键文案歧义</td><td>131</td><td>中</td><td>9%</td></tr>
           </tbody></table>`;
-      } else if (t.endsWith(".md")) {
-        body = `<pre class="art-code"># 客户反馈问题聚类
+      }
+      if (t.endsWith(".md")) {
+        return `<pre class="art-code"># 客户反馈问题聚类
 
 ## 高影响问题（P0）
 - 状态反馈不足 —— 覆盖 37% 负向反馈
@@ -7837,17 +7823,15 @@
 每一类保留代表性原声与来源引用（feedback_2026Q2.csv）。
 
 > 结论：先建立一致的任务状态与恢复机制，再优化局部视觉表达。</pre>`;
-      } else {
-        body = `<div class="art-stage-body"><article class="artifact-document">
-          <div class="eyebrow"><span class="brand-dot"></span>${preview.eyebrow}</div>
-          <p>${artifact.description}</p>
-          <h4>核心判断</h4>
-          <ul>${preview.core.map((item) => `<li>${item}</li>`).join("")}</ul>
-          <h4>建议动作</h4>
-          <ul>${preview.actions.map((item) => `<li>${item}</li>`).join("")}</ul>
-        </article></div>`;
       }
-      return `<div class="art-stage">${head}${body}</div>`;
+      return `<article class="artifact-document">
+        <div class="eyebrow"><span class="brand-dot"></span>${preview.eyebrow}</div>
+        <p>${artifact.description}</p>
+        <h4>核心判断</h4>
+        <ul>${preview.core.map((item) => `<li>${item}</li>`).join("")}</ul>
+        <h4>建议动作</h4>
+        <ul>${preview.actions.map((item) => `<li>${item}</li>`).join("")}</ul>
+      </article>`;
     }
 
     // 从概览点击产物 → 打开右侧独立产物区并定位预览
@@ -9067,7 +9051,7 @@
     });
     el("addExpertButton").addEventListener("click", () => showToast("可从搭档中心邀请或替换成员"));
     el("editTeamButton").addEventListener("click", () => showToast("选择智囊团即可调整成员组合"));
-    el("commandButton").addEventListener("click", () => showToast("快捷命令：新建任务 · 搜索搭档 · 打开成果"));
+    el("commandButton")?.addEventListener("click", () => showToast("快捷命令：新建任务 · 搜索搭档 · 打开成果"));
     el("themeButton").addEventListener("click", () => {
       const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
       document.documentElement.dataset.theme = nextTheme;
