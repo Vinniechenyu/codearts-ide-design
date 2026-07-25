@@ -2807,8 +2807,19 @@
       border: 1px solid transparent;
       font-size: 10px; font-weight: 600;
     }
+    .fc-scene .fc-kind {
+      position: absolute; top: 10px; right: 10px; z-index: 2;
+      padding: 4px 10px;
+      font-size: 10.5px;
+      box-shadow: 0 6px 14px -10px rgba(23, 16, 48, 0.5);
+      backdrop-filter: blur(6px);
+    }
     .fc-kind.is-partner { background: rgba(26, 143, 184, 0.14); color: #1a6f8c; border-color: rgba(26, 143, 184, 0.24); }
     .fc-kind.is-team { background: rgba(131, 77, 240, 0.14); color: var(--brand-text); border-color: rgba(131, 77, 240, 0.26); }
+    .fc-scene .fc-kind.is-partner { background: rgba(233, 248, 252, 0.92); }
+    .fc-scene .fc-kind.is-team { background: rgba(243, 237, 255, 0.92); }
+    :root[data-theme="dark"] .fc-scene .fc-kind.is-partner { background: rgba(18, 48, 58, 0.86); }
+    :root[data-theme="dark"] .fc-scene .fc-kind.is-team { background: rgba(39, 27, 64, 0.86); }
     :root[data-theme="dark"] .fc-kind.is-partner { background: rgba(26, 143, 184, 0.24); color: #7fc8d6; }
     :root[data-theme="dark"] .fc-kind.is-team { background: rgba(131, 77, 240, 0.26); color: var(--purple-900); }
 
@@ -8675,11 +8686,12 @@
     }
 
     // 场景头像 · 每张卡上半部分统一的角色形象面板
-    function feedScene(images, tone, statusText) {
+    function feedScene(images, kind) {
+      const isTeam = kind === "team";
       return `
         <div class="fc-scene ${images.length > 1 ? "is-duo" : ""}">
           ${images.map((src) => `<img src="${src}" alt="角色形象">`).join("")}
-          <span class="fc-status"><span class="status-dot dot-completed"></span>${statusText}</span>
+          <span class="fc-kind ${isTeam ? "is-team" : "is-partner"}">${isTeam ? "智囊团" : "专业搭档"}</span>
         </div>`;
     }
 
@@ -8688,11 +8700,10 @@
       const lore = loreOf(expert.id);
       return `
         <article class="feed-card fc-resume ${feedTone(expert.id)}" data-agent="${expert.id}" tabindex="0" aria-label="查看 ${expert.name} 的简历">
-          ${feedScene([marketCharacter(expert)], feedTone(expert.id), "可邀请")}
+          ${feedScene([marketCharacter(expert)], "partner")}
           <div class="fc-body">
             <div class="fc-head">
               <span class="fc-name"><strong>${nickOf(expert)}</strong><span>${expert.name} · ${expert.role}</span></span>
-              <span class="fc-kind is-partner">专业搭档</span>
             </div>
             <p class="fc-pitch">${lore.pitch || expert.description}</p>
             <div class="fc-chips">${(expert.skills || []).slice(0, 3).map((skill) => `<span class="fc-chip">${skill}</span>`).join("")}</div>
@@ -8722,11 +8733,10 @@
       const combos = lore.combos || ["分工接力", "交叉校验", "统一交付"];
       return `
         <article class="feed-card fc-team is-team" data-agent="${team.id}" tabindex="0" aria-label="查看 ${team.name} 阵型">
-          ${feedScene(scene.length ? scene : ["assets/codearts-agent/team-leader.png"], "is-team", "可组建")}
+          ${feedScene(scene.length ? scene : ["assets/codearts-agent/team-leader.png"], "team")}
           <div class="fc-body">
             <div class="fc-head">
               <span class="fc-name"><strong>${team.name}</strong><span>${members.length} 位成员 · ${team.subtitle}</span></span>
-              <span class="fc-kind is-team">智囊团</span>
             </div>
             <p class="fc-pitch">${team.description}</p>
             <div class="fc-members">${memberRows}</div>
