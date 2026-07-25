@@ -327,6 +327,11 @@
     /* 标题栏图标:在玻璃上保持可识别度 */
     .titlebar .icon-button { color: var(--text-primary); }
     .titlebar .icon-button:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.32); }
+    /* 窗口控制:移到右侧,分割线隔开 */
+    .titlebar-divider { width: 1px; height: 18px; margin: 0 6px; background: var(--border-subtle); align-self: center; flex: none; }
+    .window-controls { display: inline-flex; align-items: center; gap: 2px; }
+    .window-ctl i { font-size: 13px; }
+    .window-ctl.is-close:hover { background: #e5484d; color: #fff; }
 
     .title-left,
     .title-center,
@@ -3526,6 +3531,32 @@
     .art-table th { color: var(--text-secondary); font-weight: 600; background: rgba(120, 120, 140, 0.05); }
     .art-table tr:last-child td { border-bottom: none; }
 
+    /* 能力中心 tab */
+    .cap-tabs { display: inline-flex; gap: 4px; padding: 3px; margin: 0 0 var(--sp-5); background: rgba(120, 120, 140, 0.08); border-radius: 10px; }
+    .cap-tab { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer; }
+    .cap-tab i { font-size: 15px; }
+    .cap-tab:hover { color: var(--text-primary); }
+    .cap-tab.is-selected { background: var(--surface-primary); color: var(--text-primary); box-shadow: var(--elevation-1); }
+
+    /* 任务看板 */
+    .board-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); align-items: start; }
+    .board-col { background: rgba(120, 120, 140, 0.05); border-radius: 14px; padding: var(--sp-3); }
+    .board-col-head { display: flex; align-items: center; gap: 8px; padding: 4px 6px var(--sp-3); font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .board-col-head .board-count { margin-left: auto; color: var(--text-tertiary); }
+    .board-col-body { display: flex; flex-direction: column; gap: 8px; }
+    .board-card { background: var(--surface-primary); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px; cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease; }
+    .board-card:hover { border-color: var(--brand-default); transform: translateY(-1px); }
+    .board-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; min-width: 0; }
+    .board-mode { flex: none; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 5px; }
+    .board-mode-work { background: rgba(131, 77, 240, 0.12); color: var(--brand-default); }
+    .board-mode-code { background: rgba(59, 111, 224, 0.12); color: #3b6fe0; }
+    .board-team { font-size: 11px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .board-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.4; }
+    .board-card-meta { margin-top: 4px; font-size: 12px; color: var(--text-secondary); }
+    .board-card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .board-tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: rgba(120, 120, 140, 0.08); color: var(--text-secondary); }
+    @media (max-width: 1180px) { .board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
     .artifact-scroll {
       min-height: 0;
       overflow-y: auto;
@@ -5458,11 +5489,6 @@
   <div class="app">
     <header class="titlebar">
       <div class="title-left">
-        <div class="window-dots" aria-hidden="true">
-          <span class="window-dot"></span>
-          <span class="window-dot"></span>
-          <span class="window-dot"></span>
-        </div>
         <div class="brand-lockup">
           <img class="brand-logo" src="assets/logo.png" alt="码道Work logo">
           <span>码道Work</span>
@@ -5475,6 +5501,12 @@
         <button class="icon-button" id="themeButton" aria-label="切换主题" title="切换主题">
           <i class="ph ph-moon"></i>
         </button>
+        <span class="titlebar-divider" aria-hidden="true"></span>
+        <div class="window-controls" aria-label="窗口控制">
+          <button class="icon-button window-ctl" aria-label="最小化" title="最小化"><i class="ph ph-minus"></i></button>
+          <button class="icon-button window-ctl" aria-label="最大化" title="最大化"><i class="ph ph-square"></i></button>
+          <button class="icon-button window-ctl is-close" aria-label="关闭" title="关闭"><i class="ph ph-x"></i></button>
+        </div>
       </div>
     </header>
 
@@ -5493,6 +5525,10 @@
             <i class="ph ph-plus-square"></i>
             <span>新建任务</span>
           </button>
+          <button class="sidebar-nav-item" data-sidebar-action="board">
+            <i class="ph ph-kanban"></i>
+            <span>任务看板</span>
+          </button>
           <button class="sidebar-nav-item" data-sidebar-action="experts">
             <i class="ph ph-identification-card"></i>
             <span>搭档中心</span>
@@ -5501,13 +5537,9 @@
             <i class="ph ph-clock-countdown"></i>
             <span>定时任务</span>
           </button>
-          <button class="sidebar-nav-item" data-sidebar-action="skills">
+          <button class="sidebar-nav-item" data-sidebar-action="capability">
             <i class="ph ph-magic-wand"></i>
-            <span>Skills</span>
-          </button>
-          <button class="sidebar-nav-item" data-sidebar-action="connectors">
-            <i class="ph ph-plugs-connected"></i>
-            <span>连接器</span>
+            <span>能力中心</span>
           </button>
         </nav>
         <div class="task-filter">
@@ -5909,57 +5941,67 @@
             </div>
           </section>
 
-          <section class="resource-center-view" id="skillsCenterView" hidden>
+          <section class="resource-center-view" id="capabilityCenterView" hidden>
             <div class="resource-center-head">
               <div>
-                <div class="eyebrow"><span class="brand-dot"></span>Skills · 标准化专业能力</div>
-                <h1>Skills</h1>
-                <p>Skills 是可被专业搭档和智囊团重复调用的工作方法，包含清晰输入、执行步骤和可验证输出。</p>
+                <div class="eyebrow"><span class="brand-dot"></span><span id="capEyebrow">Skills · 标准化专业能力</span></div>
+                <h1>能力中心</h1>
+                <p id="capIntro">统一管理可复用的专业能力(Skills)与外部系统连接(MCP 连接器),供专业搭档与智囊团在授权范围内调用。</p>
               </div>
               <button class="button button-primary" id="addSkillButton"><i class="ph ph-plus"></i>添加 Skill</button>
+              <button class="button button-primary" id="customConnectorButton" hidden><i class="ph ph-plus-circle"></i>自定义 MCP</button>
             </div>
-            <div class="resource-toolbar">
-              <div class="resource-filter-group" id="skillFilterGroup">
-                <button class="filter-chip is-selected" data-skill-filter="全部">全部</button>
-                <button class="filter-chip" data-skill-filter="Work">Work</button>
-                <button class="filter-chip" data-skill-filter="Code">Code</button>
-                <button class="filter-chip" data-skill-filter="设计">设计</button>
+            <div class="cap-tabs" id="capTabs" role="tablist">
+              <button class="cap-tab is-selected" data-cap-tab="skills" role="tab" aria-selected="true"><i class="ph ph-magic-wand"></i>Skills</button>
+              <button class="cap-tab" data-cap-tab="connectors" role="tab" aria-selected="false"><i class="ph ph-plugs-connected"></i>连接器</button>
+            </div>
+            <div id="capSkillsPanel">
+              <div class="resource-toolbar">
+                <div class="resource-filter-group" id="skillFilterGroup">
+                  <button class="filter-chip is-selected" data-skill-filter="全部">全部</button>
+                  <button class="filter-chip" data-skill-filter="Work">Work</button>
+                  <button class="filter-chip" data-skill-filter="Code">Code</button>
+                  <button class="filter-chip" data-skill-filter="设计">设计</button>
+                </div>
+                <label class="resource-search">
+                  <i class="ph ph-magnifying-glass"></i>
+                  <input type="search" id="skillSearchInput" placeholder="搜索 Skill">
+                </label>
               </div>
-              <label class="resource-search">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="search" id="skillSearchInput" placeholder="搜索 Skill">
-              </label>
+              <div class="resource-grid" id="skillMarketGrid"></div>
             </div>
-            <div class="resource-grid" id="skillMarketGrid"></div>
+            <div id="capConnectorsPanel" hidden>
+              <div class="connector-intro">
+                <i class="ph ph-plugs-connected"></i>
+                <div><strong>连接器就是 MCP 能力入口。</strong> 每个连接器都明确可读、可写范围;部署、删除、对外发送等敏感操作必须经过人工确认。</div>
+              </div>
+              <div class="resource-toolbar">
+                <div class="resource-filter-group" id="connectorFilterGroup">
+                  <button class="filter-chip is-selected" data-connector-filter="全部">全部</button>
+                  <button class="filter-chip" data-connector-filter="研发">研发</button>
+                  <button class="filter-chip" data-connector-filter="办公">办公</button>
+                  <button class="filter-chip" data-connector-filter="设计">设计</button>
+                  <button class="filter-chip" data-connector-filter="数据">数据</button>
+                </div>
+                <label class="resource-search">
+                  <i class="ph ph-magnifying-glass"></i>
+                  <input type="search" id="connectorSearchInput" placeholder="搜索 MCP 连接器">
+                </label>
+              </div>
+              <div class="resource-grid" id="connectorMarketGrid"></div>
+            </div>
           </section>
 
-          <section class="resource-center-view" id="connectorsCenterView" hidden>
+          <section class="resource-center-view" id="boardCenterView" hidden>
             <div class="resource-center-head">
               <div>
-                <div class="eyebrow"><span class="brand-dot"></span>Connectors · MCP</div>
-                <h1>连接器（MCP）</h1>
-                <p>通过标准协议连接文档、研发、协作和数据系统，让搭档在授权范围内读取信息或执行操作。</p>
+                <div class="eyebrow"><span class="brand-dot"></span>任务看板 · 全部工作一览</div>
+                <h1>任务看板</h1>
+                <p>按状态查看所有任务的进展,一眼看清哪些需要你介入、哪些已可验收。</p>
               </div>
-              <button class="button button-primary" id="customConnectorButton"><i class="ph ph-plus-circle"></i>自定义 MCP</button>
+              <button class="button button-primary" id="boardNewButton"><i class="ph ph-plus"></i>新建任务</button>
             </div>
-            <div class="connector-intro">
-              <i class="ph ph-plugs-connected"></i>
-              <div><strong>连接器就是 MCP 能力入口。</strong> 每个连接器都明确可读、可写范围；部署、删除、对外发送等敏感操作必须经过人工确认。</div>
-            </div>
-            <div class="resource-toolbar">
-              <div class="resource-filter-group" id="connectorFilterGroup">
-                <button class="filter-chip is-selected" data-connector-filter="全部">全部</button>
-                <button class="filter-chip" data-connector-filter="研发">研发</button>
-                <button class="filter-chip" data-connector-filter="办公">办公</button>
-                <button class="filter-chip" data-connector-filter="设计">设计</button>
-                <button class="filter-chip" data-connector-filter="数据">数据</button>
-              </div>
-              <label class="resource-search">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="search" id="connectorSearchInput" placeholder="搜索 MCP 连接器">
-              </label>
-            </div>
-            <div class="resource-grid" id="connectorMarketGrid"></div>
+            <div class="board-grid" id="boardGrid"></div>
           </section>
 
           <section class="run-view" id="runView">
@@ -7995,9 +8037,45 @@
       context.appendChild(tag);
     }
 
+    const BOARD_COLUMNS = [
+      { id: "running", label: "进行中", dot: "running" },
+      { id: "decision", label: "待我决定", dot: "waiting" },
+      { id: "review", label: "待验收", dot: "waiting" },
+      { id: "done", label: "已完成", dot: "completed" }
+    ];
+    const BOARD_TASKS = [
+      { title: "客户反馈洞察与改版建议", col: "decision", mode: "Work", team: "UI/UX 智囊团", meta: "阶段 2/4 · 待选择报告受众", tags: ["洞察报告", "改版建议"] },
+      { title: "工作日报自动化", col: "decision", mode: "Work", team: "写作搭档", meta: "待确认发送渠道", tags: ["定时", "日报"] },
+      { title: "竞品研究", col: "running", mode: "Work", team: "研究搭档", meta: "正在检索 6 家竞品", tags: ["竞品", "对标"] },
+      { title: "响应体验优化专项", col: "running", mode: "Work", team: "UI/UX 智囊团", meta: "六产品同题实测中", tags: ["实测", "根因"] },
+      { title: "订单退款能力实现", col: "review", mode: "Code", team: "研发搭档 + UX", meta: "36 用例通过 · 待验收", tags: ["状态机", "幂等"] },
+      { title: "搭档中心游戏化体验", col: "done", mode: "Work", team: "UX 专业搭档", meta: "3 个角色档案已交付", tags: ["角色", "激励"] }
+    ];
+    function renderBoard() {
+      const grid = el("boardGrid");
+      if (!grid) return;
+      grid.innerHTML = BOARD_COLUMNS.map((col) => {
+        const cards = BOARD_TASKS.filter((t) => t.col === col.id);
+        return `<div class="board-col">
+          <div class="board-col-head"><span class="status-dot dot-${col.dot}"></span>${col.label}<span class="board-count">${cards.length}</span></div>
+          <div class="board-col-body">
+            ${cards.map((t) => `<article class="board-card" data-board-title="${t.title}">
+              <div class="board-card-top"><span class="board-mode board-mode-${t.mode.toLowerCase()}">${t.mode}</span><span class="board-team">${t.team}</span></div>
+              <div class="board-card-title">${t.title}</div>
+              <div class="board-card-meta">${t.meta}</div>
+              <div class="board-card-tags">${t.tags.map((tag) => `<span class="board-tag">${tag}</span>`).join("")}</div>
+            </article>`).join("")}
+          </div>
+        </div>`;
+      }).join("");
+      qsa("[data-board-title]", grid).forEach((card) => {
+        card.addEventListener("click", () => showToast(`打开任务「${card.dataset.boardTitle}」`));
+      });
+    }
+
     function hideResourceCenters() {
-      ["scheduledCenterView", "skillsCenterView", "connectorsCenterView"].forEach((id) => {
-        el(id).hidden = true;
+      ["scheduledCenterView", "capabilityCenterView", "boardCenterView"].forEach((id) => {
+        if (el(id)) el(id).hidden = true;
       });
       el("workspace").classList.remove("is-resource-center");
     }
@@ -8009,8 +8087,8 @@
       }
       const viewMap = {
         scheduled: ["scheduledCenterView", "定时任务"],
-        skills: ["skillsCenterView", "Skills"],
-        connectors: ["connectorsCenterView", "连接器（MCP）"]
+        capability: ["capabilityCenterView", "能力中心"],
+        board: ["boardCenterView", "任务看板"]
       };
       const target = viewMap[action];
       if (!target) return;
@@ -8028,8 +8106,22 @@
       el("selectionFooter").hidden = true;
       document.querySelector(".control-scroll").scrollTop = 0;
       if (action === "scheduled") renderScheduledCenter();
-      if (action === "skills") renderSkillsCenter();
-      if (action === "connectors") renderConnectorsCenter();
+      if (action === "capability") { renderSkillsCenter(); renderConnectorsCenter(); setCapTab("skills"); }
+      if (action === "board") renderBoard();
+    }
+
+    // 能力中心:Skills / 连接器 tab 切换
+    function setCapTab(tab) {
+      qsa("[data-cap-tab]").forEach((b) => {
+        const on = b.dataset.capTab === tab;
+        b.classList.toggle("is-selected", on);
+        b.setAttribute("aria-selected", String(on));
+      });
+      if (el("capSkillsPanel")) el("capSkillsPanel").hidden = tab !== "skills";
+      if (el("capConnectorsPanel")) el("capConnectorsPanel").hidden = tab !== "connectors";
+      if (el("addSkillButton")) el("addSkillButton").hidden = tab !== "skills";
+      if (el("customConnectorButton")) el("customConnectorButton").hidden = tab !== "connectors";
+      if (el("capEyebrow")) el("capEyebrow").textContent = tab === "skills" ? "Skills · 标准化专业能力" : "Connectors · MCP 能力入口";
     }
 
     function showComposeView() {
@@ -8760,6 +8852,13 @@
         setSidebarActive(button);
         showResourceCenter(action);
       });
+    });
+    qsa("[data-cap-tab]").forEach((button) => {
+      button.addEventListener("click", () => setCapTab(button.dataset.capTab));
+    });
+    el("boardNewButton")?.addEventListener("click", () => {
+      setSidebarActive(el("newTaskButton"));
+      showComposeView();
     });
     qsa("[data-schedule-tab]").forEach((button) => {
       button.addEventListener("click", () => setScheduleTab(button.dataset.scheduleTab));
