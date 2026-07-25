@@ -2674,6 +2674,7 @@
     }
 
     .feed-card {
+      position: relative;
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -2744,7 +2745,6 @@
     /* 宽卡内容不挤:更大的内边距与行距,富余空间收在案例之前,案例+履历成组贴底 */
     .feed-card.fc-team .fc-body { flex: 1 1 auto; padding: 12px 18px 11px; gap: 9px; }
     .feed-card.fc-team .fc-pitch { height: auto; max-height: 40px; }
-    .feed-card.fc-team .fc-folder { margin-top: auto; padding-top: 10px; }
     .feed-card.fc-team .fc-foot { margin-top: 10px; }
     .fc-members { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
     .fc-member { display: flex; align-items: center; gap: 7px; min-width: 0; }
@@ -2855,21 +2855,26 @@
     .feed-card:focus-within .fc-actions { opacity: 1; pointer-events: auto; }
     .fc-actions .button { flex: 1; justify-content: center; padding-left: 10px; padding-right: 10px; }
 
-    /* hover 浮层 · 蒙层升起:案例库放大 + 操作按钮 */
+    /* hover 蒙层 · 盖满整张卡:身份 + 放大案例库 + 操作按钮 */
     .fc-hover {
-      position: absolute; left: 0; right: 0; bottom: 0; top: 21%;
+      position: absolute; inset: 0;
       z-index: 6;
-      display: flex; flex-direction: column; justify-content: flex-end; gap: 9px;
-      padding: 14px 14px 12px;
+      display: flex; flex-direction: column; justify-content: center; gap: 10px;
+      padding: 14px;
+      border-radius: inherit;
       background: var(--surface-primary);
-      box-shadow: 0 -12px 20px -16px rgba(23, 16, 48, 0.3);
-      opacity: 0; transform: translateY(10px);
+      opacity: 0; transform: scale(0.99);
       pointer-events: none;
       transition: opacity var(--motion-normal) var(--ease), transform var(--motion-normal) var(--ease);
     }
-    :root[data-theme="dark"] .fc-hover { background: var(--surface-secondary); box-shadow: 0 -12px 20px -16px rgba(0, 0, 0, 0.6); }
+    :root[data-theme="dark"] .fc-hover { background: var(--surface-secondary); }
     .feed-card:hover .fc-hover,
     .feed-card:focus-within .fc-hover { opacity: 1; transform: none; pointer-events: auto; }
+    .fc-hover-id {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13.5px; font-weight: 600; line-height: 19px;
+      color: var(--text-primary);
+    }
     .fc-hover-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .fc-hover-cases { display: flex; gap: 8px; }
     .fc-hover-thumb {
@@ -2879,14 +2884,14 @@
       border: 1px solid var(--border-subtle); border-radius: 10px;
       overflow: hidden; background: var(--surface-subtle);
       cursor: zoom-in;
-      opacity: 0; transform: translateY(12px) scale(0.94);
+      opacity: 0; transform: translateY(10px) scale(0.95);
       transition: opacity 200ms var(--ease), transform 260ms var(--ease), border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
     }
     .feed-card:hover .fc-hover-thumb,
     .feed-card:focus-within .fc-hover-thumb { opacity: 1; transform: none; }
     .fc-hover-thumb:nth-child(2) { transition-delay: 50ms; }
     .fc-hover-thumb:nth-child(3) { transition-delay: 100ms; }
-    .fc-hover-thumb img { display: block; width: 100%; height: 96px; object-fit: cover; object-position: center top; }
+    .fc-hover-thumb img { display: block; width: 100%; height: 92px; object-fit: cover; object-position: center top; }
     .fc-hover-thumb:hover { border-color: var(--brand-border); box-shadow: 0 12px 22px -16px rgba(23, 16, 48, 0.6); }
     .fc-hover-thumb .fc-thumb-name {
       position: absolute; left: 0; right: 0; bottom: 0;
@@ -2898,62 +2903,20 @@
     }
     .fc-hover-thumb:hover .fc-thumb-name { opacity: 1; }
     /* 浮层里的按钮回到常驻布局 */
-    .fc-hover .fc-actions { position: static; opacity: 1; pointer-events: auto; background: transparent; }
-    .feed-card.fc-team .fc-hover { top: 30%; }
-    .feed-card.fc-team .fc-hover-thumb img { height: 118px; }
-
-    /* 案例作品 · 附属在搭档卡内:作品从文件夹里探出头(hover 摊开,点开看大图) */
-    .fc-label { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--text-secondary); }
-    .fc-label i { font-size: 14px; color: var(--text-tertiary); }
-    .fc-folder { margin-top: 2px; padding-top: 6px; }
-    .fc-folder-stage { position: relative; height: 58px; cursor: zoom-in; }
-    .fc-fsheet {
-      position: absolute; left: 50%; bottom: 18px;
-      width: 52px; margin-left: -26px;
-      border-radius: 8px; overflow: hidden;
-      background: var(--surface-primary);
-      border: 1px solid rgba(23, 16, 48, 0.08);
-      box-shadow: 0 10px 18px -14px rgba(23, 16, 48, 0.65);
-      transition: transform var(--motion-normal) var(--ease);
-    }
-    :root[data-theme="dark"] .fc-fsheet { border-color: rgba(255, 255, 255, 0.12); }
-    .fc-fsheet img { display: block; width: 100%; height: 44px; object-fit: cover; object-position: center top; }
-    .fc-fsheet.f1 { transform: rotate(-9deg) translate(-20px, -2px); z-index: 1; }
-    .fc-fsheet.f2 { transform: rotate(0deg) translate(0, -8px); z-index: 2; }
-    .fc-fsheet.f3 { transform: rotate(9deg) translate(20px, -2px); z-index: 3; }
-    .feed-card:hover .fc-fsheet.f1 { transform: rotate(-13deg) translate(-34px, -8px); }
-    .feed-card:hover .fc-fsheet.f2 { transform: translate(0, -16px); }
-    .feed-card:hover .fc-fsheet.f3 { transform: rotate(13deg) translate(34px, -8px); }
-    /* 文件夹正面:磨砂玻璃 + 左上凸起标签页 */
-    .fc-folder-front {
-      position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      height: 38px; padding: 0 11px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.66);
-      background: linear-gradient(160deg, var(--accent-1, #f4f3ef) 0%, rgba(255, 255, 255, 0.62) 100%);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 14px 24px -18px rgba(23, 16, 48, 0.6);
-      backdrop-filter: blur(10px);
-    }
-    .fc-folder-front::before {
-      content: "";
-      position: absolute; left: 14px; top: -9px;
-      width: 76px; height: 12px;
-      border-radius: 8px 8px 0 0;
-      border: 1px solid rgba(255, 255, 255, 0.66);
-      border-bottom: 0;
-      background: var(--accent-1, #f4f3ef);
-    }
-    :root[data-theme="dark"] .fc-folder-front { border-color: rgba(255, 255, 255, 0.14); background: linear-gradient(160deg, var(--accent-1, #26252c) 0%, rgba(28, 27, 33, 0.7) 100%); box-shadow: 0 14px 24px -18px rgba(0, 0, 0, 0.8); }
-    :root[data-theme="dark"] .fc-folder-front::before { border-color: rgba(255, 255, 255, 0.14); }
+    .fc-hover .fc-actions { position: static; opacity: 1; pointer-events: auto; background: transparent; margin-top: 2px; }
+    .feed-card.fc-team .fc-hover { flex-direction: column; justify-content: center; padding: 18px 22px; }
+    .feed-card.fc-team .fc-hover-thumb img { height: 126px; }
+    .feed-card.fc-team .fc-hover .fc-actions { max-width: 320px; }
     .fc-folder-count {
       flex: 0 0 auto;
       padding: 3px 9px; border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(23, 16, 48, 0.06);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
       font-size: 10.5px; color: var(--text-secondary);
     }
-    :root[data-theme="dark"] .fc-folder-count { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.1); }
+
+    .fc-label { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--text-secondary); }
+    .fc-label i { font-size: 14px; color: var(--text-tertiary); }
 
     /* 方法论 · 简历里的一段自述观点 */
     .fc-note {
@@ -8631,26 +8594,6 @@
       return haystack.includes(feedQuery);
     }
 
-    // 案例区块 · 作品收在搭档自己的文件夹里(hover 探头,点开看大图)
-    function feedCaseBlock(lore, ownerName) {
-      const cases = (lore.cases || []).slice(0, 3);
-      if (!cases.length) return "";
-      const covers = JSON.stringify(cases.map((one) => one.cover));
-      const titles = JSON.stringify(cases.map((one) => one.title));
-      return `
-        <div class="fc-folder" data-feed-cases='${covers}' data-feed-case-titles='${titles}' data-feed-case-owner="${ownerName}">
-          <div class="fc-folder-stage" data-feed-case="0">
-            ${cases.map((one, index) => `
-              <span class="fc-fsheet f${index + 1}" data-feed-case="${index}" title="${one.title}"><img src="${one.cover}" alt="${one.title}"></span>
-            `).join("")}
-            <span class="fc-folder-front">
-              <span class="fc-label"><i class="ph ph-folder"></i>${lore.caseTitle || "案例作品"}</span>
-              <span class="fc-folder-count">${lore.caseCount || cases.length} 件</span>
-            </span>
-          </div>
-        </div>`;
-    }
-
     function feedActions(id, kind) {
       const inviteLabel = kind === "team" ? `<i class="ph ph-users-three"></i>组建` : `<i class="ph ph-user-plus"></i>邀请`;
       return `
@@ -8660,8 +8603,8 @@
         </div>`;
     }
 
-    // hover 浮层 · 蒙层升起,把案例库放大并露出操作按钮
-    function feedHoverLayer(lore, ownerName, id, kind) {
+    // hover 蒙层 · 覆盖整张卡:身份 + 放大的案例库 + 操作按钮
+    function feedHoverLayer(lore, ownerName, id, kind, avatar) {
       const cases = (lore.cases || []).slice(0, 3);
       const covers = JSON.stringify(cases.map((one) => one.cover));
       const titles = JSON.stringify(cases.map((one) => one.title));
@@ -8680,6 +8623,7 @@
         </div>` : "";
       return `
         <div class="fc-hover" data-feed-cases='${covers}' data-feed-case-titles='${titles}' data-feed-case-owner="${ownerName}">
+          <div class="fc-hover-id"><span class="fc-avatar is-sm"><img src="${avatar}" alt=""></span>${ownerName}</div>
           ${caseBlock}
           ${feedActions(id, kind)}
         </div>`;
@@ -8707,7 +8651,6 @@
             </div>
             <p class="fc-pitch">${lore.pitch || expert.description}</p>
             <div class="fc-chips">${(expert.skills || []).slice(0, 3).map((skill) => `<span class="fc-chip">${skill}</span>`).join("")}</div>
-            ${feedCaseBlock(lore, nickOf(expert))}
             <div class="fc-foot">
               <div class="fc-meta">
                 <span><i class="ph ph-check-circle"></i>${lore.jobs || 60} 次交付</span>
@@ -8715,8 +8658,8 @@
                 <span><i class="ph ph-clock"></i>本周活跃</span>
               </div>
             </div>
-            ${feedHoverLayer(lore, nickOf(expert), expert.id, "expert")}
           </div>
+          ${feedHoverLayer(lore, nickOf(expert), expert.id, "expert", marketAvatar(expert))}
         </article>`;
     }
 
@@ -8741,15 +8684,14 @@
             <p class="fc-pitch">${team.description}</p>
             <div class="fc-members">${memberRows}</div>
             <div class="fc-chips">${combos.map((combo) => `<span class="fc-chip is-combo"><i class="ph ph-link"></i>${combo}</span>`).join("")}</div>
-            ${feedCaseBlock(lore, team.name)}
             <div class="fc-foot">
               <div class="fc-meta">
                 <span><i class="ph ph-users-three"></i>${members.length} 位成员</span>
                 <span><i class="ph ph-lightning"></i>协作技已激活</span>
               </div>
             </div>
-            ${feedHoverLayer(lore, team.name, team.id, "team")}
           </div>
+          ${feedHoverLayer(lore, team.name, team.id, "team", marketAvatar(members[0]))}
         </article>`;
     }
 
