@@ -3538,7 +3538,7 @@
     .cap-tab:hover { color: var(--text-primary); }
     .cap-tab.is-selected { background: var(--surface-primary); color: var(--text-primary); box-shadow: var(--elevation-1); }
     /* 顶部大 tab:页面主导航,更明显 */
-    .cap-tabs-top { display: flex; gap: 6px; margin: 0 0 var(--sp-6); padding: 4px; }
+    .cap-tabs-top { display: inline-flex; gap: 6px; margin: 0 0 var(--sp-6); padding: 4px; }
     .cap-tabs-top .cap-tab { height: 40px; padding: 0 22px; font-size: 15px; border-radius: 10px; }
     .cap-tabs-top .cap-tab i { font-size: 17px; }
 
@@ -5916,23 +5916,6 @@
               </div>
               <button class="button button-primary" id="createScheduleButton"><i class="ph ph-plus"></i>新建定时任务</button>
             </div>
-            <div class="resource-kpis">
-              <article class="resource-kpi">
-                <div class="resource-kpi-label">运行中</div>
-                <div class="resource-kpi-value" id="scheduledRunningCount">3<span>个</span></div>
-                <div class="resource-kpi-meta">全部运行状态正常</div>
-              </article>
-              <article class="resource-kpi">
-                <div class="resource-kpi-label">本月触发</div>
-                <div class="resource-kpi-value">86<span>次</span></div>
-                <div class="resource-kpi-meta">较上月 +18%</div>
-              </article>
-              <article class="resource-kpi">
-                <div class="resource-kpi-label">执行成功率</div>
-                <div class="resource-kpi-value">98.6<span>%</span></div>
-                <div class="resource-kpi-meta">1 次等待人工确认</div>
-              </article>
-            </div>
             <div class="resource-tabbar" role="tablist" aria-label="定时任务视图">
               <button class="resource-tab is-selected" role="tab" aria-selected="true" data-schedule-tab="tasks">任务配置</button>
               <button class="resource-tab" role="tab" aria-selected="false" data-schedule-tab="records">执行记录</button>
@@ -7356,7 +7339,7 @@
 
     function renderScheduledCenter() {
       const running = scheduledTasks.filter((task) => task.enabled).length;
-      el("scheduledRunningCount").innerHTML = `${running}<span>个</span>`;
+      if (el("scheduledRunningCount")) el("scheduledRunningCount").innerHTML = `${running}<span>个</span>`;
       el("scheduledTaskGrid").innerHTML = scheduledTasks.map((task) => `
         <article class="schedule-card ${task.enabled ? "" : "is-paused"}" data-schedule-id="${task.id}">
           <div class="resource-card-head">
