@@ -1789,8 +1789,11 @@
       top: 0;
       z-index: 30;
       background: var(--surface-primary);
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--motion-fast) var(--ease);
     }
+    /* 分隔线只在真正吸顶(向下滚动)时出现 */
+    .expert-hub-view .expert-hub-hero.is-stuck { border-bottom-color: var(--border-subtle); }
     .expert-hub-view .expert-hub-hero > div {
       max-width: 1080px;
       margin: 0 auto;
@@ -8855,6 +8858,15 @@
         renderResumeFeed();
       });
     });
+    // 吸顶时才给 hero 加分隔线
+    (function () {
+      const scroller = document.querySelector(".control-scroll");
+      if (!scroller) return;
+      scroller.addEventListener("scroll", () => {
+        const hero = document.querySelector(".expert-hub-view .expert-hub-hero");
+        if (hero) hero.classList.toggle("is-stuck", scroller.scrollTop > 4);
+      });
+    })();
     el("feedSearch")?.addEventListener("input", (event) => {
       feedQuery = event.target.value.trim().toLowerCase();
       renderResumeFeed();
