@@ -304,10 +304,14 @@ const ITEMS = [
   {
     title: "CodeArts AgentSpace · Agent 工作台客户端",
     cat: "原型", product: "AgentSpace", status: "proto",
-    desc: "多模式(Work/Code)AI 协作客户端:可选「专业搭档 / 智囊团」组队;任务详情页以对话为中枢,任务概览平铺/浮窗、右侧独立产物区预览代码与文件;搭档中心含精选阵容与专业搭档市场。磨砂玻璃外壳,面板可拖拽调宽。",
+    desc: "多模式(Work/Code)AI 协作客户端:可选「专业搭档 / 智囊团」组队;任务详情页以对话为中枢,任务概览平铺/浮窗、右侧独立产物区预览代码与文件;搭档中心做成 Agent 简历市场——一张卡一份简历,案例收在搭档自己的文件夹里,hover 展开作品与邀请。另有任务看板与能力中心。",
     preview: "assets/preview-codearts-space.png",
-    tags: ["对话中枢", "独立产物区", "搭档市场"],
-    href: "codearts-space/"
+    tags: ["Agent 简历市场", "对话中枢", "任务看板"],
+    href: "codearts-space/",
+    versions: [
+      { label: "Agent 简历市场版", note: "默认 · 最新", href: "codearts-space/", current: true },
+      { label: "精选阵容版", note: "历史版本", href: "codearts-space/classic.html" }
+    ]
   },
   {
     title: "码道 · 生成响应体验优化专项",
