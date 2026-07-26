@@ -2644,56 +2644,6 @@
     .hub-search input { width: 158px; border: 0; outline: 0; background: transparent; font-family: inherit; font-size: 12.5px; color: var(--text-primary); }
     .hub-search input::placeholder { color: var(--text-disabled); }
 
-    /* 贴活条 · 反向市场的入口:先说活儿,再看谁来投 */
-    .brief-bar {
-      display: flex; align-items: center; gap: 10px;
-      margin-top: 16px; padding: 7px 8px 7px 14px;
-      border-radius: 10px;
-      background: var(--surface-primary);
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 1px 2px rgba(23, 16, 48, .04);
-      transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
-    }
-    .brief-bar:focus-within { border-color: var(--brand-border); box-shadow: 0 0 0 3px rgba(131, 77, 240, .1); }
-    .brief-bar > i { font-size: 17px; color: var(--text-tertiary); flex: 0 0 auto; }
-    .brief-bar input {
-      flex: 1 1 auto; min-width: 0;
-      border: 0; outline: 0; background: transparent;
-      font-family: inherit; font-size: 13px; color: var(--text-primary);
-    }
-    .brief-bar input::placeholder { color: var(--text-disabled); }
-    .brief-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 9px; font-size: 11.5px; color: var(--text-disabled); }
-    .brief-examples button {
-      appearance: none; font-family: inherit; cursor: pointer;
-      padding: 4px 10px; border-radius: var(--radius-full);
-      background: transparent; border: 1px dashed var(--border-default);
-      font-size: 11.5px; color: var(--text-tertiary);
-      transition: color var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
-    }
-    .brief-examples button:hover { color: var(--text-primary); border-color: var(--brand-border); border-style: solid; background: var(--surface-hover); }
-    .brief-examples button.is-clear { border-style: solid; border-color: var(--border-subtle); }
-    /* 已贴出的活儿:一张回执 */
-    .brief-posted {
-      display: flex; align-items: flex-start; gap: 9px;
-      margin-top: 14px; padding: 10px 12px;
-      border-radius: 8px;
-      background: var(--tone-wash, #f7f3ff);
-      border: 1px solid var(--brand-border);
-    }
-    .brief-posted i { font-size: 15px; color: var(--brand); margin-top: 1px; flex: 0 0 auto; }
-    .brief-posted div { min-width: 0; flex: 1; }
-    .brief-posted em {
-      display: block; font-style: normal; font-family: var(--mono);
-      font-size: 9.5px; letter-spacing: .12em; color: var(--brand-text); margin-bottom: 3px;
-    }
-    .brief-posted p { margin: 0; font-size: 12.5px; line-height: 18px; color: var(--text-primary); }
-    .brief-posted button {
-      appearance: none; flex: 0 0 auto; cursor: pointer; font-family: inherit;
-      background: none; border: 0; padding: 0 2px;
-      font-size: 11.5px; color: var(--text-tertiary); text-decoration: underline; text-underline-offset: 3px;
-    }
-    .brief-posted button:hover { color: var(--text-primary); }
-
     .feed-catbar { display: flex; align-items: center; gap: var(--sp-4); margin-top: 10px; }
     .feed-cats { display: flex; flex-wrap: wrap; gap: 4px; }
     .feed-cats button {
@@ -2714,36 +2664,18 @@
       background: transparent;
       min-height: 62vh;
     }
-    /* 分区:投递区 / 全部简历,各自一个等高网格 */
-    .resume-feed { max-width: 1080px; margin: 0 auto; display: block; }
-    .feed-sec + .feed-sec { margin-top: 30px; }
-    .feed-sec-bar {
-      display: flex; align-items: baseline; gap: 10px;
-      margin: 0 2px 12px;
-      padding-bottom: 9px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-    .feed-sec-bar strong { font-size: 13px; font-weight: 650; color: var(--text-primary); letter-spacing: .01em; }
-    .feed-sec-bar em {
-      font-style: normal; font-family: var(--mono);
-      font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-disabled);
-    }
-    .feed-sec-bar span { margin-left: auto; font-size: 11.5px; color: var(--text-tertiary); }
-    .feed-sec.is-rest .feed-sec-bar { border-bottom-style: dashed; }
-    .feed-grid {
+    /* 等高网格:每张卡结构一致(场景头像 + 简介 + 案例 + 履历) */
+    .resume-feed {
+      max-width: 1080px;
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
       grid-auto-flow: row dense;
-      /* 立绘要从卡上沿破出去,行距和上留白都得先让出来 */
-      gap: 56px 18px;
-      padding-top: 46px;
+      grid-auto-rows: 1fr;
+      gap: 16px;
       align-items: stretch;
     }
 
-    /* ============================================================
-       英雄卡 · 一张卡 = 一位可召唤的角色
-       顶部彩色立绘台(立绘破框而出) + 白身介绍 + 底部三格数值条
-       ============================================================ */
     .feed-card {
       position: relative;
       display: flex;
@@ -2752,537 +2684,278 @@
       height: 100%;
       text-align: left;
       font-family: inherit;
-      /* 卡面整体是中性灰白,颜色只当点缀:立绘身后的光晕、等级字、细节里的小色块 */
-      --art-h: 110px;
-      --art-1: #f4f4f7;
-      --art-2: #e9e9ef;
-      --hero-bar: #7d5be0;
-      --hero-ink: #6a41d6;
-      --hero-glow: rgba(125, 91, 224, .3);
-      /* 只有 hover 时才亮起来的那层身份色 */
-      --hero-1: #dbcfff;
-      --hero-2: #b295f7;
-      --tone: var(--hero-ink);
-      --tone-wash: #f6f6f9;
-      --tone-line: rgba(23, 16, 48, 0.08);
-      --card-face: #ffffff;
-      padding: 0;
-      background: var(--card-face);
-      border: 0;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-subtle);
       border-radius: 14px;
-      overflow: visible;
+      overflow: hidden;
       cursor: pointer;
-      box-shadow: 0 10px 22px -16px rgba(23, 16, 48, .5), 0 1px 3px rgba(23, 16, 48, .06);
-      transition: transform var(--motion-normal) var(--ease), box-shadow var(--motion-normal) var(--ease);
+      transition: transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
-    .feed-card:hover { transform: translateY(-8px); box-shadow: 0 30px 46px -24px rgba(23, 16, 48, .55); z-index: 4; }
-    .feed-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+    .feed-card:hover { transform: translateY(-2px); border-color: var(--border-default); box-shadow: 0 16px 30px -20px rgba(23, 16, 48, 0.45); }
+    .feed-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+    :root[data-theme="dark"] .feed-card { background: var(--surface-secondary); border-color: rgba(255, 255, 255, 0.08); }
 
-    .feed-card.is-tone-rose   { --hero-bar: #e4638d; --hero-ink: #c4386b; --hero-glow: rgba(228, 99, 141, .3);  --hero-1: #ffd6e2; --hero-2: #f79fba; }
-    .feed-card.is-tone-amber  { --hero-bar: #e08e34; --hero-ink: #b96f1c; --hero-glow: rgba(224, 142, 52, .32); --hero-1: #ffe3ba; --hero-2: #f5c07c; }
-    .feed-card.is-tone-violet { --hero-bar: #7d5be0; --hero-ink: #6a41d6; --hero-glow: rgba(125, 91, 224, .28); --hero-1: #ddd2ff; --hero-2: #b49af7; }
-    .feed-card.is-tone-teal   { --hero-bar: #2f9d90; --hero-ink: #1d7f74; --hero-glow: rgba(47, 157, 144, .28); --hero-1: #bdeee6; --hero-2: #7fd3c8; }
-    .feed-card.is-tone-squad  { --hero-bar: #4f66cc; --hero-ink: #3a4fae; --hero-glow: rgba(79, 102, 204, .26); --hero-1: #d2dcff; --hero-2: #a0b2f2; }
-    :root[data-theme="dark"] .feed-card {
-      --card-face: #201d2b; --tone-line: rgba(255, 255, 255, .12);
-      --art-1: #2a2636; --art-2: #232030;
-      box-shadow: 0 12px 24px -18px rgba(0, 0, 0, .8), 0 0 0 1px rgba(255, 255, 255, .06);
-    }
-    :root[data-theme="dark"] .feed-card.is-tone-rose { --hero-ink: #ffa8c5; --hero-1: #6e2c45; --hero-2: #9c4468; }
-    :root[data-theme="dark"] .feed-card.is-tone-amber { --hero-ink: #ffc984; --hero-1: #6b4419; --hero-2: #96632a; }
-    :root[data-theme="dark"] .feed-card.is-tone-violet { --hero-ink: #c4abff; --hero-1: #3e2d6e; --hero-2: #57409b; }
-    :root[data-theme="dark"] .feed-card.is-tone-teal { --hero-ink: #7fdccf; --hero-1: #1a5049; --hero-2: #2a7a70; }
-    :root[data-theme="dark"] .feed-card.is-tone-squad { --hero-ink: #aec0ff; --hero-1: #2b3768; --hero-2: #3d4f96; }
-
-    /* ---- 立绘台 · 中性灰底,只有角色身后那团光是彩的 ---- */
-    .hc-art {
+    /* 场景头像 · 每张卡上半部分统一的角色形象面板 */
+    .fc-scene {
       position: relative;
       flex: 0 0 auto;
-      height: var(--art-h);
-      border-radius: 14px 14px 0 0;
-      background: linear-gradient(180deg, var(--art-1) 0%, var(--art-2) 100%);
-      overflow: visible;
-    }
-    /* hover 才亮起的身份色 —— 平时一屏是灰白的,鼠标停在谁身上谁才「上色」 */
-    .hc-art::after {
-      content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
-      background: linear-gradient(158deg, var(--hero-1) 0%, var(--hero-2) 100%);
-      opacity: 0; transition: opacity var(--motion-normal) var(--ease);
-    }
-    .feed-card:hover .hc-art::after { opacity: 1; }
-    /* 底噪:细网点,让纯色底不发死 */
-    .hc-art::before {
-      content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit;
-      background-image: radial-gradient(rgba(23, 16, 48, .12) 1px, transparent 1.2px);
-      background-size: 13px 13px; opacity: .5;
-      transition: background-image var(--motion-normal) var(--ease);
-    }
-    .feed-card:hover .hc-art::before { background-image: radial-gradient(rgba(255, 255, 255, .6) 1px, transparent 1.2px); }
-    /* 角色身后的光晕:平时是身份色的一点晕,亮起来之后换成白光把人托出来 */
-    .hc-halo {
-      position: absolute; left: 50%; bottom: -10px; z-index: 1; transform: translateX(-50%);
-      width: 176px; height: 156px; border-radius: 50%;
-      background: radial-gradient(circle, var(--hero-glow) 0%, transparent 66%);
-      transition: transform var(--motion-normal) var(--ease), background var(--motion-normal) var(--ease);
-    }
-    .feed-card:hover .hc-halo {
-      transform: translateX(-50%) scale(1.16);
-      background: radial-gradient(circle, rgba(255, 255, 255, .75) 0%, rgba(255, 255, 255, 0) 68%);
-    }
-    /* 立绘比色台高 —— 头顶破出卡片上沿,脚踩在白身的分界线上。
-       整张图完整放进来(contain),不做任何裁切 */
-    .hc-fig {
-      position: absolute; left: 50%; bottom: -20px; z-index: 2;
-      width: 270px; height: 196px;
-      transform: translateX(-50%);
-      transition: transform var(--motion-normal) var(--ease);
-    }
-    .hc-fig img {
-      display: block; width: 100%; height: 100%;
-      object-fit: contain; object-position: center bottom;
-      filter: drop-shadow(0 14px 14px rgba(23, 16, 48, .24));
-    }
-    .feed-card:hover .hc-fig { transform: translateX(-50%) translateY(-7px) scale(1.05); }
-    /* 双人:两个角色一左一右站台上,前后错开一点才像一队人 */
-    .hc-fig.is-duo { width: 372px; height: 216px; bottom: -22px; display: flex; justify-content: center; align-items: flex-end; }
-    .hc-fig.is-duo img { width: 226px; height: 100%; }
-    .hc-fig.is-duo img:last-child { margin-left: -80px; }
-
-    /* 档案号 / 稀有度 —— 立绘台的两个角 */
-    .hc-code {
-      position: absolute; top: 9px; left: 11px; z-index: 3;
-      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
-      letter-spacing: .12em; color: var(--text-disabled);
-      transition: color var(--motion-normal) var(--ease);
-    }
-    .feed-card:hover .hc-code { color: rgba(23, 16, 48, .5); }
-    /* 类型标 · 专业搭档 / 智囊团,颜色只落在这一小块 */
-    .hc-kind {
-      position: absolute; top: 7px; right: 9px; z-index: 3;
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 8px; border-radius: 4px;
-      background: var(--card-face); border: 1px solid var(--tone-line);
-      font-size: 10.5px; font-weight: 600; color: var(--hero-ink);
-    }
-    .hc-kind::before {
-      content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--hero-bar);
-    }
-    /* 投递中:角标换成「已投递」旗 */
-    .hc-flag {
-      position: absolute; top: 7px; right: 9px; z-index: 3;
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px 8px; border-radius: 4px;
-      background: #d9b23c; color: #fff;
-      font-size: 10px; font-weight: 600; letter-spacing: .02em;
-      box-shadow: 0 3px 8px -3px rgba(80, 62, 0, .6);
-    }
-    .hc-flag i { font-size: 11px; }
-    .feed-card.is-applied { box-shadow: 0 0 0 2px rgba(217, 178, 60, .85), 0 14px 28px -18px rgba(80, 62, 0, .6); }
-    .feed-card.is-applied:hover { box-shadow: 0 0 0 2px rgba(217, 178, 60, .95), 0 30px 46px -24px rgba(80, 62, 0, .6); }
-
-    /* ---- 白身 · 等级 / 名字 / 一句自述 ---- */
-    .hc-body {
-      position: relative; flex: 1 1 auto; min-height: 0;
-      display: flex; flex-direction: column;
-      padding: 14px 16px 14px;
-      text-align: center;
-    }
-    .hc-face { display: flex; flex-direction: column; flex: 1 1 auto; }
-    .hc-level {
-      font-family: var(--mono); font-size: 9.5px; font-weight: 700;
-      letter-spacing: .14em; color: var(--hero-ink); text-transform: uppercase;
-    }
-    .hc-name {
-      margin: 3px 0 0; font-size: 19px; font-weight: 700; line-height: 26px;
-      letter-spacing: -.01em; color: var(--text-primary);
-    }
-    .hc-role { font-size: 11px; line-height: 16px; color: var(--text-tertiary); margin-top: 1px; }
-    .hc-desc {
-      margin: 8px 0 0; font-size: 12px; line-height: 18.5px; color: var(--text-secondary);
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-    }
-
-    /* 背面 · hover 时盖住立绘台以下的整块(白身 + 数值条),给「他怎么干活 + 作品 + 操作」 */
-    .hc-back {
-      /* 不硬塞进卡里:内容比卡长时,像抽屉一样往下伸出去 */
-      position: absolute; left: 0; right: 0; top: var(--art-h); bottom: auto; z-index: 5;
-      min-height: calc(100% - var(--art-h));
-      display: flex; flex-direction: column; gap: 7px;
-      padding: 12px 14px 13px;
-      background: var(--card-face);
-      border-radius: 0 0 14px 14px;
-      box-shadow: 0 20px 30px -20px rgba(23, 16, 48, .45);
-      text-align: left;
-      opacity: 0; transform: translateY(6px); pointer-events: none;
-      transition: opacity var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
-    }
-    .feed-card:hover .hc-back,
-    .feed-card:focus-within .hc-back { opacity: 1; transform: none; pointer-events: auto; }
-    .hc-back-label {
-      display: flex; align-items: baseline; gap: 6px;
-      font-family: var(--mono); font-size: 9px; font-weight: 600;
-      letter-spacing: .12em; color: var(--hero-ink);
-    }
-    .hc-back-label em { font-style: normal; font-family: inherit; letter-spacing: .02em; color: var(--text-disabled); }
-    .hc-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
-    .hc-lines li {
-      position: relative; padding-left: 11px;
-      font-size: 11.5px; line-height: 17px; color: var(--text-secondary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .hc-lines li::before {
-      content: ""; position: absolute; left: 1px; top: 7.5px;
-      width: 4px; height: 4px; border-radius: 1px; background: var(--hero-bar); opacity: .75;
-    }
-    .hc-shots { display: flex; gap: 6px; margin-top: auto; }
-    .hc-shot {
-      appearance: none; padding: 0; border: 0; background: none; cursor: pointer;
-      flex: 1 1 0; min-width: 0;
-    }
-    .hc-shot span {
-      display: block; height: 40px; overflow: hidden; border-radius: 4px;
-      border: 1px solid var(--tone-line); background: #fff;
-      transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
-    }
-    .hc-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .hc-shot:hover span { transform: translateY(-2px); border-color: var(--hero-bar); }
-    .hc-back .fc-bar { margin-top: auto; padding-top: 8px; }
-    .hc-back .fc-bar .button { font-size: 11.5px; }
-
-    /* ---- 底部数值条 · 一眼可比的三个数,底色仍是中性的 ---- */
-    .hc-stats {
-      display: flex; flex: 0 0 auto; position: relative; z-index: 4;
-      background: var(--art-1);
-      border-top: 1px solid var(--tone-line);
-      border-radius: 0 0 14px 14px;
+      height: 100px;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(170deg, var(--accent-1, #f3f2ee) 0%, var(--accent-2, #ffffff) 100%);
       overflow: hidden;
     }
-    .hc-stats div {
-      flex: 1 1 0; min-width: 0; padding: 8px 4px 9px;
-      text-align: center; color: var(--text-primary);
+    .fc-scene::after {
+      content: "";
+      position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 100%);
+      pointer-events: none;
     }
-    .hc-stats div + div { box-shadow: inset 1px 0 0 var(--tone-line); }
-    .hc-stats b {
-      display: block; font-size: 17px; font-weight: 700; line-height: 21px; letter-spacing: -.01em;
-    }
-    .hc-stats b sup { font-size: 10px; font-weight: 600; margin-left: 1px; color: var(--hero-bar); }
-    .hc-stats em {
-      display: block; margin-top: 1px; font-style: normal;
-      font-family: var(--mono); font-size: 8.5px; letter-spacing: .12em;
-      color: var(--text-disabled); text-transform: uppercase;
-    }
-
-    /* ---- 智囊团 · 占两个卡位的「阵容卡」 ---- */
-    .feed-card.fc-team { --art-h: 124px; }
-    .feed-card.fc-team .hc-halo { width: 300px; height: 176px; }
-    .feed-card.fc-team .hc-body { text-align: left; }
-    .feed-card.fc-team .hc-face { flex-direction: row; gap: 20px; align-items: flex-start; }
-    .feed-card.fc-team .hc-face-main { flex: 1 1 0; min-width: 0; }
-    .feed-card.fc-team .hc-face-side { flex: 0 0 45%; min-width: 0; padding-top: 2px; }
-    .feed-card.fc-team .hc-name { font-size: 20px; }
-    .feed-card.fc-team .hc-back { flex-direction: row; gap: 20px; }
-    .feed-card.fc-team .hc-back-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
-    .hc-crew { display: flex; flex-wrap: wrap; gap: 5px; }
-    .hc-crew span {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 2px 9px 2px 2px; border-radius: var(--radius-full);
-      background: var(--tone-wash); border: 1px solid var(--tone-line);
-      font-size: 10.5px; color: var(--text-secondary);
-    }
-    .hc-crew img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; object-position: center top; }
-    :root[data-theme="dark"] .hc-crew span { background: rgba(255, 255, 255, .07); }
-
-    /* 附函便签在英雄卡上左对齐,别跟着白身居中 */
-    .feed-card .fc-letter { text-align: left; margin: 0 0 10px; }
-
-    /* 井号标签 · 这位搭档是哪一类人 */
-    .fc-tag {
-      display: block; margin-bottom: 16px;
-      font-family: var(--mono); font-size: 10px; font-weight: 600;
-      letter-spacing: .06em; color: var(--tone);
-    }
-
-    /* 拍立得 · 斜插在卡右上角并溢出边界,是这套卡最出彩的一笔 */
-    .fc-polaroid {
-      position: absolute; top: -14px; right: -12px; z-index: 2;
-      width: 84px; padding: 5px 5px 14px;
-      background: #fff; border-radius: 2px;
-      box-shadow: 0 10px 20px -10px rgba(23, 16, 48, .45), 0 2px 4px rgba(23, 16, 48, .1);
-      transform: rotate(4.5deg);
+    :root[data-theme="dark"] .fc-scene::after { background: linear-gradient(180deg, rgba(20, 19, 26, 0) 0%, rgba(20, 19, 26, 0.5) 100%); }
+    .fc-scene img {
+      height: 96px; width: auto; object-fit: contain;
+      filter: drop-shadow(0 10px 16px rgba(23, 16, 48, 0.16));
       transition: transform var(--motion-normal) var(--ease);
     }
-    .feed-card:hover .fc-polaroid { transform: rotate(1.5deg) translateY(-2px); }
-    .fc-polaroid-inner {
-      position: relative; height: 84px; overflow: hidden; border-radius: 1px;
-      background: var(--tone-wash);
-      display: flex; align-items: stretch;
-    }
-    .fc-polaroid img { flex: 1 1 0; min-width: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 14%; }
-    .fc-polaroid.is-duo img { object-position: center 12%; }
-    :root[data-theme="dark"] .fc-polaroid { background: #f2f0f5; }
+    .fc-scene.is-duo img { height: 84px; }
+    .fc-scene.is-duo img:nth-child(2) { margin-left: -22px; }
+    .feed-card:hover .fc-scene img { transform: translateY(-4px) scale(1.03); }
 
-    /* 字段头 · LABEL 在上,大字值在下 */
-    .fc-heads { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px; padding-right: 76px; }
-    .fc-head-cell { min-width: 0; }
-    .fc-head-cell:first-child { flex: 1 1 auto; }
-    .fc-head-cell + .fc-head-cell { flex: 0 0 auto; }
-    .fc-head-cell dt {
-      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
-      letter-spacing: .1em; color: var(--tone); margin-bottom: 3px;
+    /* 场景里的渐变元素:角色身后一团柔光 + 底部渐隐 */
+    .fc-scene::before {
+      content: "";
+      position: absolute; left: 50%; top: 50%;
+      width: 150px; height: 150px; margin: -84px 0 0 -75px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, var(--glow, rgba(131, 77, 240, 0.26)) 0%, rgba(255, 255, 255, 0) 68%);
+      pointer-events: none;
     }
-    .fc-head-cell dd {
-      margin: 0; font-size: 19.5px; font-weight: 650; line-height: 26px;
-      letter-spacing: -.01em; color: var(--text-primary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .fc-head-cell dd small { font-size: 12px; font-weight: 500; color: var(--text-tertiary); margin-left: 3px; }
-    .feed-card.fc-team .fc-heads { padding-right: 92px; }
+    .feed-card.is-ux { --glow: rgba(131, 77, 240, 0.26); }
+    .feed-card.is-ui { --glow: rgba(26, 143, 184, 0.24); }
+    .feed-card.is-neutral { --glow: rgba(196, 154, 108, 0.2); }
+    .feed-card.is-cool { --glow: rgba(88, 122, 184, 0.2); }
+    .feed-card.is-team { --glow: rgba(131, 77, 240, 0.22); }
+    .fc-scene img { position: relative; z-index: 1; }
+    .feed-card.fc-team .fc-scene::before { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
 
-    .fc-block-label {
-      display: flex; align-items: baseline; gap: 7px; margin-bottom: 8px;
-      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
-      letter-spacing: .1em; color: var(--tone);
+    /* 智囊团卡 · 占两个卡位、横向版式(左场景 + 右内容) */
+    .feed-card.fc-team { grid-column: span 2; flex-direction: row; }
+    .feed-card.fc-team .fc-scene { width: 42%; flex: 0 0 42%; height: auto; align-self: stretch; align-items: center; padding: 0 8px; }
+    .feed-card.fc-team .fc-scene::after { height: 44px; background: linear-gradient(90deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.45) 100%); left: auto; right: 0; top: 0; bottom: 0; width: 46px; height: auto; }
+    :root[data-theme="dark"] .feed-card.fc-team .fc-scene::after { background: linear-gradient(90deg, rgba(20, 19, 26, 0) 40%, rgba(20, 19, 26, 0.4) 100%); }
+    .feed-card.fc-team .fc-scene img { height: auto; max-height: 78%; max-width: 68%; }
+    .feed-card.fc-team .fc-scene.is-duo img { max-height: 68%; max-width: 58%; }
+    .feed-card.fc-team .fc-scene.is-duo img:nth-child(2) { margin-left: -16px; }
+    /* 宽卡内容不挤:更大的内边距与行距,富余空间收在案例之前,案例+履历成组贴底 */
+    .feed-card.fc-team .fc-body { flex: 1 1 auto; padding: 12px 18px 11px; gap: 9px; }
+    .feed-card.fc-team .fc-pitch { height: auto; max-height: 40px; }
+    .feed-card.fc-team .fc-foot { margin-top: 10px; }
+    .fc-members { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
+    .fc-member { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .fc-member-id { min-width: 0; }
+    .fc-member-id strong { display: block; font-size: 12px; font-weight: 600; line-height: 16px; color: var(--text-primary); }
+    .fc-member-id em { display: block; font-style: normal; font-size: 10.5px; line-height: 14px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fc-chip.is-combo {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: linear-gradient(135deg, rgba(131, 77, 240, 0.12) 0%, rgba(26, 143, 184, 0.1) 100%);
+      border-color: rgba(131, 77, 240, 0.22);
+      color: var(--brand-text);
     }
-    .fc-block-label em { font-style: normal; font-family: inherit; color: var(--text-tertiary); letter-spacing: .04em; }
+    .fc-chip.is-combo i { font-size: 12px; }
+    :root[data-theme="dark"] .fc-chip.is-combo { color: var(--purple-900); }
+    @media (max-width: 900px) {
+      .feed-card.fc-team { grid-column: span 1; flex-direction: column; }
+      .feed-card.fc-team .fc-scene { width: auto; flex: 0 0 auto; height: 116px; align-items: flex-end; }
+      .feed-card.fc-team .fc-scene img { height: 110px; max-height: none; max-width: none; }
+      .feed-card.fc-team .fc-scene.is-duo img { height: 96px; max-height: none; max-width: none; }
+    }
+    .feed-card.is-ux { --accent-1: #f4efff; --accent-2: #ffffff; }
+    .feed-card.is-ui { --accent-1: #ecfbff; --accent-2: #ffffff; }
+    .feed-card.is-neutral { --accent-1: #f4f3ef; --accent-2: #ffffff; }
+    .feed-card.is-cool { --accent-1: #eef1f6; --accent-2: #ffffff; }
+    :root[data-theme="dark"] .feed-card.is-ux { --accent-1: #271b40; --accent-2: #1b1730; }
+    :root[data-theme="dark"] .feed-card.is-ui { --accent-1: #12303a; --accent-2: #0e2530; }
+    :root[data-theme="dark"] .feed-card.is-neutral { --accent-1: #26252c; --accent-2: #1c1b21; }
+    :root[data-theme="dark"] .feed-card.is-cool { --accent-1: #212530; --accent-2: #1a1c22; }
 
-    /* 翻面区 · 正面是案例作品,hover 换成详细介绍。卡高不变,靠交叉淡入 */
-    .fc-flip { position: relative; flex: 0 0 auto; margin-top: auto; padding-top: 18px; }
-    .fc-works, .fc-detail {
-      transition: opacity var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
-    }
-    .fc-detail {
-      position: absolute; left: 0; right: 0; top: 0; bottom: 0;
-      display: flex; flex-direction: column;
-      opacity: 0; transform: translateY(6px); pointer-events: none;
-    }
-    .feed-card:hover .fc-works,
-    .feed-card:focus-within .fc-works { opacity: 0; transform: translateY(-6px); pointer-events: none; }
-    .feed-card:hover .fc-detail,
-    .feed-card:focus-within .fc-detail { opacity: 1; transform: none; pointer-events: auto; }
-
-    /* 正面 · 案例作品是主角 */
-    .fc-work-row { display: flex; gap: 8px; }
-    .fc-work {
-      appearance: none; padding: 0; border: 0; background: none; font-family: inherit;
-      flex: 1 1 0; min-width: 0; cursor: pointer; text-align: left;
-    }
-    .fc-work-shot {
-      display: block; height: 92px; overflow: hidden;
-      border-radius: 5px; background: #fff;
-      border: 1px solid var(--tone-line);
-      box-shadow: 0 4px 10px -8px rgba(23, 16, 48, .5);
-      transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
-    }
-    .fc-work-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .fc-work:hover .fc-work-shot { transform: translateY(-3px); border-color: var(--tone); box-shadow: 0 12px 20px -12px rgba(23, 16, 48, .55); }
-    .fc-work-name {
-      display: block; margin-top: 6px;
-      font-size: 10.5px; line-height: 15px; color: var(--text-tertiary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .fc-works-empty { margin: 0; font-size: 11.5px; color: var(--text-disabled); }
-
-    /* 背面 · 详细介绍 */
-    .fc-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    .fc-list li {
-      position: relative; padding-left: 11px;
-      font-size: 11.5px; line-height: 17px; color: var(--text-secondary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .fc-list li::before {
-      content: ""; position: absolute; left: 1px; top: 7px;
-      width: 4px; height: 1.5px; border-radius: 1px; background: var(--tone); opacity: .6;
-    }
-    .fc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 9px; }
-    .fc-tags span {
-      padding: 2px 8px; border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, .72); border: 1px solid var(--tone-line);
+    .fc-status {
+      position: absolute; top: 10px; right: 10px;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(23, 16, 48, 0.07);
       font-size: 10.5px; color: var(--text-secondary);
+      backdrop-filter: blur(6px);
     }
-    :root[data-theme="dark"] .fc-tags span { background: rgba(255, 255, 255, .08); }
+    :root[data-theme="dark"] .fc-status { background: rgba(20, 19, 26, 0.78); border-color: rgba(255, 255, 255, 0.12); }
 
-    /* 操作 · 挂在背面底部 */
-    .fc-bar { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; }
-    .fc-bar .button { flex: 1 1 auto; justify-content: center; padding-left: 8px; padding-right: 8px; }
+    .fc-body { position: relative; flex: 1; min-height: 0; padding: 11px 14px 11px; display: flex; flex-direction: column; gap: 7px; }
+    .fc-head { display: flex; align-items: center; gap: 9px; }
+    .fc-avatar {
+      flex: 0 0 auto;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #f0efea;
+      overflow: hidden;
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    :root[data-theme="dark"] .fc-avatar { background: #2a2930; }
+    .fc-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .fc-avatar.is-sm { width: 24px; height: 24px; }
+    .fc-name { min-width: 0; flex: 1; }
+    .fc-name strong { display: block; font-size: 14px; font-weight: 600; line-height: 19px; color: var(--text-primary); }
+    .fc-name span { display: block; margin-top: 1px; font-size: 11px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fc-kind {
+      flex: 0 0 auto;
+      padding: 2px 8px; border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      font-size: 10px; font-weight: 600;
+    }
+    .fc-scene .fc-kind {
+      position: absolute; top: 10px; right: 10px; z-index: 2;
+      padding: 4px 10px;
+      font-size: 10.5px;
+      box-shadow: 0 6px 14px -10px rgba(23, 16, 48, 0.5);
+      backdrop-filter: blur(6px);
+    }
+    .fc-kind.is-partner { background: rgba(26, 143, 184, 0.14); color: #1a6f8c; border-color: rgba(26, 143, 184, 0.24); }
+    .fc-kind.is-team { background: rgba(131, 77, 240, 0.14); color: var(--brand-text); border-color: rgba(131, 77, 240, 0.26); }
+    .fc-scene .fc-kind.is-partner { background: rgba(233, 248, 252, 0.92); }
+    .fc-scene .fc-kind.is-team { background: rgba(243, 237, 255, 0.92); }
+    :root[data-theme="dark"] .fc-scene .fc-kind.is-partner { background: rgba(18, 48, 58, 0.86); }
+    :root[data-theme="dark"] .fc-scene .fc-kind.is-team { background: rgba(39, 27, 64, 0.86); }
+    :root[data-theme="dark"] .fc-kind.is-partner { background: rgba(26, 143, 184, 0.24); color: #7fc8d6; }
+    :root[data-theme="dark"] .fc-kind.is-team { background: rgba(131, 77, 240, 0.26); color: var(--purple-900); }
 
-    /* 附函便签 · A 方案:候选人把自荐条别在简历上 */
-    .fc-letter {
-      position: relative; z-index: 3;
-      margin: 0 0 15px;
-      padding: 10px 12px 11px;
-      border-radius: 3px;
-      background: linear-gradient(178deg, #fff9dd 0%, #fdf3c6 100%);
-      border: 1px solid rgba(168, 138, 32, .26);
-      box-shadow: 0 6px 12px -8px rgba(80, 62, 0, .45);
-      transform: rotate(-.5deg);
+    /* 自述(简历里的一句话) */
+    .fc-pitch {
+      margin: 0; font-size: 13px; line-height: 20px; height: 40px;
+      color: var(--text-primary); letter-spacing: -0.005em;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    :root[data-theme="dark"] .fc-letter {
-      background: linear-gradient(178deg, #4a4222 0%, #413a1d 100%);
-      border-color: rgba(255, 226, 120, .2);
-    }
-    .fc-letter-top {
-      display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
-      font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
-      color: #8a6d12; text-transform: uppercase;
-    }
-    :root[data-theme="dark"] .fc-letter-top { color: #e8d68a; }
-    .fc-letter-top i { font-size: 12px; }
-    .fc-letter p {
-      margin: 0; font-size: 12px; line-height: 18.5px; color: #5c4a10;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-    }
-    :root[data-theme="dark"] .fc-letter p { color: #f0e6bd; }
-    .fc-letter p + p { margin-top: 5px; }
-    .fc-letter-hits { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
-    .fc-hit {
-      padding: 2px 7px; border-radius: var(--radius-full);
-      background: rgba(138, 109, 18, .12); border: 1px solid rgba(138, 109, 18, .2);
-      font-size: 10px; color: #7a5f0d;
-    }
-    :root[data-theme="dark"] .fc-hit { background: rgba(255, 226, 120, .12); border-color: rgba(255, 226, 120, .22); color: #e8d68a; }
-    .fc-letter-ask {
-      appearance: none; margin-top: 8px; padding: 0; cursor: pointer;
-      background: none; border: 0; font-family: inherit;
-      font-size: 11px; color: #8a6d12; text-decoration: underline; text-underline-offset: 3px;
-    }
-    :root[data-theme="dark"] .fc-letter-ask { color: #e8d68a; }
-    .fc-letter-qa { margin-top: 7px; padding-top: 7px; border-top: 1px dashed rgba(138, 109, 18, .3); }
-    .fc-letter-qa strong { display: block; font-size: 11px; font-weight: 650; color: #5c4a10; }
-    :root[data-theme="dark"] .fc-letter-qa strong { color: #f5ecc8; }
-    /* 投递中的简历:装订条变粗、纸更亮 */
-    .feed-card.is-applied { border-color: rgba(168, 138, 32, .34); box-shadow: 0 10px 22px -18px rgba(80, 62, 0, .55); }
-    .feed-card.is-applied::before { width: 4px; background: #d9b23c; }
-
-    /* 第二页 · B 方案:开工样张,从纸下抽上来盖住第一页 */
-    .fc-page2 {
-      position: absolute; inset: 0; z-index: 6; overflow: hidden;
-      display: flex; flex-direction: column; gap: 10px;
-      padding: 18px 20px 16px;
-      background: var(--tone-wash);
-      border-radius: 16px;
-      transform: translateY(10px); opacity: 0; pointer-events: none;
-      transition: transform var(--motion-normal) var(--ease), opacity var(--motion-fast) var(--ease);
-    }
-
-    .feed-card.is-trial .fc-page2 { transform: none; opacity: 1; pointer-events: auto; }
-    .fc-p2-top {
-      display: flex; align-items: baseline; gap: 7px;
-      padding-bottom: 9px; border-bottom: 1px solid var(--tone-line);
-    }
-    .fc-p2-top strong { font-size: 12.5px; font-weight: 650; color: var(--text-primary); }
-    .fc-p2-top em { font-style: normal; font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--text-disabled); margin-left: auto; }
-    .fc-p2-brief { margin: 0; font-size: 10.5px; line-height: 15px; color: var(--text-tertiary); }
-    .fc-p2-brief b { font-weight: 600; color: var(--text-secondary); }
-    .fc-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .fc-steps li {
-      display: flex; gap: 8px; align-items: flex-start;
-      font-size: 11.5px; line-height: 16.5px; color: var(--text-secondary);
-      opacity: 0; transform: translateY(4px);
-      transition: opacity 260ms var(--ease), transform 260ms var(--ease);
-    }
-    .feed-card.is-trial .fc-steps li { opacity: 1; transform: none; }
-    .feed-card.is-trial .fc-steps li:nth-child(2) { transition-delay: 90ms; }
-    .feed-card.is-trial .fc-steps li:nth-child(3) { transition-delay: 180ms; }
-    .fc-steps b {
-      flex: 0 0 auto; width: 16px; height: 16px; margin-top: 1px;
-      border-radius: 50%; background: rgba(255, 255, 255, .75); border: 1px solid var(--tone);
-      font-family: var(--mono); font-size: 9px; font-weight: 600; color: var(--tone);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .fc-handoff { display: flex; flex-direction: column; gap: 5px; }
-    .fc-handoff-row {
-      display: flex; align-items: baseline; gap: 6px; min-width: 0;
-      font-size: 11px; line-height: 17px; color: var(--text-tertiary);
-    }
-    .fc-handoff-row b { font-weight: 600; color: var(--text-secondary); flex: 0 0 auto; }
-    .fc-handoff-row i { font-size: 11px; color: var(--text-disabled); flex: 0 0 auto; }
-    .fc-handoff-row em {
-      font-style: normal; min-width: 0; flex: 1 1 auto;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      padding-left: 4px; border-bottom: 1px dotted var(--tone-line);
-    }
-    .fc-out {
-      padding: 7px 9px; border-radius: 4px;
-      background: rgba(255, 255, 255, .6); border: 1px dashed var(--tone-line);
-      font-size: 11px; line-height: 16px; color: var(--text-secondary);
-      opacity: 0; transform: translateY(4px);
-      transition: opacity 260ms var(--ease) 200ms, transform 260ms var(--ease) 200ms;
-    }
-    :root[data-theme="dark"] .fc-out { background: rgba(255, 255, 255, .04); }
-    .feed-card.is-trial .fc-out { opacity: 1; transform: none; }
-    .fc-out span { display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; color: var(--text-disabled); margin-bottom: 3px; }
-    .fc-p2-cols {
-      flex: 1 1 auto; min-height: 0; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 9px;
-      scrollbar-width: none;
-      mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent 100%);
-    }
-    .fc-p2-cols::-webkit-scrollbar { width: 0; }
-    .feed-card.fc-team .fc-p2-cols { mask-image: none; }
-    .fc-p2-left, .fc-p2-right { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
-    .fc-p2-right { margin-top: auto; }
-    /* 宽卡:左边怎么干,右边拿到什么 + 决定 */
-    .feed-card.fc-team .fc-p2-cols { flex-direction: row; gap: 20px; align-items: stretch; }
-    .feed-card.fc-team .fc-p2-left { flex: 1.15 1 0; }
-    .feed-card.fc-team .fc-p2-right { flex: 1 1 0; margin-top: 0; }
-    .fc-ask {
-      padding: 7px 9px; border-radius: 4px;
-      background: rgba(255, 255, 255, .6); border: 1px solid var(--tone-line);
-      font-size: 11px; line-height: 16px; color: var(--text-secondary);
-      opacity: 0; transform: translateY(4px);
-      transition: opacity 260ms var(--ease) 260ms, transform 260ms var(--ease) 260ms;
-    }
-    .feed-card.is-trial .fc-ask { opacity: 1; transform: none; }
-    .fc-ask span { display: block; font-size: 9.5px; letter-spacing: .12em; color: var(--text-disabled); margin-bottom: 3px; font-family: var(--mono); }
-    .fc-p2-bar {
-      display: flex; gap: 6px; flex: 0 0 auto;
-      padding-top: 10px; border-top: 1px solid var(--tone-line);
-    }
-    .fc-p2-bar .button { flex: 1 1 auto; justify-content: center; padding-left: 8px; padding-right: 8px; }
-
-    /* ============================================================
-       智囊团 · 占两个卡位,做成「团队履历表」:抬头通栏 + 左名册右协作
-       ============================================================ */
-    .feed-card.fc-team { grid-column: span 2; }
-    /* 智囊团:成员做成一行头像 chip,不再是整张名册 */
-    .fc-crew { display: flex; flex-wrap: wrap; gap: 6px; }
-    .fc-crew-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 3px 10px 3px 3px; border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, .72); border: 1px solid var(--tone-line);
+    .fc-desc { margin: 0; font-size: 12px; line-height: 18px; color: var(--text-secondary); }
+    .fc-chips { display: flex; align-items: center; gap: 5px; min-height: 26px; white-space: nowrap; overflow-x: hidden; }
+    .fc-chips > * { flex: 0 0 auto; }
+    .fc-chip {
+      padding: 3px 8px; border-radius: var(--radius-full);
+      background: var(--surface-subtle); border: 1px solid var(--border-subtle);
       font-size: 11px; color: var(--text-secondary);
     }
-    .fc-crew-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; object-position: center top; }
-    :root[data-theme="dark"] .fc-crew-chip { background: rgba(255, 255, 255, .08); }
-    .feed-card.fc-team .fc-work-shot { height: 108px; }
-    .fc-team-body { flex: 1 1 auto; display: flex; gap: 24px; }
-    .fc-team-col { flex: 1 1 0; min-width: 0; }
-    /* 成员名册:一行一位,细横线分隔 */
-    .fc-roster-list { display: flex; flex-direction: column; }
-    .fc-roster-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 0; min-width: 0;
-      border-bottom: 1px solid var(--tone-line);
+    :root[data-theme="dark"] .fc-chip { background: rgba(255, 255, 255, 0.05); }
+
+    /* 底部履历数据 · hover 原地换成操作按钮(不撑高卡片) */
+    .fc-foot { position: relative; margin-top: auto; padding-top: 8px; }
+    .fc-meta { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text-tertiary); }
+    .fc-meta i { font-size: 13px; margin-right: 3px; vertical-align: -2px; }
+    .fc-actions {
+      position: absolute; left: 0; right: 0; top: 10px; bottom: -2px;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface-primary);
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--motion-fast) var(--ease);
     }
-    .fc-roster-row:last-child { border-bottom: 0; }
-    .fc-roster-row .fc-avatar { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; overflow: hidden; background: rgba(255, 255, 255, .7); }
-    .fc-roster-row .fc-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .fc-roster-id { min-width: 0; flex: 1; }
-    .fc-roster-id strong { display: block; font-size: 11.5px; font-weight: 600; line-height: 15px; color: var(--text-primary); }
-    .fc-roster-id em { display: block; font-style: normal; font-size: 10px; line-height: 14px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .fc-roster-no { flex: 0 0 auto; font-family: var(--mono); font-size: 9px; color: var(--tone); opacity: .7; }
-    /* 协作链:上一位的产出是下一位的输入 */
-    .fc-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
-    .fc-chain span {
-      padding: 3px 8px; border-radius: 4px;
-      background: rgba(255, 255, 255, .7); border: 1px solid var(--tone-line);
+    :root[data-theme="dark"] .fc-actions { background: var(--surface-secondary); }
+    .feed-card:hover .fc-actions,
+    .feed-card:focus-within .fc-actions { opacity: 1; pointer-events: auto; }
+    .fc-actions .button { flex: 1; justify-content: center; padding-left: 10px; padding-right: 10px; }
+
+    /* hover 蒙层 · 盖满整张卡:身份 + 放大案例库 + 操作按钮 */
+    .fc-hover {
+      position: absolute; inset: 0;
+      z-index: 6;
+      display: flex; flex-direction: column; justify-content: center; gap: 10px;
+      padding: 14px;
+      border-radius: inherit;
+      background: var(--surface-primary);
+      opacity: 0; transform: scale(0.99);
+      pointer-events: none;
+      transition: opacity var(--motion-normal) var(--ease), transform var(--motion-normal) var(--ease);
+    }
+    :root[data-theme="dark"] .fc-hover { background: var(--surface-secondary); }
+    .feed-card:hover .fc-hover,
+    .feed-card:focus-within .fc-hover { opacity: 1; transform: none; pointer-events: auto; }
+    .fc-hover-id {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13.5px; font-weight: 600; line-height: 19px;
+      color: var(--text-primary);
+    }
+    .fc-hover-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .fc-hover-cases { display: flex; gap: 8px; }
+    .fc-hover-thumb {
+      position: relative;
+      flex: 1 1 0; min-width: 0;
+      appearance: none; padding: 0;
+      border: 1px solid var(--border-subtle); border-radius: 10px;
+      overflow: hidden; background: var(--surface-subtle);
+      cursor: zoom-in;
+      opacity: 0; transform: translateY(10px) scale(0.95);
+      transition: opacity 200ms var(--ease), transform 260ms var(--ease), border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+    }
+    .feed-card:hover .fc-hover-thumb,
+    .feed-card:focus-within .fc-hover-thumb { opacity: 1; transform: none; }
+    .fc-hover-thumb:nth-child(2) { transition-delay: 50ms; }
+    .fc-hover-thumb:nth-child(3) { transition-delay: 100ms; }
+    .fc-hover-thumb img { display: block; width: 100%; height: 92px; object-fit: cover; object-position: center top; }
+    .fc-hover-thumb:hover { border-color: var(--brand-border); box-shadow: 0 12px 22px -16px rgba(23, 16, 48, 0.6); }
+    .fc-hover-thumb .fc-thumb-name {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 12px 7px 5px;
+      background: linear-gradient(180deg, rgba(23, 16, 48, 0) 0%, rgba(23, 16, 48, 0.74) 62%);
+      color: #fff; font-size: 10px; line-height: 13px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      opacity: 0; transition: opacity var(--motion-fast) var(--ease);
+    }
+    .fc-hover-thumb:hover .fc-thumb-name { opacity: 1; }
+    /* 浮层里的按钮回到常驻布局 */
+    .fc-hover .fc-actions { position: static; opacity: 1; pointer-events: auto; background: transparent; margin-top: 2px; }
+    .feed-card.fc-team .fc-hover { flex-direction: column; justify-content: center; padding: 18px 22px; }
+    .feed-card.fc-team .fc-hover-thumb img { height: 126px; }
+    .feed-card.fc-team .fc-hover .fc-actions { max-width: 320px; }
+    .fc-folder-count {
+      flex: 0 0 auto;
+      padding: 3px 9px; border-radius: var(--radius-full);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
       font-size: 10.5px; color: var(--text-secondary);
     }
-    .fc-chain i { font-size: 11px; color: var(--tone); opacity: .6; }
-    @media (max-width: 900px) {
-      .feed-card.fc-team { grid-column: span 1; }
-      .fc-team-body { flex-direction: column; gap: 15px; }
+
+    .fc-label { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--text-secondary); }
+    .fc-label i { font-size: 14px; color: var(--text-tertiary); }
+
+    /* 方法论 · 简历里的一段自述观点 */
+    .fc-note {
+      margin: 2px 0 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-left: 2px solid var(--brand-border);
     }
+    :root[data-theme="dark"] .fc-note { background: rgba(255, 255, 255, 0.04); }
+    .fc-note strong { display: block; font-size: 12.5px; font-weight: 600; line-height: 18px; color: var(--text-primary); }
+    .fc-note span { display: block; margin-top: 4px; font-size: 11.5px; line-height: 18px; color: var(--text-secondary); }
+
+    /* 智囊团卡 · 头像簇 + 分工链 */
+    .fc-cluster { display: flex; align-items: center; padding: 15px 14px 0; }
+    .fc-cluster .fc-avatar { width: 40px; height: 40px; border: 2px solid var(--surface-primary); }
+    :root[data-theme="dark"] .fc-cluster .fc-avatar { border-color: var(--surface-secondary); }
+    .fc-cluster .fc-avatar + .fc-avatar,
+    .fc-cluster .fc-more { margin-left: -13px; }
+    .fc-more {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--surface-primary);
+      background: var(--brand-soft); color: var(--brand-text);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11.5px; font-weight: 600;
+    }
+    :root[data-theme="dark"] .fc-more { border-color: var(--surface-secondary); }
+    .fc-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+    .fc-chain span {
+      padding: 3px 8px; border-radius: var(--radius-full);
+      background: var(--surface-subtle); border: 1px solid var(--border-subtle);
+      font-size: 11px; color: var(--text-secondary);
+    }
+    :root[data-theme="dark"] .fc-chain span { background: rgba(255, 255, 255, 0.05); }
+    .fc-chain i { font-size: 11px; color: var(--text-disabled); }
 
     .feed-empty {
       max-width: 1080px; margin: 60px auto;
@@ -3513,18 +3186,6 @@
     .profile-case-cover img { display: block; width: 100%; height: 104px; object-fit: cover; object-position: center top; }
     .profile-case:hover .profile-case-cover { transform: translateY(-2px); border-color: var(--brand-border); box-shadow: 0 12px 22px -16px rgba(23, 16, 48, 0.6); }
     .profile-case-name { font-size: 12.5px; color: var(--text-secondary); }
-    /* 方法论 · 简历里的一段自述观点(详情页引用) */
-    .fc-note {
-      margin: 2px 0 0;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: var(--surface-subtle);
-      border: 1px solid var(--border-subtle);
-      border-left: 2px solid var(--brand-border);
-    }
-    :root[data-theme="dark"] .fc-note { background: rgba(255, 255, 255, 0.04); }
-    .fc-note strong { display: block; font-size: 12.5px; font-weight: 600; line-height: 18px; color: var(--text-primary); }
-    .fc-note span { display: block; margin-top: 4px; font-size: 11.5px; line-height: 18px; color: var(--text-secondary); }
     .profile-note { margin-top: 14px; }
 
     .match-tag {
@@ -6424,7 +6085,7 @@
                   <div class="hero-text">
                     <div class="eyebrow"><span class="brand-dot"></span>搭档中心 · Agent 简历市场</div>
                     <h1>翻简历，挑搭档</h1>
-                    <p>先看他交付过什么，再看他怎么干活。看得中，直接邀请进 Work 或 Code。</p>
+                    <p>每份简历都带着自述、作品和方法论。看得中，就直接邀请加入 Work 或 Code。</p>
                   </div>
                   <div class="hub-tools">
                     <label class="hub-search">
@@ -7729,8 +7390,6 @@
 
     const el = (id) => document.getElementById(id);
     const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
-    const escapeHtml = (text) => String(text == null ? "" : text)
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     const getScenario = () => taskScenarios[state.mode];
 
     function getSelectedExperts() {
@@ -8938,543 +8597,120 @@
       return haystack.includes(feedQuery);
     }
 
-    // ============================================================
-    // 开工样张 · 「先让他开个头」用的内容
-    // 每位搭档:为什么我合适(自荐) / 三步开工计划 / 他会先反问你的一个问题 / 他需要你提供什么
-    // 这是用「他怎么动手」代替「他说自己会什么」——不依赖虚构的交付次数与评分
-    // ============================================================
-    const TRIAL_PLAY = {
-      researcher: {
-        why: "这类问题最容易翻车的地方是结论没有出处。我会先把资料源摆出来，再谈判断。",
-        steps: ["把可用的资料源列成清单，标出哪些够权威、哪些只能参考", "每条关键判断至少交叉两个来源，冲突的地方单独标出来", "先出一版带引用的结论骨架给你过目，再展开写"],
-        out: "一份带引用的结论骨架，每句判断都能点回原文出处",
-        ask: "这份结论最后给谁看、要支撑哪个决定？", need: "已有的资料链接或文档入口，以及不能对外引用的范围。"
-      },
-      ux: {
-        why: "你描述的是现象。我先把它翻译成能定位的问题，再谈方案。",
-        steps: ["还原真实用户旅程，标出卡点发生在哪一步、卡在什么判断上", "把「不好用」拆成可定位的病灶：认知、路径、反馈还是容错", "对最痛的两个卡点各出一版交互方案和验收标准"],
-        out: "一张标注了卡点的用户旅程，加两个卡点的交互方案与验收标准",
-        ask: "这条流程里，哪一步失败的代价最高？", need: "能走通流程的入口，以及最近的用户反馈或客诉原文。"
-      },
-      "ux-researcher": {
-        why: "动手改之前得先确认用户到底卡在哪，而不是我们以为的哪。",
-        steps: ["从现有反馈和行为信号里聚类出高频场景", "识别每类场景下的障碍与没被满足的诉求", "按影响面 × 可改动性排出机会清单"],
-        out: "一份按影响面排序的机会清单，每条都挂着来源反馈",
-        ask: "这批用户以新手为主还是熟手为主？", need: "最近的用户反馈、访谈记录或行为数据的任一样本。"
-      },
-      interaction: {
-        why: "流程跑不通，多半是状态漏了，不是页面丑。",
-        steps: ["把任务流画完整，补齐空/加载/失败/权限这些被忽略的状态", "定位断点：信息在哪一步丢了、用户在哪一步失去反馈", "给出重排后的流程与关键状态的交互规格"],
-        out: "一张补齐了异常状态的完整任务流，和关键状态的交互规格",
-        ask: "哪些状态线上真实会出现，但从没被设计过？", need: "当前流程的截图或原型，以及后端可能返回的异常类型。"
-      },
-      ui: {
-        why: "界面不是画出来的，是层级和规则长出来的。先定规则，再落界面。",
-        steps: ["确认信息层级：一屏里什么必须先被看到", "把层级映射成字号 / 间距 / 色彩的可复用规则", "出一版可验证的界面与组件规范"],
-        out: "一版可验证的界面，以及它背后可复用的层级与间距规则",
-        ask: "要和现有设计系统对齐，还是可以另起一套？", need: "现有的设计规范，或一张最能代表现状的界面截图。"
-      },
-      engineer: {
-        why: "先读懂现有代码库，再动第一行——不然改一处崩三处。",
-        steps: ["摸清相关模块的边界与调用关系，标出高风险改动点", "给出最小可行的改动方案和回滚路径", "实现，并补上关键路径的验证"],
-        out: "一份最小改动方案 + 回滚路径，关键路径带验证",
-        ask: "这块代码有测试覆盖吗，能直接跑起来吗？", need: "仓库访问权限，以及本地能跑起来的启动方式。"
-      },
-      analyst: {
-        why: "给我数据之前，先说清楚你想用它回答什么问题。",
-        steps: ["把问题翻译成可计算的指标口径", "清洗数据，并标注口径不一致的地方", "出一版带结论的图表，而不是一堆图"],
-        out: "一份口径明确的指标说明，和三张能直接下结论的图",
-        ask: "这个指标现在的口径是谁定的、有没有改过？", need: "数据源的访问方式，或一份能代表结构的样本。"
-      },
-      writer: {
-        why: "读者读不懂，通常不是文笔问题，是结构问题。",
-        steps: ["先定读者，以及他读完要做的那个动作", "搭出结论先行的结构骨架", "按骨架填写，并把术语统一到一份词表"],
-        out: "一份结论先行的结构骨架，外加统一好的术语词表",
-        ask: "这份东西的读者是内部同事还是外部客户？", need: "已有的素材稿、要点清单，或者上一版文档。"
-      },
-      slides: {
-        why: "汇报的胜负在结构，不在动效。",
-        steps: ["把要讲的事收敛成一条主线和三个支点", "每页只留一个论点，并给它配上证据", "统一视觉语言，做成可以直接开讲的版本"],
-        out: "一条主线三个支点的提纲，以及可直接开讲的版本",
-        ask: "这次讲多长时间、听众最关心哪一件事？", need: "要讲的素材，以及听众角色（老板 / 客户 / 评审）。"
-      },
-      product: {
-        why: "要不要做，比怎么做更值钱。我会先帮你砍需求。",
-        steps: ["把诉求还原成要解决的问题和衡量方式", "按价值 × 成本给候选方案排序，明确不做什么", "出一版带里程碑的推进路线"],
-        out: "一张砍完需求的优先级清单，明确写出这次不做什么",
-        ask: "如果这个季度只能做一半，你希望是哪一半？", need: "业务目标、已知的资源约束和时间点。"
-      },
-      tester: {
-        why: "验收标准没写清楚之前，交付都是薛定谔的。",
-        steps: ["把需求翻译成可判定的验收条件", "设计正常 / 边界 / 异常三类用例并标出优先级", "跑一轮，给出可复现的问题清单"],
-        out: "一份可判定的验收条件清单，和按优先级排好的用例",
-        ask: "这次的质量门槛是「能演示」还是「能上线」？", need: "可测的环境或构建产物，以及需求的验收口径。"
-      }
-    };
-    const TRIAL_FALLBACK = {
-      why: "先把目标和验收标准对齐，再动手——这样返工最少。",
-      steps: ["确认这次要解决的问题和判断成功的标准", "拆出关键路径，标出需要你决策的地方", "先交一版小样给你过目，再铺开做"],
-      out: "一版可以直接接着往下做的小样，附带待确认清单",
-      ask: "这件事什么时候要、交到谁手上？", need: "现有材料的入口，以及不能碰的边界。"
-    };
-    const playOf = (id) => TRIAL_PLAY[id] || TRIAL_FALLBACK;
-
-    // ============================================================
-    // 反向市场 · 贴出活儿 → 谁合适谁来投
-    // 意图词典把「人话」翻译成专业方向,再回落到搭档的技能上
-    // ============================================================
-    let feedBrief = "";      // 用户贴出的活儿
-    let briefRank = [];      // 匹配结果:[{ id, kind, score, hits }]
-    let trialCard = null;    // 当前翻到第二页的卡
-
-    const BRIEF_INTENT = [
-      { label: "资料调研", keys: ["调研", "研究", "竞品", "资料", "文献", "查一下", "来源", "背景"], ids: ["researcher", "analyst"] },
-      { label: "体验诊断", keys: ["体验", "好用", "难用", "卡住", "卡点", "易用", "旅程", "用起来"], ids: ["ux", "interaction", "ux-researcher"] },
-      { label: "流程梳理", keys: ["流程", "链路", "步骤", "状态", "走不通", "断"], ids: ["interaction", "ux"] },
-      { label: "界面视觉", keys: ["界面", "视觉", "ui", "配色", "样式", "组件", "好看", "排版", "设计稿"], ids: ["ui", "slides"] },
-      { label: "用户洞察", keys: ["用户", "客户", "访谈", "洞察", "痛点", "需求", "反馈", "客诉"], ids: ["ux-researcher", "ux", "product"] },
-      { label: "数据分析", keys: ["数据", "指标", "统计", "转化", "留存", "报表", "口径"], ids: ["analyst"] },
-      { label: "文档写作", keys: ["文档", "写", "文案", "稿", "说明", "手册", "整理成"], ids: ["writer"] },
-      { label: "汇报材料", keys: ["汇报", "ppt", "演示", "deck", "评审", "宣讲", "材料"], ids: ["slides", "writer"] },
-      { label: "工程实现", keys: ["代码", "开发", "实现", "接口", "重构", "bug", "联调", "性能", "仓库"], ids: ["engineer"] },
-      { label: "质量验收", keys: ["测试", "质量", "验收", "回归", "用例", "上线前"], ids: ["tester", "engineer"] },
-      { label: "方案取舍", keys: ["方案", "策略", "优先级", "路线", "要不要做", "规划", "立项", "改版"], ids: ["product", "ux"] }
-    ];
-
-    function matchBrief(text) {
-      const q = (text || "").toLowerCase();
-      if (!q) return [];
-      const score = {};
-      const hits = {};
-      const groups = new Set();
-      const bump = (id, value, label) => {
-        if (!expertById(id)) return;
-        score[id] = (score[id] || 0) + value;
-        if (label) { hits[id] = hits[id] || []; if (!hits[id].includes(label)) hits[id].push(label); }
-      };
-      BRIEF_INTENT.forEach((intent) => {
-        if (!intent.keys.some((key) => q.includes(key))) return;
-        groups.add(intent.label);
-        intent.ids.forEach((id, index) => bump(id, index === 0 ? 4 : 3, intent.label));
-      });
-      // 技能词直接命中,权重最高:这是搭档自己写在简历上的词
-      experts.forEach((expert) => {
-        (expert.skills || []).forEach((skill) => {
-          if (q.includes(skill.toLowerCase())) bump(expert.id, 5, skill);
-        });
-        (expert.categories || []).forEach((cat) => {
-          if (cat !== "全部" && cat !== "推荐" && q.includes(cat.toLowerCase())) bump(expert.id, 2, cat);
-        });
-      });
-      const ranked = Object.keys(score)
-        .map((id) => ({ id, kind: "partner", score: score[id], hits: (hits[id] || []).slice(0, 3) }))
-        .sort((a, b) => b.score - a.score);
-      if (!ranked.length) return [];
-      // 跨了两个以上专业方向 → 单个搭档接不住,推一个智囊团上来
-      const list = ranked.slice(0, 3);
-      if (groups.size >= 2) {
-        const topIds = ranked.slice(0, 4).map((one) => one.id);
-        const teamList = (typeof teams !== "undefined" ? teams : []);
-        let best = null;
-        teamList.forEach((team) => {
-          const cover = (team.memberIds || []).filter((id) => topIds.includes(id)).length;
-          if (cover >= 2 && (!best || cover > best.cover)) best = { team, cover };
-        });
-        if (!best && groups.size >= 2) {
-          // 没有现成阵容接得住 → 智能组建:按这次的活儿现场组一队
-          const smart = teamList.find((one) => one.id === "smart");
-          if (smart) best = { team: smart, cover: 0, adhoc: ranked.slice(0, 3).map((one) => one.id) };
-        }
-        if (best) {
-          list.splice(1, 0, {
-            id: best.team.id, kind: "team", score: 99,
-            hits: [...groups].slice(0, 3), cross: groups.size, adhoc: best.adhoc
-          });
-          list.length = Math.min(list.length, 4);
-        }
-      }
-      return list;
-    }
-
-    const BRIEF_SAMPLES = [
-      "结算流程用户老是卡住，帮我把问题梳理清楚并出一版改版方案",
-      "下周要给客户讲这个季度的进展，帮我把材料做出来",
-      "把这个模块重构掉，顺便补上关键路径的测试"
-    ];
-
-    function renderBriefBar() {
-      const box = el("briefExamples");
-      if (!box) return;
-      if (feedBrief) {
-        box.innerHTML = `
-          <div class="brief-posted">
-            <i class="ph ph-push-pin"></i>
-            <div>
-              <em>已贴出的活儿 · JOB POSTED</em>
-              <p>${escapeHtml(feedBrief)}</p>
-            </div>
-            <button type="button" id="briefClear">撤下</button>
-          </div>`;
-        el("briefClear")?.addEventListener("click", () => {
-          feedBrief = ""; briefRank = [];
-          if (el("briefInput")) el("briefInput").value = "";
-          renderBriefBar(); renderResumeFeed();
-        });
-      } else {
-        box.innerHTML = `<span>试试：</span>${BRIEF_SAMPLES.map((one, index) =>
-          `<button type="button" data-brief="${index}">${one.length > 22 ? one.slice(0, 22) + "…" : one}</button>`).join("")}`;
-      }
-    }
-
-    function feedActions(id, kind, context) {
+    function feedActions(id, kind) {
       const inviteLabel = kind === "team" ? `<i class="ph ph-users-three"></i>组建` : `<i class="ph ph-user-plus"></i>邀请`;
       return `
-        <div class="fc-bar">
+        <div class="fc-actions">
           <button class="button button-secondary button-compact" data-feed-profile="${id}"><i class="ph ph-identification-card"></i>看简历</button>
           <button class="button button-accent button-compact" data-feed-invite="${id}" data-feed-invite-kind="${kind === "team" ? "team" : "expert"}">${inviteLabel}</button>
         </div>`;
     }
 
-    // 第二页 · 开工样张:他会怎么动手 + 他会先反问你什么
-    function feedPage2(id, kind, name, adhoc) {
-      const play = kind === "team" ? teamPlay(id, adhoc) : playOf(id);
-      const target = feedBrief
-        ? `针对你贴出的活儿：<b>${escapeHtml(feedBrief.length > 30 ? feedBrief.slice(0, 30) + "…" : feedBrief)}</b>`
-        : "还没贴活儿，这是他的通用起手式。";
-      return `
-        <div class="fc-page2">
-          <div class="fc-p2-top"><strong>${name} · 开工样张</strong><em>PAGE 2 / 2</em></div>
-          <p class="fc-p2-brief">${target}</p>
-          <div class="fc-p2-cols">
-            <div class="fc-p2-left">
-              <ol class="fc-steps">${play.steps.map((step, index) => `<li><b>${index + 1}</b><span>${step}</span></li>`).join("")}</ol>
-              ${play.handoff ? `
-                <div class="fc-handoff">
-                  <span class="fc-sec-label">交接点</span>
-                  ${play.handoff.map((one) => `
-                    <div class="fc-handoff-row"><b>${one.from}</b><i class="ph ph-arrow-right"></i><b>${one.to}</b><em>${one.what}</em></div>
-                  `).join("")}
-                </div>` : ""}
-            </div>
-            <div class="fc-p2-right">
-              ${play.out ? `<div class="fc-out"><span>这一轮结束你会拿到</span>${play.out}</div>` : ""}
-              <div class="fc-ask"><span>${kind === "team" ? "我们会先反问你" : "他会先反问你"}</span>${play.ask}</div>
-            </div>
-          </div>
-          <div class="fc-p2-bar">
-            <button class="button button-tertiary button-compact" data-trial-close="1"><i class="ph ph-arrow-u-up-left"></i>回到简历</button>
-            <button class="button button-accent button-compact" data-feed-invite="${id}" data-feed-invite-kind="${kind === "team" ? "team" : "expert"}"><i class="ph ph-check"></i>${kind === "team" ? "就这队了" : "就他了"}</button>
-          </div>
-        </div>`;
-    }
-
-    function teamPlay(teamId, adhoc) {
-      const team = (typeof teams !== "undefined" ? teams : []).find((one) => one.id === teamId);
-      const members = (adhoc || (team && team.memberIds) || []).map(expertById).filter(Boolean);
-      if (!members.length) return TRIAL_FALLBACK;
-      return {
-        why: "这活儿跨了不止一个专业，一个人接会漏。我们整队来，交接点会显式确认。",
-        steps: members.slice(0, 3).map((member, index) =>
-          `${nickOf(member)} ${index === 0 ? "先" : "接着"}${(playOf(member.id).steps[0] || member.role)}`),
-        // 交接点:上一位的产出就是下一位的输入,哪一步停下来等你拍板
-        handoff: members.slice(0, 3).map((member, index, list) => ({
-          from: nickOf(member),
-          to: list[index + 1] ? nickOf(list[index + 1]) : "交付给你",
-          what: (playOf(member.id).out || "阶段产出").replace(/^一[份张版条]/, "")
-        })),
-        out: `${members.map(nickOf).slice(0, 3).join(" / ")} 各自的产出串成一条完整交付，交接处双方都签过字`,
-        ask: "这条链上，哪一步你要亲自过目？",
-        need: "各环节的材料入口，以及你希望在哪个交接点介入。"
-      };
-    }
-
-    // 附函便签 · 候选人别在简历上的自荐条
-    function feedLetter(id, kind, rank) {
-      const play = kind === "team" ? teamPlay(id, rank.adhoc) : playOf(id);
-      let why = play.why;
-      // 点名实际跨了哪两件事,比报一个「跨 N 个方向」的数字更可信
-      const spans = (rank.hits || []).slice(0, 2).join("和");
-      if (kind === "team" && rank.adhoc) {
-        const crew = rank.adhoc.map((one) => nickOf(expertById(one) || {})).filter(Boolean).join(" → ");
-        why = `这活儿要同时管${spans}，没有现成阵容正好接得住。我按你贴的活儿现场组一队：${crew}。`;
-      } else if (kind === "team" && rank.cross) {
-        why = `这活儿要同时管${spans}，一个人接会漏。我们整队来，交接点会显式确认。`;
-      }
-      const hits = (rank.hits || []).map((hit) => `<span class="fc-hit">${hit}</span>`).join("");
-      return `
-        <div class="fc-letter" data-letter="${id}">
-          <div class="fc-letter-top"><i class="ph ph-paperclip"></i>附函 · 我为什么合适</div>
-          <p>${why}</p>
-          ${hits ? `<div class="fc-letter-hits">${hits}</div>` : ""}
-          <button class="fc-letter-ask" data-letter-ask="${id}" data-letter-kind="${kind}">追问一句：你需要我提供什么？</button>
-        </div>`;
-    }
-
-    // 近期经历 · 简历里的「时间 — 事项」两栏,同时把纸的下半填实
-    const RECENT_WHEN = ["本周", "上月", "去年"];
-    function feedRecent(lore) {
-      const rows = (lore.cases || []).slice(0, 2);
-      if (!rows.length) return "";
-      return `
-        <section class="fc-recent">
-          <span class="fc-sec-label">近期经历</span>
-          <div class="fc-recent-list">
-            ${rows.map((one, index) => `
-              <div class="fc-recent-row"><span class="fc-when">${RECENT_WHEN[index]}</span><span class="fc-what">${one.title}</span></div>
-            `).join("")}
-          </div>
-        </section>`;
-    }
-
-    // 附件行 · 案例是简历的附件,不单独成卡
-    function feedAttach(lore, ownerName) {
+    // hover 蒙层 · 覆盖整张卡:身份 + 放大的案例库 + 操作按钮
+    function feedHoverLayer(lore, ownerName, id, kind, avatar) {
       const cases = (lore.cases || []).slice(0, 3);
-      if (!cases.length) return `<div class="fc-attach"><i class="ph ph-paperclip"></i>暂无附件</div>`;
       const covers = JSON.stringify(cases.map((one) => one.cover));
       const titles = JSON.stringify(cases.map((one) => one.title));
+      const caseBlock = cases.length ? `
+        <div class="fc-hover-head">
+          <span class="fc-label"><i class="ph ph-folder-open"></i>${lore.caseTitle || "案例作品"}</span>
+          <span class="fc-folder-count">${lore.caseCount || cases.length} 件</span>
+        </div>
+        <div class="fc-hover-cases">
+          ${cases.map((one, index) => `
+            <button class="fc-hover-thumb" data-feed-case="${index}" aria-label="预览 ${one.title}">
+              <img src="${one.cover}" alt="${one.title}">
+              <span class="fc-thumb-name">${one.title}</span>
+            </button>
+          `).join("")}
+        </div>` : "";
       return `
-        <div class="fc-attach" data-feed-cases='${covers}' data-feed-case-titles='${titles}' data-feed-case-owner="${ownerName}">
-          <i class="ph ph-paperclip"></i>附：${lore.caseTitle || "案例作品"} ${lore.caseCount || cases.length} 件
-          <span class="fc-clips">
-            ${cases.map((one, index) => `<button class="fc-clip" data-feed-case="${index}" title="预览 ${one.title}"><img src="${one.cover}" alt=""></button>`).join("")}
-          </span>
+        <div class="fc-hover" data-feed-cases='${covers}' data-feed-case-titles='${titles}' data-feed-case-owner="${ownerName}">
+          <div class="fc-hover-id"><span class="fc-avatar is-sm"><img src="${avatar}" alt=""></span>${ownerName}</div>
+          ${caseBlock}
+          ${feedActions(id, kind)}
         </div>`;
     }
 
-    // 工作方式 · 人物卡上那三条短句,说的是「他平时怎么干活」而不是技能名
-    const WORK_STYLE = {
-      researcher: ["结论必须挂着出处", "同一判断交叉两个来源", "冲突的地方标出来，不抹平"],
-      ux: ["先问用户想完成什么", "把「不好用」翻译成病灶", "每个方案配一条验收标准"],
-      "ux-researcher": ["从真实反馈里聚类场景", "只信行为，不信自称", "按影响面排机会，不排喜好"],
-      interaction: ["先画完整流程再谈页面", "空、错、慢的状态一个不落", "断点处一定给用户反馈"],
-      ui: ["先定层级，再落界面", "间距和字号都走规则", "交付可复用的组件，不是图"],
-      engineer: ["先读懂旧代码再动手", "每次改动都留回滚路径", "关键路径必须有验证"],
-      analyst: ["先对齐口径再取数", "脏数据标出来不硬洗", "图是为结论服务的"],
-      writer: ["先定读者和他的下一步", "结论先行，再展开", "术语统一到一份词表"],
-      slides: ["一页只讲一个论点", "每个论点都配证据", "按讲的时长裁内容"],
-      product: ["先砍需求再排期", "写清楚这次不做什么", "价值和成本一起摆出来"],
-      tester: ["验收标准先写成可判定的", "正常、边界、异常都覆盖", "问题必须可复现"]
-    };
-    const styleOf = (id) => WORK_STYLE[id] || ["先对齐目标和验收标准", "过程摊开，判断给依据", "需要决策时停下来问你"];
-    const slugOf = (id) => `#${String(id).toUpperCase().replace(/-/g, "_")}`;
-
-    // ---- 英雄卡 · 挑角色的那套语言:配色分路、等级稀有度、破框立绘、底部数值条 ----
-    // 一路一个色相,挑人时先认出「这是哪一路的角色」
-    const HERO_TONE = {
-      ux: "is-tone-rose", "ux-researcher": "is-tone-rose", product: "is-tone-rose",
-      ui: "is-tone-violet", interaction: "is-tone-violet", slides: "is-tone-violet",
-      researcher: "is-tone-amber", analyst: "is-tone-amber", writer: "is-tone-amber",
-      engineer: "is-tone-teal", tester: "is-tone-teal"
-    };
-    const heroTone = (id) => HERO_TONE[id] || "is-tone-violet";
-    // 立绘整张放进来(contain),脚底对齐色台下沿 —— 不裁切
-    function heroFigure(item, extraClass) {
-      return `<span class="hc-fig ${extraClass || ""}"><img src="${marketCharacter(item)}" alt=""></span>`;
-    }
-    const heroLevel = (jobs) => `LV.${Math.max(3, Math.round((jobs || 60) / 10))}`;
-
-    function heroStats(cells) {
-      return `<div class="hc-stats">${cells.map(([value, unit, label]) =>
-        `<div><b>${value}${unit ? `<sup>${unit}</sup>` : ""}</b><em>${label}</em></div>`).join("")}</div>`;
-    }
-
-    // 立绘台的两个角:档案号 + 稀有度(投递中时换成「已投递」旗)
-    function heroArt(item, code, kindLabel, applied, duo) {
+    // 场景头像 · 每张卡上半部分统一的角色形象面板
+    function feedScene(images, kind) {
+      const isTeam = kind === "team";
       return `
-        <div class="hc-art">
-          <span class="hc-halo"></span>
-          ${heroFigure(item, duo ? "is-duo" : "")}
-          <span class="hc-code">${code}</span>
-          ${applied
-            ? `<span class="hc-flag"><i class="ph ph-paper-plane-tilt"></i>已投递</span>`
-            : `<span class="hc-kind">${kindLabel}</span>`}
+        <div class="fc-scene ${images.length > 1 ? "is-duo" : ""}">
+          ${images.map((src) => `<img src="${src}" alt="角色形象">`).join("")}
+          <span class="fc-kind ${isTeam ? "is-team" : "is-partner"}">${isTeam ? "智囊团" : "专业搭档"}</span>
         </div>`;
     }
 
     function feedResumeCard(item) {
       const expert = item.ref;
       const lore = loreOf(expert.id);
-      const rank = item.rank;
-      const cases = (lore.cases || []).slice(0, 3);
       return `
-        <article class="feed-card fc-resume ${heroTone(expert.id)} ${rank ? "is-applied" : ""}" data-agent="${expert.id}" data-kind="expert" tabindex="0" aria-label="查看 ${expert.name} 的简历">
-          ${heroArt(expert, lore.code || slugOf(expert.id), "专业搭档", !!rank)}
-          <div class="hc-body">
-            ${rank ? feedLetter(expert.id, "expert", rank) : ""}
-            <div class="hc-face">
-              <span class="hc-level">${heroLevel(lore.jobs)} · ${expert.subtitle || ""}</span>
-              <h4 class="hc-name">${nickOf(expert)}</h4>
-              <p class="hc-desc">${lore.pitch || expert.description}</p>
+        <article class="feed-card fc-resume ${feedTone(expert.id)}" data-agent="${expert.id}" tabindex="0" aria-label="查看 ${expert.name} 的简历">
+          ${feedScene([marketCharacter(expert)], "partner")}
+          <div class="fc-body">
+            <div class="fc-head">
+              <span class="fc-name"><strong>${nickOf(expert)}</strong><span>${expert.name} · ${expert.role}</span></span>
+            </div>
+            <p class="fc-pitch">${lore.pitch || expert.description}</p>
+            <div class="fc-chips">${(expert.skills || []).slice(0, 3).map((skill) => `<span class="fc-chip">${skill}</span>`).join("")}</div>
+            <div class="fc-foot">
+              <div class="fc-meta">
+                <span><i class="ph ph-check-circle"></i>${lore.jobs || 60} 次交付</span>
+                <span><i class="ph ph-star"></i>${lore.rate || "4.8"}</span>
+                <span><i class="ph ph-clock"></i>本周活跃</span>
+              </div>
             </div>
           </div>
-          <div class="hc-back">
-            <span class="hc-back-label">${nickOf(expert)}<em>工作方式 · ${expert.role}</em></span>
-            <ul class="hc-lines">${styleOf(expert.id).map((one) => `<li>${one}</li>`).join("")}</ul>
-            ${heroShots(cases, nickOf(expert), lore)}
-            ${feedActions(expert.id, "expert")}
-          </div>
-          ${heroStats([
-            [lore.jobs || 60, "", "交付"],
-            [lore.rate || "4.8", "★", "评分"],
-            [(expert.skills || []).length, "", "技能"]
-          ])}
+          ${feedHoverLayer(lore, nickOf(expert), expert.id, "expert", marketAvatar(expert))}
         </article>`;
     }
-
-    // 作品缩略图 · 背面底部一排,点开还是原来的案例灯箱
-    function heroShots(cases, ownerName, lore) {
-      if (!cases.length) return `<div class="hc-shots"></div>`;
-      const covers = JSON.stringify(cases.map((one) => one.cover));
-      const titles = JSON.stringify(cases.map((one) => one.title));
-      return `
-        <div class="hc-shots" data-feed-cases='${covers}' data-feed-case-titles='${titles}' data-feed-case-owner="${ownerName}">
-          ${cases.map((one, index) => `
-            <button class="hc-shot" data-feed-case="${index}" aria-label="预览 ${one.title}" title="${one.title}"><span><img src="${one.cover}" alt=""></span></button>`).join("")}
-        </div>`;
-    }
-
-    // 正面 · 案例作品是卡片主角:一句标题 + 放大的作品缩略图
-    function feedWorks(lore, ownerName) {
-      const cases = (lore.cases || []).slice(0, 3);
-      if (!cases.length) return `<div class="fc-works"><span class="fc-block-label">案例作品</span><p class="fc-works-empty">暂无公开作品</p></div>`;
-      const covers = JSON.stringify(cases.map((one) => one.cover));
-      const titles = JSON.stringify(cases.map((one) => one.title));
-      return `
-        <div class="fc-works" data-feed-cases='${covers}' data-feed-case-titles='${titles}' data-feed-case-owner="${ownerName}">
-          <span class="fc-block-label">${lore.caseTitle || "案例作品"}<em>${lore.caseCount || cases.length} 件</em></span>
-          <div class="fc-work-row">
-            ${cases.map((one, index) => `
-              <button class="fc-work" data-feed-case="${index}" aria-label="预览 ${one.title}">
-                <span class="fc-work-shot"><img src="${one.cover}" alt=""></span>
-                <span class="fc-work-name">${one.title}</span>
-              </button>`).join("")}
-          </div>
-        </div>`;
-    }
-
-    // 背面 · 详细介绍只在 hover 时出现,默认卡上不占高度
-    function feedDetail(lines, tags, id, kind) {
-      const inviteLabel = kind === "team" ? `<i class="ph ph-users-three"></i>组建` : `<i class="ph ph-user-plus"></i>邀请`;
-      return `
-        <div class="fc-detail">
-          <span class="fc-block-label">${kind === "team" ? "协作方式" : "工作方式"}</span>
-          <ul class="fc-list">${lines.map((one) => `<li>${one}</li>`).join("")}</ul>
-          <div class="fc-tags">${tags.map((one) => `<span>${one}</span>`).join("")}</div>
-          <div class="fc-bar">
-            <button class="button button-secondary button-compact" data-feed-profile="${id}"><i class="ph ph-identification-card"></i>看简历</button>
-            <button class="button button-accent button-compact" data-feed-invite="${id}" data-feed-invite-kind="${kind === "team" ? "team" : "expert"}">${inviteLabel}</button>
-          </div>
-        </div>`;
-    }
-
-    const TEAM_STYLE = ["上一位的产出就是下一位的输入", "交接点双方都会确认一次", "高风险动作停下来等你拍板"];
 
     function feedTeamCard(item) {
       const team = item.ref;
       const lore = TEAM_LORE[team.id] || {};
-      const rank = item.rank;
-      // 智能组建被推上来时,成员按这次活儿的匹配结果临时换人
-      const memberIds = (rank && rank.adhoc) ? rank.adhoc : (team.memberIds || []);
-      const members = memberIds.map(expertById).filter(Boolean);
-      // 立绘台上并排站两个角色 —— 一眼看出这是「一队人」而不是一个人
-      const leads = members.filter((one, index, list) =>
-        list.findIndex((other) => marketCharacter(other) === marketCharacter(one)) === index).slice(0, 2);
-      const cases = (lore.cases || []).slice(0, 3);
-      const jobsSum = members.reduce((sum, one) => sum + (loreOf(one.id).jobs || 60), 0);
-      const domains = new Set(members.map((one) => one.subtitle || one.role));
-      const duoArt = `
-        <div class="hc-art">
-          <span class="hc-halo"></span>
-          <span class="hc-fig is-duo">${(leads.length ? leads : members.slice(0, 1))
-            .map((one) => `<img src="${marketCharacter(one)}" alt="">`).join("")}</span>
-          <span class="hc-code">${slugOf(team.id)}_SQUAD</span>
-          ${rank
-            ? `<span class="hc-flag"><i class="ph ph-paper-plane-tilt"></i>已投递</span>`
-            : `<span class="hc-kind">智囊团</span>`}
-        </div>`;
+      const members = (team.memberIds || []).map(expertById).filter(Boolean);
+      const scene = [...new Set(members.map(marketCharacter))].slice(0, 2);
+      const memberRows = members.slice(0, 4).map((member) => `
+        <span class="fc-member">
+          <span class="fc-avatar is-sm"><img src="${marketAvatar(member)}" alt=""></span>
+          <span class="fc-member-id"><strong>${nickOf(member)}</strong><em>${member.subtitle || member.role}</em></span>
+        </span>`).join("");
+      const combos = lore.combos || ["分工接力", "交叉校验", "统一交付"];
       return `
-        <article class="feed-card fc-team is-team is-tone-squad ${rank ? "is-applied" : ""}" data-agent="${team.id}" data-kind="team" tabindex="0" aria-label="查看 ${team.name} 的团队履历">
-          ${duoArt}
-          <div class="hc-body">
-            ${rank ? feedLetter(team.id, "team", rank) : ""}
-            <div class="hc-face">
-              <div class="hc-face-main">
-                <span class="hc-level">SQUAD · ${members.length} 人阵容</span>
-                <h4 class="hc-name">${team.name}</h4>
-                <p class="hc-desc">${team.description || "按活儿分工，上一位的产出就是下一位的输入。"}</p>
-              </div>
-              <div class="hc-face-side">
-                <span class="hc-back-label" style="margin-bottom:6px">阵容成员</span>
-                <div class="hc-crew">${members.slice(0, 4).map((member) => `
-                  <span><img src="${marketAvatar(member)}" alt="">${nickOf(member)}</span>`).join("")}</div>
+        <article class="feed-card fc-team is-team" data-agent="${team.id}" tabindex="0" aria-label="查看 ${team.name} 阵型">
+          ${feedScene(scene.length ? scene : ["assets/codearts-agent/team-leader.png"], "team")}
+          <div class="fc-body">
+            <div class="fc-head">
+              <span class="fc-name"><strong>${team.name}</strong><span>${members.length} 位成员 · ${team.subtitle}</span></span>
+            </div>
+            <p class="fc-pitch">${team.description}</p>
+            <div class="fc-members">${memberRows}</div>
+            <div class="fc-chips">${combos.map((combo) => `<span class="fc-chip is-combo"><i class="ph ph-link"></i>${combo}</span>`).join("")}</div>
+            <div class="fc-foot">
+              <div class="fc-meta">
+                <span><i class="ph ph-users-three"></i>${members.length} 位成员</span>
+                <span><i class="ph ph-lightning"></i>协作技已激活</span>
               </div>
             </div>
           </div>
-          <div class="hc-back">
-            <div class="hc-back-col">
-              <span class="hc-back-label">${team.name}<em>协作方式</em></span>
-              <ul class="hc-lines">${TEAM_STYLE.map((one) => `<li>${one}</li>`).join("")}</ul>
-              ${feedActions(team.id, "team")}
-            </div>
-            <div class="hc-back-col">
-              <span class="hc-back-label">联合案例<em>${lore.caseCount || cases.length} 件</em></span>
-              ${heroShots(cases, team.name, lore)}
-            </div>
-          </div>
-          ${heroStats([
-            [members.length, "", "成员"],
-            [domains.size, "", "覆盖方向"],
-            [jobsSum, "", "合计交付"]
-          ])}
+          ${feedHoverLayer(lore, team.name, team.id, "team", marketAvatar(members[0]))}
         </article>`;
-    }
-
-    function feedSection(items, opts) {
-      if (!items.length) return "";
-      const cards = items.map((item) => (item.kind === "team" ? feedTeamCard(item) : feedResumeCard(item))).join("");
-      const bar = opts.title ? `
-        <div class="feed-sec-bar">
-          <strong>${opts.title}</strong><em>${opts.en || ""}</em>
-          ${opts.note ? `<span>${opts.note}</span>` : ""}
-        </div>` : "";
-      return `<div class="feed-sec ${opts.rest ? "is-rest" : ""}">${bar}<div class="feed-grid">${cards}</div></div>`;
     }
 
     function renderResumeFeed() {
       const feed = el("resumeFeed");
       const cats = el("feedCats");
       if (!feed || !cats) return;
-      trialCard = null;
       cats.innerHTML = feedCategories().map((cat) =>
         `<button role="tab" class="${cat === feedCat ? "is-selected" : ""}" aria-selected="${cat === feedCat}" data-feed-cat="${cat}">${cat}</button>`
       ).join("");
       const items = buildFeedItems().filter(feedItemMatches);
-
-      // 贴了活儿:命中的简历带着附函浮到投递区,其余下沉
-      const rankById = {};
-      briefRank.forEach((one) => { rankById[one.id] = one; });
-      const applied = [];
-      const rest = [];
-      items.forEach((item) => {
-        const rank = rankById[item.ref.id];
-        if (feedBrief && rank) applied.push({ ...item, rank });
-        else rest.push(item);
-      });
-      applied.sort((a, b) => b.rank.score - a.rank.score);
-
-      feed.innerHTML = feedBrief
-        ? feedSection(applied, { title: `${applied.length} 份投递`, en: "APPLICANTS", note: "带着针对这次活儿的自荐来的" })
-          + feedSection(rest, { title: "其余简历", en: "ALL RESUMES", rest: true })
-        : feedSection(items, {});
-
-      if (feedBrief && !applied.length && el("feedEmpty")) {
-        el("feedEmpty").hidden = false;
-      } else if (el("feedEmpty")) {
-        el("feedEmpty").hidden = items.length > 0;
-      }
+      feed.innerHTML = items.map((item) => (item.kind === "team" ? feedTeamCard(item) : feedResumeCard(item))).join("");
       const partnerCount = items.filter((item) => item.kind === "partner").length;
       const teamCount = items.length - partnerCount;
       if (el("feedCount")) el("feedCount").textContent = items.length ? `${partnerCount} 位专业搭档 · ${teamCount} 个智囊团` : "";
+      if (el("feedEmpty")) el("feedEmpty").hidden = items.length > 0;
       qsa("[data-feed-kind]").forEach((button) => {
         const selected = button.dataset.feedKind === feedKind;
         button.classList.toggle("is-selected", selected);
@@ -9600,34 +8836,6 @@
       if (profileBtn) { openResumeDetail(profileBtn.dataset.feedProfile); return; }
       const inviteBtn = event.target.closest("[data-feed-invite]");
       if (inviteBtn) { openSummonDialog(inviteBtn.dataset.feedInviteKind, "hub", inviteBtn.dataset.feedInvite); return; }
-      // 试聘 · 把简历翻到第二页看开工样张
-      const trialBtn = event.target.closest("[data-feed-trial]");
-      if (trialBtn) {
-        const card = trialBtn.closest(".feed-card");
-        if (trialCard && trialCard !== card) trialCard.classList.remove("is-trial");
-        card.classList.add("is-trial");
-        trialCard = card;
-        return;
-      }
-      const closeBtn = event.target.closest("[data-trial-close]");
-      if (closeBtn) {
-        const card = closeBtn.closest(".feed-card");
-        card.classList.remove("is-trial");
-        if (trialCard === card) trialCard = null;
-        return;
-      }
-      // 附函 · 追问一句,候选人当场答「需要你提供什么」
-      const askBtn = event.target.closest("[data-letter-ask]");
-      if (askBtn) {
-        const id = askBtn.dataset.letterAsk;
-        const rank = briefRank.find((one) => one.id === id) || {};
-        const play = askBtn.dataset.letterKind === "team" ? teamPlay(id, rank.adhoc) : playOf(id);
-        const qa = document.createElement("div");
-        qa.className = "fc-letter-qa";
-        qa.innerHTML = `<strong>你需要我提供什么？</strong><p>${play.need}</p>`;
-        askBtn.replaceWith(qa);
-        return;
-      }
       if (event.target.closest("button")) return;
       const card = event.target.closest(".feed-card");
       if (card) openResumeDetail(card.dataset.agent);
@@ -9664,32 +8872,6 @@
       renderResumeFeed();
     });
 
-    // 贴活条 · 提交后跑一次匹配,命中的简历带附函浮到投递区
-    function postBrief(text) {
-      const brief = (text || "").trim();
-      if (!brief) return;
-      feedBrief = brief;
-      briefRank = matchBrief(brief);
-      if (el("briefInput")) el("briefInput").value = brief;
-      // 贴了活儿就回到「全部」,免得筛选把投递者挡掉
-      feedKind = "all";
-      feedCat = "全部";
-      feedQuery = "";
-      if (el("feedSearch")) el("feedSearch").value = "";
-      renderBriefBar();
-      renderResumeFeed();
-      showToast(briefRank.length ? `${briefRank.length} 位搭档投了简历` : "没读懂这活儿，换个说法试试");
-      document.querySelector(".control-scroll")?.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    el("briefBar")?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      postBrief(el("briefInput")?.value);
-    });
-    el("briefExamples")?.addEventListener("click", (event) => {
-      const sample = event.target.closest("[data-brief]");
-      if (sample) postBrief(BRIEF_SAMPLES[Number(sample.dataset.brief)]);
-    });
-
     function showExpertHub() {
       if (state.running) {
         showToast("任务运行中，暂时不能离开当前 Run");
@@ -9708,7 +8890,6 @@
       el("expertHubView").hidden = false;
       if (el("hubDetailView")) el("hubDetailView").hidden = true;
       if (el("hubBrowse")) el("hubBrowse").hidden = false;
-      renderBriefBar();
       renderResumeFeed();
       el("breadcrumbTitle").textContent = "搭档中心";
       setArtifactView("selection");
