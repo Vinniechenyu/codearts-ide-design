@@ -2918,6 +2918,11 @@
     }
     /* 平时:名字这一块在白身里居中(上下各留一半余量),不是「顶上去、下面空一片」;
        hover:展开区吃掉余量,两个 auto 自然归零 */
+    /* 立绘台收窄多少,这一叠就跟着上移多少 —— 少了这条,白身会原地不动,
+       上面留出一条空白、下面把内容顶出卡外(自测时被调试样式补上过,漏了整整两轮) */
+    .feed-card:hover .hc-lower,
+    .feed-card:focus-within .hc-lower { top: var(--art-hover); }
+
     .hc-face { flex: 0 0 auto; margin-top: auto; }
     .hc-level {
       font-family: var(--mono); font-size: 9.5px; font-weight: 700;
