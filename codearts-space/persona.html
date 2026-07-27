@@ -305,9 +305,7 @@
     }
     .pane-resizer:hover::after, .workspace.is-resizing .pane-resizer::after { background: var(--brand-default); }
     .workspace.is-resizing { user-select: none; }
-    /* 新建任务是操作项,不显示选中态 */
-    .task-domain #newTaskButton.is-active { background: transparent; color: var(--text-secondary); }
-    .task-domain #newTaskButton.is-active i { color: var(--icon-secondary); }
+    /* 新建任务也是一个去处,选中态跟其它导航项一致(以前特意压暗,反而像失效项) */
     .task-domain .task-row.is-selected { background: rgba(255, 255, 255, 0.34); border-color: rgba(255, 255, 255, 0.42); color: var(--text-primary); }
     .task-domain .task-row:hover { background: rgba(255, 255, 255, 0.2); }
     .task-domain .task-footer { background: transparent; border-top-color: rgba(255, 255, 255, 0.28); }
@@ -1010,7 +1008,7 @@
     }
 
     /* 新任务页:标题+输入框不贴顶,整块往下坐,首屏留白更像「起手」而不是「表单」 */
-    .workspace.is-compose .compose-view { padding-top: clamp(24px, 9vh, 96px); }
+    .workspace.is-compose .compose-view { padding-top: clamp(64px, 24vh, 260px); }
 
     .hero {
       margin-bottom: var(--sp-8);
@@ -1041,6 +1039,15 @@
       line-height: 26px;
       letter-spacing: -0.015em;
     }
+
+    /* 新任务页的大标题是这一屏的主角,单独放大;运行页的标题保持原来的尺寸 */
+    .workspace.is-compose .hero h1 {
+      font-size: clamp(26px, 2.6vw, 34px);
+      font-weight: 650;
+      line-height: 1.28;
+      letter-spacing: -0.025em;
+    }
+    .workspace.is-compose .hero p { font-size: 14.5px; line-height: 23px; margin-top: var(--sp-3); }
 
     .hero p,
     .run-subtitle {
@@ -1086,9 +1093,10 @@
     .composer-context {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: var(--sp-2);
       min-height: 24px;
-      margin-top: var(--sp-3);
+      margin-bottom: var(--sp-2);
     }
 
     .composer-context:empty {
@@ -1175,6 +1183,15 @@
       border-radius: var(--radius-md);
       box-shadow: var(--elevation-3);
     }
+    .env-menu.is-right { left: auto; right: 0; bottom: calc(100% + 6px); top: auto; }
+    .composer-safe {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-right: 4px;
+      color: var(--text-tertiary); font-size: 12px;
+    }
+    .composer-safe i { font-size: 13px; color: var(--icon-secondary); }
+    .composer-meta .env-button { height: 28px; }
+
     .env-menu-item {
       display: flex;
       align-items: flex-start;
@@ -1440,6 +1457,104 @@
     :root[data-theme="dark"] .tpl-mock { --mk-1: #2a2738; --mk-2: #232030; --mk-ink: #b9a8ff; --mk-ink-2: #6f689a; }
     :root[data-theme="dark"] .tpl-mock.tone-2 { --mk-1: #1f2b38; --mk-2: #1b2531; --mk-ink: #8fbde8; --mk-ink-2: #5c7c99; }
     :root[data-theme="dark"] .tpl-mock.tone-3 { --mk-1: #35291c; --mk-2: #2c2217; --mk-ink: #e0b276; --mk-ink-2: #8f7550; }
+
+    /* 真实配图 · 铺满 16:9 的封面框 */
+    .tpl-photo {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      background: var(--surface-hover);
+      transition: transform var(--motion-normal) var(--ease);
+    }
+    .task-template-card:hover .tpl-photo { transform: scale(1.03); }
+
+    /* Code 模式 · 一排起手式 */
+    .quick-task-row {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2);
+    }
+    .quick-task {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 34px; padding: 0 12px;
+      color: var(--text-primary);
+      background: var(--surface-hover);
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
+    }
+    .quick-task:hover { background: var(--surface-primary); border-color: var(--border-hover); }
+    .quick-task i { font-size: 13px; color: var(--icon-secondary); }
+    /* 类目标签 · 浅紫,和普通资料标签区分开 */
+    .tag.tag-category {
+      height: 24px; padding: 0 6px 0 9px;
+      color: var(--brand-text); background: var(--brand-soft);
+      border: 1px solid var(--brand-border);
+      font-weight: 550;
+    }
+    .tag.tag-category i,
+    .tag.tag-category button { color: var(--brand-text); }
+    .tag.tag-category button:hover { background: rgba(255, 255, 255, .5); }
+
+    /* 封面 hover · 两个入口:看这份案例怎么做出来的 / 直接照着做一份 */
+    .tpl-actions {
+      position: absolute; inset: 0; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(23, 16, 48, .18);
+      opacity: 0;
+      transition: opacity var(--motion-fast) var(--ease);
+    }
+    .task-template-card:hover .tpl-actions,
+    .task-template-card:focus-within .tpl-actions { opacity: 1; }
+    .tpl-actions-pill {
+      display: flex; align-items: stretch;
+      border-radius: var(--radius-full);
+      background: rgba(28, 24, 40, .82);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .6);
+      overflow: hidden;
+    }
+    .tpl-act {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 13px;
+      color: #fff; background: transparent; border: 0;
+      font-size: 12px; font-weight: 500; line-height: 16px;
+      transition: background var(--motion-fast) var(--ease);
+    }
+    .tpl-act + .tpl-act { box-shadow: inset 1px 0 0 rgba(255, 255, 255, .22); }
+    .tpl-act:hover { background: rgba(255, 255, 255, .16); }
+    .tpl-act i { font-size: 14px; }
+
+    /* 这份案例是谁做的 */
+    .tpl-author {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 7px; padding-top: 0;
+      border-top: 0;
+      color: var(--text-tertiary); font-size: 11.5px;
+    }
+    .tpl-author img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; object-position: center top; }
+    /* 头像堆叠 · 后一个压在前一个上面,和真实协作里「一队人」的观感对上 */
+    .tpl-stack { display: inline-flex; align-items: center; flex: 0 0 auto; }
+    .tpl-stack img,
+    .tpl-stack .tpl-stack-more {
+      width: 18px; height: 18px; border-radius: 50%;
+      box-shadow: 0 0 0 1.5px var(--surface-primary);
+    }
+    .tpl-stack img + img,
+    .tpl-stack .tpl-stack-more { margin-left: -6px; }
+    .tpl-stack .tpl-stack-more {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--brand-soft); color: var(--brand-text);
+      font-size: 9.5px; font-style: normal; font-weight: 600;
+    }
+    .tpl-author .tpl-author-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--brand-soft); color: var(--brand-text); font-size: 11px;
+    }
+    .tpl-author strong { font-weight: 550; color: var(--text-secondary); }
+    /* .task-template-copy span{display:block} 会把作者行掰成竖排,这里掰回来 */
+    .task-template-copy .tpl-author { display: flex; }
+    .task-template-copy .tpl-author span { display: inline-flex; }
 
     /* 纸面 · 所有样张都画在这张「纸」上 */
     .mk-paper {
@@ -2901,8 +3016,8 @@
 
     .bn-slide {
       position: absolute; inset: 0;
-      display: flex; align-items: center; gap: 24px;
-      padding: 0 0 0 34px;
+      display: flex; align-items: center; justify-content: center; gap: 32px;
+      padding: 0 32px;
       background: linear-gradient(105deg, var(--bn-1) 0%, var(--bn-2) 62%, var(--bn-3) 100%);
       opacity: 0; transform: scale(1.015);
       transition: opacity 620ms var(--ease), transform 900ms var(--ease);
@@ -2915,7 +3030,7 @@
       background-image: radial-gradient(currentColor 1px, transparent 1px);
       background-size: 14px 14px; color: var(--bn-ink); opacity: .07;
     }
-    .bn-body { position: relative; z-index: 1; flex: 1 1 auto; min-width: 0; }
+    .bn-body { position: relative; z-index: 1; flex: 0 1 430px; min-width: 0; }
     .bn-kicker {
       display: inline-flex; align-items: center; gap: 6px; margin-bottom: 9px;
       padding: 3px 10px 3px 8px; border-radius: var(--radius-full);
@@ -2954,7 +3069,7 @@
     /* 右侧舞台 · 搭档=立绘+能力气泡;智囊团=散开的成员头像 */
     .bn-stage {
       position: relative; z-index: 1; flex: 0 0 auto;
-      width: 520px; height: 100%; margin-right: 40px;
+      width: 480px; height: 100%; margin-right: 0;
     }
     .bn-figure {
       position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%);
@@ -3039,7 +3154,7 @@
 
     /* 进度点 · 当前那颗拉长成进度条,自动播时走完一圈 */
     .bn-dots {
-      position: absolute; right: 34px; bottom: 18px; z-index: 3;
+      position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 3;
       display: flex; align-items: center; gap: 6px;
     }
     .bn-dots button {
@@ -3058,7 +3173,7 @@
       .bn-slide { position: relative; padding: 22px 24px; }
       .bn-slide:not(.is-on) { display: none; }
       .bn-stage { display: none; }
-      .bn-dots { position: static; margin: 0 0 16px 24px; }
+      .bn-dots { position: static; transform: none; margin: 0 auto 16px; }
     }
 
     /* 满铺画布:浅灰底 + 白卡,形成 feed「墙」的感觉 */
@@ -3259,8 +3374,8 @@
     /* 案例集 · 叠成一摞,做成通栏一条,右下角不留空 */
     .fc-stack-row {
       appearance: none; font-family: inherit; text-align: left; cursor: pointer;
-      display: flex; align-items: center; gap: 20px; width: 100%;
-      padding: 8px 16px 8px 20px;
+      display: flex; align-items: center; gap: 16px; width: 100%;
+      padding: 8px 12px 8px 16px;
       border-radius: 10px;
       background: rgba(255, 255, 255, .62);
       border: 1px solid var(--tone-line);
@@ -3273,7 +3388,7 @@
     :root[data-theme="dark"] .fc-stack-row { background: rgba(255, 255, 255, .05); }
     .fc-stack {
       position: relative; flex: 0 0 auto;
-      width: 84px; height: 64px;
+      width: 72px; height: 54px;
     }
     .fc-stack span {
       position: absolute; inset: 0; overflow: hidden;
@@ -3283,16 +3398,22 @@
       transition: transform var(--motion-normal) var(--ease);
     }
     .fc-stack span img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .fc-stack span:nth-child(1) { transform: rotate(-8deg) translate(-8px, 3px); }
-    .fc-stack span:nth-child(2) { transform: rotate(5deg) translate(8px, -2px); }
+    /* 一摞就该像一摞:小角度、等距错开,不要撒开成一把 */
+    .fc-stack span:nth-child(1) { transform: rotate(-3.5deg) translate(-5px, 4px); }
+    .fc-stack span:nth-child(2) { transform: rotate(-1.5deg) translate(-2px, 2px); }
     .fc-stack span:nth-child(3) { transform: none; }
-    .feed-card:hover .fc-stack span:nth-child(1) { transform: rotate(-10deg) translate(-11px, 5px); }
-    .feed-card:hover .fc-stack span:nth-child(2) { transform: rotate(6deg) translate(10px, -3px); }
+    .feed-card:hover .fc-stack span:nth-child(1) { transform: rotate(-5deg) translate(-8px, 5px); }
+    .feed-card:hover .fc-stack span:nth-child(2) { transform: rotate(-2.5deg) translate(-4px, 3px); }
     .fc-stack-meta { min-width: 0; flex: 1 1 auto; }
     .fc-stack-meta strong {
       display: flex; align-items: baseline; gap: 7px;
       font-size: 12px; font-weight: 600; line-height: 17px; color: var(--text-primary);
       overflow: hidden; white-space: nowrap;
+    }
+    .fc-stack-sub {
+      display: block; margin-top: 3px;
+      font-size: 10.5px; line-height: 16px; color: var(--text-tertiary);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .fc-stack-names { display: block; margin-top: 5px; }
     .fc-stack-names em {
@@ -5989,13 +6110,14 @@
       gap: var(--sp-3);
     }
 
+    /* 资源卡统一浅灰底 —— 和搭档中心的卡片一致,白底留给弹层和详情 */
     .schedule-card,
     .skill-market-card,
     .connector-card {
       min-width: 0;
       padding: var(--sp-4);
-      background: var(--surface-primary);
-      border: 1px solid var(--border-default);
+      background: var(--surface-secondary);
+      border: 1px solid transparent;
       border-radius: var(--radius-lg);
       transition:
         border-color var(--motion-fast) var(--ease),
@@ -6011,6 +6133,7 @@
     .schedule-card:hover,
     .skill-market-card:hover,
     .connector-card:hover {
+      background: var(--surface-primary);
       border-color: var(--border-hover);
       box-shadow: var(--elevation-1);
       transform: translateY(-1px);
@@ -6448,13 +6571,13 @@
             <i class="ph ph-kanban"></i>
             <span>任务看板</span>
           </button>
-          <button class="sidebar-nav-item" data-sidebar-action="experts">
-            <i class="ph ph-identification-card"></i>
-            <span>搭档中心</span>
-          </button>
           <button class="sidebar-nav-item" data-sidebar-action="scheduled">
             <i class="ph ph-clock-countdown"></i>
             <span>定时任务</span>
+          </button>
+          <button class="sidebar-nav-item" data-sidebar-action="experts">
+            <i class="ph ph-identification-card"></i>
+            <span>搭档中心</span>
           </button>
           <button class="sidebar-nav-item" data-sidebar-action="capability">
             <i class="ph ph-magic-wand"></i>
@@ -6477,7 +6600,7 @@
               <i class="ph ph-caret-right project-caret"></i>
             </button>
             <div class="project-tasks">
-              <article class="task-row is-project-task is-selected" data-demo-task="work" data-search="CodeArts AI IDE 客户反馈洞察与改版建议 等待决定">
+              <article class="task-row is-project-task" data-demo-task="work" data-search="CodeArts AI IDE 客户反馈洞察与改版建议 等待决定">
                 <span class="status-dot dot-waiting"></span>
                 <div class="task-row-main">
                   <div class="task-row-title">客户反馈洞察与改版建议</div>
@@ -6573,15 +6696,15 @@
         <div class="control-scroll">
           <section class="compose-view" id="composeView">
             <div class="hero">
-              <div class="eyebrow"><span class="brand-dot"></span><span id="modeEyebrow">Work · 专业工作</span></div>
-              <h1 id="heroTitle">今天想完成什么？</h1>
-              <p id="heroDescription">描述目标，或选择一个模板快速开始；需要专业协作时再邀请搭档加入。</p>
+              <div class="eyebrow"><span class="brand-dot"></span><span id="modeEyebrow">Work</span></div>
+              <h1 id="heroTitle">工作中的每一步，都有搭档</h1>
+              <p id="heroDescription">描述目标，或从模板开始；专业搭档与智囊团随时加入，共同推进到交付。</p>
             </div>
 
             <div class="compose-shell">
             <div class="composer">
-              <textarea id="taskPrompt" aria-label="任务描述" placeholder="描述你想完成的任务，或从下方选择一个模板…"></textarea>
               <div class="composer-context" id="contextTags"></div>
+              <textarea id="taskPrompt" aria-label="任务描述" placeholder="描述你想完成的任务，或从下方选择一个模板…"></textarea>
               <div class="composer-toolbar">
                 <div class="composer-tools">
                   <div class="composer-plus-wrap">
@@ -6611,7 +6734,18 @@
                   </div>
                 </div>
                 <div class="composer-meta">
-                  <span><i class="ph ph-shield-check"></i>仅访问已授权资料</span>
+                  <div class="env-wrap">
+                    <button class="env-button" id="modelButton" aria-haspopup="true" aria-expanded="false">
+                      <span id="modelLabel">Auto Mode</span><i class="ph ph-caret-down env-caret"></i>
+                    </button>
+                    <div class="env-menu is-right" id="modelMenu" hidden></div>
+                  </div>
+                  <button class="icon-button" id="voiceButton" aria-label="语音输入" title="语音输入">
+                    <i class="ph ph-microphone"></i>
+                  </button>
+                  <button class="icon-button" id="polishButton" aria-label="一键润色" title="一键润色：把口语描述整理成清晰的任务">
+                    <i class="ph ph-magic-wand"></i>
+                  </button>
                   <button class="button button-accent" id="composeStartButton" aria-label="开始任务" title="开始任务" style="width:36px;padding:0">
                     <i class="ph ph-paper-plane-tilt"></i>
                   </button>
@@ -7172,18 +7306,18 @@
   <script>
     const modeContent = {
       work: {
-        eyebrow: "Work · 专业工作",
-        title: "今天想完成什么？",
-        description: "描述目标，或选择一个模板快速开始；需要专业协作时再邀请搭档加入。",
+        eyebrow: "Work",
+        title: "工作中的每一步，都有搭档",
+        description: "描述目标，或从模板开始；专业搭档与智囊团随时加入，共同推进到交付。",
         prompt: "",
         placeholder: "描述你想完成的任务，或从下方选择一个模板…",
         contexts: [],
         defaultCategory: "全部"
       },
       code: {
-        eyebrow: "Code · 软件研发",
-        title: "把需求交付成可运行的软件",
-        description: "描述研发目标，或从模板快速开始；需要 UX/UI 判断时可随时邀请专业搭档。",
+        eyebrow: "Code",
+        title: "代码里的每一步，都有搭档",
+        description: "描述要理解、实现、修改或评审的代码任务；专业搭档随时加入，与你协同推进。",
         prompt: "",
         placeholder: "描述要实现、修复或评审的研发任务，或选择一个模板…",
         contexts: [],
@@ -7342,12 +7476,57 @@
       }
     };
 
-    const templateTypes = [
-      { id: "ppt", label: "PPT", icon: "ph-presentation-chart" },
-      { id: "website", label: "Website", icon: "ph-browser" },
-      { id: "table", label: "Table", icon: "ph-table" },
-      { id: "doc", label: "Doc", icon: "ph-file-text" }
-    ];
+    // Work 交付产物 / Code 开发场景 —— 两种模式的 tab 不是一回事
+    const TEMPLATE_TYPES = {
+      work: [
+        { id: "table", label: "Table", icon: "ph-table" },
+        { id: "ppt", label: "PPT", icon: "ph-presentation-chart" },
+        { id: "doc", label: "Doc", icon: "ph-file-text" }
+      ],
+      code: [
+        { id: "website", label: "Website 开发", icon: "ph-browser" },
+        { id: "agent", label: "Agent 开发", icon: "ph-robot" },
+        { id: "daily", label: "日常开发", icon: "ph-code" }
+      ]
+    };
+    // 兼容旧引用(渲染里按当前模式取)
+    const templateTypes = TEMPLATE_TYPES.work;
+    const typesOfMode = () => TEMPLATE_TYPES[state.mode] || TEMPLATE_TYPES.work;
+
+    // Code 模式:tab 下面不是封面卡,而是一排「起手式」快捷任务;点了就在输入框里落一个类目标签
+    const CODE_QUICK = {
+      website: {
+        tag: "Website 开发",
+        items: [
+          { label: "落地页开发", prompt: "开发一个产品落地页：突出核心价值、关键能力和明确的行动入口，响应式适配。" },
+          { label: "管理后台", prompt: "搭建一个管理后台：列表页、详情页、权限控制与表单校验，复用现有组件库。" },
+          { label: "组件库搭建", prompt: "搭建基础组件库：按钮、表单、表格、弹层，含状态规范与使用文档。" },
+          { label: "官网改版", prompt: "对现有官网做一次改版：先梳理信息架构，再重做首页与产品页。" },
+          { label: "文档站点", prompt: "生成一个文档站点：目录结构、搜索、代码高亮与版本切换。" }
+        ]
+      },
+      agent: {
+        tag: "Agent 应用",
+        items: [
+          { label: "Agent 应用开发", prompt: "从零搭一个 Agent 应用：定义角色与工具、串起对话与任务执行、补上失败重试。" },
+          { label: "聊天应用初始化", prompt: "初始化一个聊天应用：会话管理、流式输出、上下文裁剪与历史存储。" },
+          { label: "客户端 Agent 应用", prompt: "做一个客户端 Agent 应用：本地文件访问、任务队列与执行过程可视化。" },
+          { label: "智能客服 Agent", prompt: "实现一个智能客服 Agent：知识库检索、多轮澄清、转人工与满意度回收。" },
+          { label: "工具调用编排", prompt: "为现有 Agent 补齐工具调用编排：工具注册、参数校验、并发与超时处理。" }
+        ]
+      },
+      daily: {
+        tag: "日常开发",
+        items: [
+          { label: "新增功能开发", prompt: "在现有代码库里新增一个功能：先读懂相关模块，再给出改动方案和验收标准。" },
+          { label: "代码重构优化", prompt: "重构这个模块：保持行为不变，拆掉重复逻辑，补上关键路径的测试。" },
+          { label: "修复 Bug", prompt: "定位并修复这个 Bug：先复现，再给出根因判断，最后补一条回归用例。" },
+          { label: "性能优化", prompt: "做一轮性能优化：先测出瓶颈在哪，再动手，改完给出前后对比。" },
+          { label: "补充单元测试", prompt: "为这个模块补单元测试：正常、边界、异常三类都要覆盖。" },
+          { label: "排查报错信息", prompt: "帮我排查这段报错：还原调用链，指出触发条件，并给出修复方案。" }
+        ]
+      }
+    };
 
     const taskTemplates = {
       work: {
@@ -7856,8 +8035,9 @@
       pendingSummonKind: "team",
       pendingSummonSource: "conversation",
       summonTarget: "current",
-      selectedTemplateType: "ppt",
+      selectedTemplateType: "table",
       selectedTemplateId: null,
+      model: "auto",        // 模型档位
       runEnv: "local",      // 这次任务在哪跑:本地 / worktree
       projectFolder: null,  // 动哪个项目文件夹
       scheduleTab: "tasks",
@@ -8012,6 +8192,22 @@
       renderSelectedTemplateTag();
     }
 
+    // 类目标签 · Code 模式点快捷任务后落在输入框里的那个黑标签
+    function addCategoryTag(label, icon) {
+      const context = el("contextTags");
+      if (!context) return;
+      context.querySelector("[data-category-tag]")?.remove();
+      const tag = document.createElement("span");
+      tag.className = "tag tag-category";
+      tag.dataset.categoryTag = label;
+      tag.innerHTML = `<i class="ph ${icon}"></i>${label}<button aria-label="移除 ${label}"><i class="ph ph-x"></i></button>`;
+      tag.querySelector("button").addEventListener("click", () => {
+        tag.remove();
+        showToast(`已移除「${label}」`);
+      });
+      context.prepend(tag);
+    }
+
     function renderSelectedTemplateTag() {
       const context = el("contextTags");
       if (!context) return;
@@ -8053,13 +8249,19 @@
       { id: "desktop", icon: "ph-folder", label: "Desktop", desc: "上次打开：本周" }
     ];
 
+    const MODELS = [
+      { id: "auto", label: "Auto Mode", desc: "按任务复杂度自动选模型" },
+      { id: "deep", label: "深度模式", desc: "复杂推理、长文档,慢一些但更稳" },
+      { id: "fast", label: "快速模式", desc: "短任务、改一版,优先出结果" }
+    ];
+
     function closeEnvMenus(except) {
-      ["envRunMenu", "envFolderMenu"].forEach((id) => {
+      ["envRunMenu", "envFolderMenu", "modelMenu"].forEach((id) => {
         if (id === except) return;
         const menu = el(id);
         if (menu) menu.hidden = true;
       });
-      ["envRunButton", "envFolderButton"].forEach((id) => {
+      ["envRunButton", "envFolderButton", "modelButton"].forEach((id) => {
         const button = el(id);
         if (button && (!except || button.id !== except.replace("Menu", "Button"))) {
           button.setAttribute("aria-expanded", "false");
@@ -8079,6 +8281,17 @@
       folderButton.classList.toggle("is-empty", !folder);
       folderButton.querySelector("i:first-child").className = `ph ${folder ? "ph-folder" : "ph-folder-plus"}`;
       el("envFolderLabel").textContent = folder ? folder.label : "选择文件夹（可选）";
+
+      const modelLabel = el("modelLabel");
+      if (modelLabel) {
+        const model = MODELS.find((one) => one.id === state.model) || MODELS[0];
+        modelLabel.textContent = model.label;
+        el("modelMenu").innerHTML = MODELS.map((one) => `
+          <button class="env-menu-item ${one.id === state.model ? "is-checked" : ""}" data-model="${one.id}">
+            <i class="ph ${one.id === "deep" ? "ph-brain" : one.id === "fast" ? "ph-lightning" : "ph-sparkle"}"></i>
+            <span><strong>${one.label}</strong><span>${one.desc}</span></span>
+          </button>`).join("");
+      }
 
       el("envRunMenu").innerHTML = RUN_ENVS.map((one) => `
         <button class="env-menu-item ${one.id === state.runEnv ? "is-checked" : ""}" data-run-env="${one.id}">
@@ -8110,6 +8323,35 @@
       };
       toggle("envRunButton", "envRunMenu");
       toggle("envFolderButton", "envFolderMenu");
+      toggle("modelButton", "modelMenu");
+
+      el("modelMenu").addEventListener("click", (event) => {
+        const item = event.target.closest("[data-model]");
+        if (!item) return;
+        state.model = item.dataset.model;
+        closeEnvMenus();
+        renderEnvBar();
+        showToast(`已切换到${MODELS.find((one) => one.id === state.model).label}`);
+      });
+      el("voiceButton")?.addEventListener("click", () => {
+        showToast("语音输入已开启，说完自动转成文字（原型演示）");
+      });
+      el("polishButton")?.addEventListener("click", () => {
+        const input = el("taskPrompt");
+        const raw = (input.value || "").trim();
+        if (!raw) {
+          showToast("先写一句你想做什么，我再帮你润色成清晰的任务");
+          input.focus();
+          return;
+        }
+        if (raw.startsWith("目标：")) {
+          showToast("这段已经是润色过的写法了");
+          return;
+        }
+        input.value = `目标：${raw.replace(/[。.]$/, "")}\n范围：只动与该目标直接相关的部分，超出范围先问我\n验收：结论给依据、过程可回看，交付物可以直接拿去用`;
+        input.focus();
+        showToast("已按「目标 / 范围 / 验收」润色，可继续编辑");
+      });
 
       el("envRunMenu").addEventListener("click", (event) => {
         const item = event.target.closest("[data-run-env]");
@@ -8217,8 +8459,11 @@
             <div class="mk-kicker">${kicker}</div>
             <div class="mk-th"><span></span><span></span><span></span><span></span></div>
             ${[0, 1, 2].map(() => `<div class="mk-tr"><span></span><span></span><span></span><span></span></div>`).join("")}
-            <div class="mk-spark">${[34, 52, 40, 66, 58, 78, 70, 92].map((h) =>
-              `<i style="height:${h}%"></i>`).join("")}</div>
+            <div class="mk-spark">${[
+              [34, 52, 40, 66, 58, 78, 70, 92],
+              [88, 62, 74, 46, 58, 40, 52, 34],
+              [46, 70, 54, 84, 62, 92, 48, 66]
+            ][index % 3].map((h) => `<i style="height:${h}%"></i>`).join("")}</div>
           </div>`;
       } else {
         paper = `
@@ -8233,11 +8478,62 @@
       return `<span class="tpl-mock ${tone}"><span class="mk-paper">${paper}</span></span>`;
     }
 
+    // 真实配图 · Desktop/demo配图 里按产物类型各三张,统一裁成 16:9
+    // 竖图从顶部裁(文档/网页都是从上往下读),横图取中间
+    // 这份样张是谁交付的 —— 按模板归到对应的专业搭档 / 智囊团
+    const TEMPLATE_AUTHOR = {
+      "proposal-deck": "slides", "insight-deck": "ux-researcher", "roadmap-deck": "product",
+      "launch-site": "ui", "campaign-site": "ui", "portfolio-site": "interaction",
+      "feedback-table": "analyst", "project-table": "product", "benchmark-table": "researcher",
+      "prd-doc": "product", "research-doc": "researcher", "meeting-doc": "writer",
+      "tech-proposal-deck": "engineer", "review-deck": "slides", "architecture-deck": "engineer",
+      "feature-website": "ui", "admin-website": "interaction", "docs-website": "writer",
+      "test-table": "tester", "api-table": "engineer", "risk-table": "tester",
+      "feature-doc": "writer", "bugfix-doc": "engineer", "review-doc": "tester"
+    };
+    const TEMPLATE_AUTHOR_TEAM = { "insight-deck": "insight", "prd-doc": "creative" };
+    const AUTHOR_FALLBACK = { ppt: "slides", website: "ui", table: "analyst", doc: "writer" };
+
+    function templateAuthor(template, type) {
+      const teamId = TEMPLATE_AUTHOR_TEAM[template.id];
+      if (teamId) {
+        const team = (typeof teams !== "undefined" ? teams : []).find((one) => one.id === teamId);
+        if (team) {
+          // 智囊团用头像堆叠:4 个以内全排开,超过 4 个只放 3 个再加 +n
+          const members = (team.memberIds || []).map(expertById).filter(Boolean);
+          const shown = members.length > 4 ? members.slice(0, 3) : members;
+          const rest = members.length - shown.length;
+          return `<span class="tpl-author">
+            <span class="tpl-stack">
+              ${shown.map((one) => `<img src="${marketAvatar(one)}" alt="" title="${nickOf(one)}">`).join("")}
+              ${rest > 0 ? `<em class="tpl-stack-more">+${rest}</em>` : ""}
+            </span>
+            <strong>${team.name}</strong> 交付</span>`;
+        }
+      }
+      const expert = expertById(TEMPLATE_AUTHOR[template.id] || AUTHOR_FALLBACK[type] || "writer");
+      if (!expert) return "";
+      return `<span class="tpl-author">
+        <img src="${marketAvatar(expert)}" alt="">
+        <strong>${nickOf(expert)}</strong> · ${expert.subtitle || expert.role} 交付</span>`;
+    }
+
+    // 图片已经在 assets/demo-covers 里按内容边界裁成 16:9(去掉了各自的外框留白),
+    // 所以这里直接铺满即可,三张卡里的画面主体天然对齐
+    function templateShot(type, index) {
+      return `<img class="tpl-photo" src="assets/demo-covers/${type}${index + 1}.jpg" alt="" loading="lazy">`;
+    }
+
     function renderTaskTemplates() {
       const container = el("taskTemplateGrid");
       if (!container) return;
       const tabs = el("templateTypeTabs");
-      tabs.innerHTML = templateTypes.map((type) => `
+      const types = typesOfMode();
+      // 换模式后如果原来选中的类目在这套 tab 里不存在,回到第一个
+      if (!types.some((type) => type.id === state.selectedTemplateType)) {
+        state.selectedTemplateType = types[0].id;
+      }
+      tabs.innerHTML = types.map((type) => `
         <button class="template-type-tab ${state.selectedTemplateType === type.id ? "is-selected" : ""}"
                 data-template-type="${type.id}"
                 role="tab"
@@ -8254,23 +8550,57 @@
         });
       });
 
+      // Code 模式:一排「起手式」快捷任务,点了在输入框里落一个类目标签
+      const quick = state.mode === "code" ? CODE_QUICK[state.selectedTemplateType] : null;
+      if (quick) {
+        container.className = "quick-task-row";
+        container.innerHTML = quick.items.map((item, index) => `
+          <button class="quick-task" data-quick="${index}">${item.label}<i class="ph ph-arrow-up-right"></i></button>
+        `).join("");
+        qsa("[data-quick]", container).forEach((button) => {
+          button.addEventListener("click", () => {
+            const item = quick.items[Number(button.dataset.quick)];
+            addCategoryTag(quick.tag, typesOfMode().find((one) => one.id === state.selectedTemplateType)?.icon || "ph-code");
+            el("taskPrompt").value = item.prompt;
+            el("taskPrompt").focus();
+            showToast(`已按「${item.label}」起手，可继续补充细节`);
+          });
+        });
+        return;
+      }
+      container.className = "task-template-grid";
+
       const templates = taskTemplates[state.mode][state.selectedTemplateType] || [];
       container.innerHTML = templates.map((template, index) => `
         <button class="task-template-card ${state.selectedTemplateId === template.id ? "is-selected" : ""}" data-template-id="${template.id}">
           <span class="task-template-cover is-${state.selectedTemplateType} variant-${index + 1}">
-            ${templateMock(state.selectedTemplateType, index, template)}
-            <span class="task-template-badge">
-              <i class="ph ${templateTypes.find((type) => type.id === state.selectedTemplateType)?.icon || "ph-file"}"></i>
-              ${templateTypes.find((type) => type.id === state.selectedTemplateType)?.label || "模板"}
+            ${templateShot(state.selectedTemplateType, index)}
+            <span class="tpl-actions">
+              <span class="tpl-actions-pill">
+                <span class="tpl-act" role="button" tabindex="-1" data-template-replay="${template.id}" title="看这份案例是怎么一步步做出来的"><i class="ph ph-play-circle"></i>看回放</span>
+                <span class="tpl-act" title="照着这份案例做一份自己的"><i class="ph ph-magic-wand"></i>做同款</span>
+              </span>
             </span>
             <span class="task-template-selected"><i class="ph ph-check"></i></span>
           </span>
           <span class="task-template-copy">
             <strong>${template.title}</strong>
-            <span>${template.description}</span>
+            ${templateAuthor(template, state.selectedTemplateType)}
           </span>
         </button>
       `).join("");
+      // 看回放 / 做同款 · 两个入口都挂在封面上,别让整卡点击吃掉
+      qsa("[data-template-replay]", container).forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const template = templates.find((item) => item.id === button.dataset.templateReplay);
+          if (!template) return;
+          const author = TEMPLATE_AUTHOR_TEAM[template.id]
+            ? ((typeof teams !== "undefined" ? teams : []).find((one) => one.id === TEMPLATE_AUTHOR_TEAM[template.id]) || {}).name
+            : nickOf(expertById(TEMPLATE_AUTHOR[template.id] || AUTHOR_FALLBACK[state.selectedTemplateType] || "writer") || {});
+          showToast(`正在打开「${template.title}」的执行回放：${author} 的每一步过程与依据都可回看`);
+        });
+      });
       qsa("[data-template-id]", container).forEach((button) => {
         button.addEventListener("click", () => {
           const template = templates.find((item) => item.id === button.dataset.templateId);
@@ -8947,9 +9277,21 @@
       renderSelectionPanel();
     }
 
-    function setSidebarActive(button) {
+    /* 左栏选中口径:导航项与任务行共用一套「当前所在位置」,同一时刻只能有一个亮着。
+       进搭档中心/看板/定时/能力中心 → 项目下的任务行必须熄灭;点任务行 → 导航项熄灭。 */
+    function clearLeftSelection() {
       qsa(".sidebar-nav-item").forEach((item) => item.classList.remove("is-active"));
-      button.classList.add("is-active");
+      qsa(".task-row").forEach((row) => row.classList.remove("is-selected"));
+    }
+
+    function setSidebarActive(button) {
+      clearLeftSelection();
+      if (button) button.classList.add("is-active");
+    }
+
+    function setTaskRowActive(row) {
+      clearLeftSelection();
+      if (row) row.classList.add("is-selected");
     }
 
     function renderConversationExpertState() {
@@ -9038,6 +9380,7 @@
       };
       const target = viewMap[action];
       if (!target) return;
+      setSidebarActive(document.querySelector(`[data-sidebar-action="${action}"]`));
       state.currentView = action;
       el("workspace").classList.remove("is-compose", "is-expert-hub");
       el("workspace").classList.add("is-resource-center");
@@ -9713,8 +10056,8 @@
           </span>
           <span class="fc-stack-meta">
             <strong>${lore.caseTitle || "案例作品"}</strong>
-            <span class="fc-stack-names">${cases.map((one) =>
-              `<em><span>${one.title}</span><i></i><b>${caseKind(one.cover)}</b></em>`).join("")}</span>
+            <span class="fc-stack-sub">${lore.caseCount || cases.length} 件 · ${
+              [...new Set(cases.map((one) => caseKind(one.cover)))].join(" / ")}</span>
           </span>
         </button>`;
     }
@@ -10842,6 +11185,14 @@
     function openDemoScenario(mode) {
       state.running = false;
       state.selectedTemplateId = null;
+      // 从搭档中心 / 看板 / 定时 / 能力中心点进任务时,先把这些面板收掉,
+      // 否则 switchMode(silent) 不会退出搭档中心,任务会开在它下面
+      hideResourceCenters();
+      el("workspace").classList.remove("is-expert-hub");
+      el("expertHubView").hidden = true;
+      el("composeView").classList.remove("is-hidden");
+      el("selectionFooter").hidden = false;
+      state.currentView = "compose";
       switchMode(mode, true);
       state.actorType = mode === "work" ? "team" : "expert";
       state.summonedKind = mode === "work" ? "team" : "expert";
@@ -10853,7 +11204,6 @@
       renderContextTags();
       renderConversationExpertState();
       startRun();
-      qsa("[data-demo-task]").forEach((row) => row.classList.toggle("is-selected", row.dataset.demoTask === mode));
       if (mode === "code") {
         setTimeout(() => resolveIntervention("幂等返回原结果"), 850);
       }
@@ -10910,8 +11260,20 @@
       setSidebarActive(el("newTaskButton"));
       resetToCompose();
     });
-    qsa("[data-demo-task]").forEach((row) => {
-      row.addEventListener("click", () => openDemoScenario(row.dataset.demoTask));
+    qsa(".task-row").forEach((row) => {
+      row.addEventListener("click", () => {
+        if (state.running) {
+          showToast("任务运行中，暂时不能切换到其它任务");
+          return;
+        }
+        setTaskRowActive(row);
+        const mode = row.dataset.demoTask;
+        if (mode) {
+          openDemoScenario(mode);
+          return;
+        }
+        showToast(`「${row.querySelector(".task-row-title")?.textContent || "该任务"}」是示例数据，本原型只打通了两条可进入的任务`);
+      });
     });
     qsa("[data-sidebar-action]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -10921,7 +11283,6 @@
           showToast("已打开搭档中心");
           return;
         }
-        setSidebarActive(button);
         showResourceCenter(action);
       });
     });
