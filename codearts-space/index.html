@@ -6,7 +6,7 @@
   <title>码道 · 专业搭档工作台交互 Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <style>
     :root,
@@ -2750,10 +2750,17 @@
       flex-direction: column;
       width: 100%;
       height: 100%;
+      /* 下半是绝对定位的(展开才不会顶动网格),所以卡高得自己撑住 */
+      min-height: 348px;
       text-align: left;
       font-family: inherit;
       /* 卡面整体是中性灰白,颜色只当点缀:立绘身后的光晕、等级字、细节里的小色块 */
-      --art-h: 110px;
+      --art-h: 140px;
+      --art-hover: 70px;
+      /* 展开是「长高」不是弹出,所以走一条更长更缓的曲线 */
+      --hc-slide: 380ms;
+      --hc-fade: 240ms;
+      --hc-ease: cubic-bezier(.22, .78, .3, 1);
       --art-1: #f4f4f7;
       --art-2: #e9e9ef;
       --hero-bar: #7d5be0;
@@ -2773,9 +2780,9 @@
       overflow: visible;
       cursor: pointer;
       box-shadow: 0 10px 22px -16px rgba(23, 16, 48, .5), 0 1px 3px rgba(23, 16, 48, .06);
-      transition: transform var(--motion-normal) var(--ease), box-shadow var(--motion-normal) var(--ease);
+      transition: transform var(--hc-slide) var(--hc-ease), box-shadow var(--hc-slide) var(--hc-ease);
     }
-    .feed-card:hover { transform: translateY(-8px); box-shadow: 0 30px 46px -24px rgba(23, 16, 48, .55); z-index: 4; }
+    .feed-card:hover { transform: translateY(-6px); box-shadow: 0 26px 40px -26px rgba(23, 16, 48, .5); z-index: 5; }
     .feed-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 
     .feed-card.is-tone-rose   { --hero-bar: #e4638d; --hero-ink: #c4386b; --hero-glow: rgba(228, 99, 141, .3);  --hero-1: #ffd6e2; --hero-2: #f79fba; }
@@ -2802,7 +2809,10 @@
       border-radius: 14px 14px 0 0;
       background: linear-gradient(180deg, var(--art-1) 0%, var(--art-2) 100%);
       overflow: visible;
+      transition: height var(--hc-slide) var(--hc-ease);
     }
+    /* hover:立绘台收窄,把地方让给展开的内容 */
+    .feed-card:hover .hc-art { height: var(--art-hover); }
     /* hover 才亮起的身份色 —— 平时一屏是灰白的,鼠标停在谁身上谁才「上色」 */
     .hc-art::after {
       content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
@@ -2818,9 +2828,14 @@
       transition: background-image var(--motion-normal) var(--ease);
     }
     .feed-card:hover .hc-art::before { background-image: radial-gradient(rgba(255, 255, 255, .6) 1px, transparent 1.2px); }
+    /* 光晕要裁在立绘台里 —— 立绘台本身 overflow:visible(要放人破框),所以另套一层裁剪 */
+    .hc-glow-clip {
+      position: absolute; inset: 0; z-index: 1; overflow: hidden; border-radius: inherit;
+      pointer-events: none;
+    }
     /* 角色身后的光晕:平时是身份色的一点晕,亮起来之后换成白光把人托出来 */
     .hc-halo {
-      position: absolute; left: 50%; bottom: -10px; z-index: 1; transform: translateX(-50%);
+      position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%);
       width: 176px; height: 156px; border-radius: 50%;
       background: radial-gradient(circle, var(--hero-glow) 0%, transparent 66%);
       transition: transform var(--motion-normal) var(--ease), background var(--motion-normal) var(--ease);
@@ -2835,27 +2850,32 @@
       position: absolute; left: 50%; bottom: -20px; z-index: 2;
       width: 270px; height: 196px;
       transform: translateX(-50%);
-      transition: transform var(--motion-normal) var(--ease);
+      transform-origin: bottom center;
+      transition: transform var(--hc-slide) var(--hc-ease);
     }
     .hc-fig img {
       display: block; width: 100%; height: 100%;
       object-fit: contain; object-position: center bottom;
       filter: drop-shadow(0 14px 14px rgba(23, 16, 48, .24));
     }
-    .feed-card:hover .hc-fig { transform: translateX(-50%) translateY(-7px) scale(1.05); }
+    .feed-card:hover .hc-fig { transform: translateX(-50%) scale(.74); }
     /* 双人:两个角色一左一右站台上,前后错开一点才像一队人 */
     .hc-fig.is-duo { width: 372px; height: 216px; bottom: -22px; display: flex; justify-content: center; align-items: flex-end; }
     .hc-fig.is-duo img { width: 226px; height: 100%; }
     .hc-fig.is-duo img:last-child { margin-left: -80px; }
 
     /* 档案号 / 稀有度 —— 立绘台的两个角 */
-    .hc-code {
-      position: absolute; top: 9px; left: 11px; z-index: 3;
-      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
-      letter-spacing: .12em; color: var(--text-disabled);
-      transition: color var(--motion-normal) var(--ease);
+    /* 英文名 · 立绘旁的名牌,「THE + 角色」,游戏卡的叫法 */
+    .hc-eng {
+      position: absolute; top: 12px; left: 15px; z-index: 2;
+      max-width: 112px;
+      font-family: "Caveat", "Snell Roundhand", "Bradley Hand", cursive;
+      font-size: 25px; font-weight: 700; line-height: 28px;
+      color: var(--text-tertiary); opacity: .85;
+      transition: color var(--hc-slide) var(--hc-ease), opacity var(--hc-slide) var(--hc-ease);
     }
-    .feed-card:hover .hc-code { color: rgba(23, 16, 48, .5); }
+    .feed-card:hover .hc-eng { color: #fff; opacity: 1; }
+
     /* 类型标 · 专业搭档 / 智囊团,颜色只落在这一小块 */
     .hc-kind {
       position: absolute; top: 7px; right: 9px; z-index: 3;
@@ -2877,17 +2897,28 @@
       box-shadow: 0 3px 8px -3px rgba(80, 62, 0, .6);
     }
     .hc-flag i { font-size: 11px; }
-    .feed-card.is-applied { box-shadow: 0 0 0 2px rgba(217, 178, 60, .85), 0 14px 28px -18px rgba(80, 62, 0, .6); }
+    /* 投递中的卡多了一张附函,卡身要先长够 —— 否则展开时会压到下一行 */
+    .feed-card.is-applied { min-height: 478px; box-shadow: 0 0 0 2px rgba(217, 178, 60, .85), 0 14px 28px -18px rgba(80, 62, 0, .6); }
     .feed-card.is-applied:hover { box-shadow: 0 0 0 2px rgba(217, 178, 60, .95), 0 30px 46px -24px rgba(80, 62, 0, .6); }
 
-    /* ---- 白身 · 等级 / 名字 / 一句自述 ---- */
-    .hc-body {
-      position: relative; flex: 1 1 auto; min-height: 0;
+    /* ---- 白身 · 等级 / 名字 / 一句自述 / 展开的细节 / 数值条 ----
+       整块是绝对定位的一叠:平时正好铺满卡片下半;hover 时立绘台收窄、自述收起、
+       细节展开,这一叠顺势往下长出卡外 —— 卡片是「长高」而不是被面板盖住,
+       所以等级、昵称、三格数值全程都在。绝对定位保证它长高不会顶动网格里的其它卡。 */
+    .hc-lower {
+      position: absolute; left: 0; right: 0; top: var(--art-h); z-index: 3;
+      min-height: calc(100% - var(--art-h));
       display: flex; flex-direction: column;
-      padding: 14px 16px 14px;
+      padding: 13px 16px 0;
+      background: var(--card-face);
+      border-radius: 0 0 14px 14px;
       text-align: center;
+      box-shadow: 0 14px 26px -20px rgba(23, 16, 48, .5);
+      transition: top var(--hc-slide) var(--hc-ease);
     }
-    .hc-face { display: flex; flex-direction: column; flex: 1 1 auto; }
+    /* 平时:名字这一块在白身里居中(上下各留一半余量),不是「顶上去、下面空一片」;
+       hover:展开区吃掉余量,两个 auto 自然归零 */
+    .hc-face { flex: 0 0 auto; margin-top: auto; }
     .hc-level {
       font-family: var(--mono); font-size: 9.5px; font-weight: 700;
       letter-spacing: .14em; color: var(--hero-ink); text-transform: uppercase;
@@ -2896,67 +2927,74 @@
       margin: 3px 0 0; font-size: 19px; font-weight: 700; line-height: 26px;
       letter-spacing: -.01em; color: var(--text-primary);
     }
-    .hc-role { font-size: 11px; line-height: 16px; color: var(--text-tertiary); margin-top: 1px; }
     .hc-desc {
       margin: 8px 0 0; font-size: 12px; line-height: 18.5px; color: var(--text-secondary);
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
 
-    /* 背面 · hover 时盖住立绘台以下的整块(白身 + 数值条),给「他怎么干活 + 作品 + 操作」 */
-    .hc-back {
-      /* 不硬塞进卡里:内容比卡长时,像抽屉一样往下伸出去 */
-      position: absolute; left: 0; right: 0; top: var(--art-h); bottom: auto; z-index: 5;
-      min-height: calc(100% - var(--art-h));
-      display: flex; flex-direction: column; gap: 7px;
-      padding: 12px 14px 13px;
-      background: var(--card-face);
-      border-radius: 0 0 14px 14px;
-      box-shadow: 0 20px 30px -20px rgba(23, 16, 48, .45);
-      text-align: left;
-      opacity: 0; transform: translateY(6px); pointer-events: none;
-      transition: opacity var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
+    /* 折叠件 · 0fr ⇄ 1fr 的高度过渡,比 max-height 跳变顺 */
+    .hc-fold {
+      display: grid; grid-template-rows: 1fr; flex: 0 0 auto;
+      transition: grid-template-rows var(--hc-slide) var(--hc-ease), opacity var(--hc-fade) var(--hc-ease);
     }
-    .feed-card:hover .hc-back,
-    .feed-card:focus-within .hc-back { opacity: 1; transform: none; pointer-events: auto; }
-    .hc-back-label {
+    .hc-fold > * { min-height: 0; overflow: hidden; }
+    .hc-fold.is-detail { grid-template-rows: 0fr; opacity: 0; }
+    .feed-card:hover .hc-fold.is-desc,
+    .feed-card:focus-within .hc-fold.is-desc { grid-template-rows: 0fr; opacity: 0; }
+    .feed-card:hover .hc-fold.is-detail,
+    .feed-card:focus-within .hc-fold.is-detail { grid-template-rows: 1fr; opacity: 1; }
+
+    /* 展开区 · 他怎么干活 + 作品 + 操作 */
+    .hc-detail { display: flex; flex-direction: column; gap: 6px; padding-top: 9px; text-align: left; }
+    .hc-detail-label {
       display: flex; align-items: baseline; gap: 6px;
       font-family: var(--mono); font-size: 9px; font-weight: 600;
       letter-spacing: .12em; color: var(--hero-ink);
     }
-    .hc-back-label em { font-style: normal; font-family: inherit; letter-spacing: .02em; color: var(--text-disabled); }
-    .hc-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+    .hc-detail-label em { font-style: normal; font-family: inherit; letter-spacing: .02em; color: var(--text-disabled); }
+    .hc-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
     .hc-lines li {
       position: relative; padding-left: 11px;
       font-size: 11.5px; line-height: 17px; color: var(--text-secondary);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      opacity: 0; transform: translateY(5px);
+      transition: opacity var(--hc-fade) var(--hc-ease), transform var(--hc-fade) var(--hc-ease);
     }
     .hc-lines li::before {
       content: ""; position: absolute; left: 1px; top: 7.5px;
       width: 4px; height: 4px; border-radius: 1px; background: var(--hero-bar); opacity: .75;
     }
-    .hc-shots { display: flex; gap: 6px; margin-top: auto; }
+    /* 一条一条跟上来,别整块闪现 */
+    .feed-card:hover .hc-lines li,
+    .feed-card:focus-within .hc-lines li { opacity: 1; transform: none; }
+    .feed-card:hover .hc-lines li:nth-child(2) { transition-delay: 60ms; }
+    .feed-card:hover .hc-lines li:nth-child(3) { transition-delay: 120ms; }
+    .hc-shots { display: flex; gap: 6px; }
     .hc-shot {
       appearance: none; padding: 0; border: 0; background: none; cursor: pointer;
       flex: 1 1 0; min-width: 0;
     }
     .hc-shot span {
-      display: block; height: 40px; overflow: hidden; border-radius: 4px;
+      display: block; height: 38px; overflow: hidden; border-radius: 4px;
       border: 1px solid var(--tone-line); background: #fff;
       transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
     .hc-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
     .hc-shot:hover span { transform: translateY(-2px); border-color: var(--hero-bar); }
-    .hc-back .fc-bar { margin-top: auto; padding-top: 8px; }
-    .hc-back .fc-bar .button { font-size: 11.5px; }
+    .hc-detail .fc-bar { margin-top: 2px; padding-top: 0; }
+    .hc-detail .fc-bar .button { font-size: 11.5px; }
 
     /* ---- 底部数值条 · 一眼可比的三个数,底色仍是中性的 ---- */
     .hc-stats {
       display: flex; flex: 0 0 auto; position: relative; z-index: 4;
+      margin: 11px -16px 0; /* 抵掉 .hc-lower 的左右内边距,数值条要通栏 */
       background: var(--art-1);
       border-top: 1px solid var(--tone-line);
       border-radius: 0 0 14px 14px;
       overflow: hidden;
     }
+    /* 内容不满时,数值条压在这一叠的最下沿 */
+    .hc-lower > .hc-stats:last-child { margin-top: auto; }
     .hc-stats div {
       flex: 1 1 0; min-width: 0; padding: 8px 4px 9px;
       text-align: center; color: var(--text-primary);
@@ -2973,15 +3011,15 @@
     }
 
     /* ---- 智囊团 · 占两个卡位的「阵容卡」 ---- */
-    .feed-card.fc-team { --art-h: 124px; }
+    .feed-card.fc-team { --art-h: 150px; --art-hover: 84px; min-height: 352px; }
     .feed-card.fc-team .hc-halo { width: 300px; height: 176px; }
-    .feed-card.fc-team .hc-body { text-align: left; }
-    .feed-card.fc-team .hc-face { flex-direction: row; gap: 20px; align-items: flex-start; }
+    .feed-card.fc-team .hc-lower { text-align: left; }
+    .feed-card.fc-team .hc-face { display: flex; gap: 20px; align-items: flex-start; }
     .feed-card.fc-team .hc-face-main { flex: 1 1 0; min-width: 0; }
     .feed-card.fc-team .hc-face-side { flex: 0 0 45%; min-width: 0; padding-top: 2px; }
     .feed-card.fc-team .hc-name { font-size: 20px; }
-    .feed-card.fc-team .hc-back { flex-direction: row; gap: 20px; }
-    .feed-card.fc-team .hc-back-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+    .feed-card.fc-team .hc-detail { flex-direction: row; gap: 20px; }
+    .feed-card.fc-team .hc-detail-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
     .hc-crew { display: flex; flex-wrap: wrap; gap: 5px; }
     .hc-crew span {
       display: inline-flex; align-items: center; gap: 5px;
@@ -8747,7 +8785,7 @@
     // 卡片密度由这里的字段决定(有没有形象图、案例、方法论),feed 的高低错落由此而来
     const RESUME_LORE = {
       researcher: {
-        nick: "溯源者", code: "RS-01", pitch: "先给你证据链，再给结论——每句判断都能点回原文。", jobs: 128, rate: "4.9", portrait: true,
+        nick: "求证研究员", code: "RS-01", pitch: "先给你证据链，再给结论——每句判断都能点回原文。", jobs: 128, rate: "4.9", portrait: true,
         style: "多疑、耐心。", styleCopy: "同一结论至少交叉两个来源，冲突处会标出来而不是抹平。",
         collab: "先对齐范围。", collabCopy: "开工前确认要回答的问题清单，避免查了一堆用不上的资料。",
         caseTitle: "研究报告库", caseCount: 9,
@@ -8759,7 +8797,7 @@
         note: { title: "结论要能点回原文", body: "任何一句判断都应该顺着引用回到出处。做不到这一点的结论，只是转述得比较自信而已。" }
       },
       ux: {
-        nick: "体验侦探", code: "UX-01", pitch: "把模糊的「不好用」翻译成能改的问题。", jobs: 96, rate: "4.9", portrait: true,
+        nick: "体验诊断师", code: "UX-01", pitch: "把模糊的「不好用」翻译成能改的问题。", jobs: 96, rate: "4.9", portrait: true,
         caseTitle: "体验案例集", caseCount: 12,
         cases: [
           { title: "新手引导体验诊断", cover: COVER_DOC },
@@ -8769,7 +8807,7 @@
         note: { title: "先定义，再塑形", body: "动手画界面之前，先把用户目标、关键场景和失败路径写清楚。定义得越准，后面的视觉决策越少靠猜。" }
       },
       "ux-researcher": {
-        nick: "洞察猎手", code: "UX-03", pitch: "从行为矛盾里挑出真正值钱的机会。", jobs: 64, rate: "4.8",
+        nick: "用户洞察师", code: "UX-03", pitch: "从行为矛盾里挑出真正值钱的机会。", jobs: 64, rate: "4.8",
         caseTitle: "研究案例", caseCount: 7,
         cases: [
           { title: "用户画像", cover: COVER_DOC },
@@ -8779,7 +8817,7 @@
         note: { title: "先看行为，再听说法", body: "用户说的和做的往往不一致。矛盾出现的地方，通常就是机会所在。" }
       },
       interaction: {
-        nick: "流程织者", code: "IX-05", pitch: "流程跑不跑得通，要看它出错时还在不在。", jobs: 72, rate: "4.8",
+        nick: "流程设计师", code: "IX-05", pitch: "流程跑不跑得通，要看它出错时还在不在。", jobs: 72, rate: "4.8",
         caseTitle: "流程案例", caseCount: 6,
         cases: [
           { title: "异常恢复路径", cover: COVER_WEB },
@@ -8787,7 +8825,7 @@
         ]
       },
       ui: {
-        nick: "视觉塑形师", code: "UI-02", pitch: "界面不是画出来的，是层级和规则长出来的。", jobs: 88, rate: "4.9", portrait: true,
+        nick: "界面设计师", code: "UI-02", pitch: "界面不是画出来的，是层级和规则长出来的。", jobs: 88, rate: "4.9", portrait: true,
         caseTitle: "界面作品集", caseCount: 18,
         cases: [
           { title: "控制台组件规范 v2", cover: COVER_WEB },
@@ -8797,7 +8835,7 @@
         note: { title: "规则先于像素", body: "间距、层级和状态先成体系，具体页面才不会互相打架。设计系统是把决策提前一次做完。" }
       },
       engineer: {
-        nick: "落地构建者", code: "EN-06", pitch: "先读懂现有代码库，再动第一行。", jobs: 152, rate: "4.8",
+        nick: "落地工程师", code: "EN-06", pitch: "先读懂现有代码库，再动第一行。", jobs: 152, rate: "4.8",
         style: "稳。", styleCopy: "在隔离工作区改动，跑通测试再提交可审查的变更。",
         collab: "改动可回溯。", collabCopy: "每次提交都说明动了什么、为什么，以及风险在哪。",
         caseTitle: "工程交付", caseCount: 24,
@@ -8807,7 +8845,7 @@
         ]
       },
       analyst: {
-        nick: "数据解读者", code: "DA-07", pitch: "先把数据洗干净，再谈结论。", jobs: 110, rate: "4.9",
+        nick: "数据分析师", code: "DA-07", pitch: "先把数据洗干净，再谈结论。", jobs: 110, rate: "4.9",
         caseTitle: "分析案例", caseCount: 15,
         cases: [
           { title: "异常任务分布分析", cover: COVER_TABLE },
@@ -8815,7 +8853,7 @@
         ]
       },
       writer: {
-        nick: "文字打磨匠", code: "WR-08", pitch: "写给谁看，决定怎么写。", jobs: 134, rate: "4.8",
+        nick: "文档撰写师", code: "WR-08", pitch: "写给谁看，决定怎么写。", jobs: 134, rate: "4.8",
         caseTitle: "文档作品", caseCount: 21,
         cases: [
           { title: "开放接口接入指南", cover: COVER_DOC },
@@ -8823,7 +8861,7 @@
         ]
       },
       slides: {
-        nick: "叙事导演", code: "PT-09", pitch: "先立叙事主线，页面自然排得下。", jobs: 76, rate: "4.7",
+        nick: "汇报叙事师", code: "PT-09", pitch: "先立叙事主线，页面自然排得下。", jobs: 76, rate: "4.7",
         caseTitle: "汇报作品", caseCount: 11,
         cases: [
           { title: "季度体验汇报 deck", cover: COVER_PPT },
@@ -8832,7 +8870,7 @@
         note: { title: "一页只讲一件事", body: "汇报的阻力大多来自信息叠加。先写下每页要留在听众脑子里的那句话，再决定放什么图。" }
       },
       product: {
-        nick: "机会捕手", code: "PM-10", pitch: "把用户问题换算成「值不值得做」。", jobs: 68, rate: "4.8",
+        nick: "产品策略师", code: "PM-10", pitch: "把用户问题换算成「值不值得做」。", jobs: 68, rate: "4.8",
         caseTitle: "策略案例", caseCount: 10,
         cases: [
           { title: "机会评估表", cover: COVER_TABLE },
@@ -8842,7 +8880,7 @@
         note: { title: "优先级不是排序，是取舍", body: "把机会按价值和成本摆开之后，真正的动作是决定这一轮不做什么，并说清楚为什么。" }
       },
       tester: {
-        nick: "边界守门人", code: "QA-11", pitch: "我负责替你先失败一次。", jobs: 94, rate: "4.9",
+        nick: "质量把关员", code: "QA-11", pitch: "我负责替你先失败一次。", jobs: 94, rate: "4.9",
         caseTitle: "验证案例", caseCount: 14,
         cases: [
           { title: "测试用例集", cover: COVER_TABLE },
@@ -9271,6 +9309,14 @@
     function heroFigure(item, extraClass) {
       return `<span class="hc-fig ${extraClass || ""}"><img src="${marketCharacter(item)}" alt=""></span>`;
     }
+    // 英文名 · 就是一个人名,和立绘上那个人对得上(男/女形象各取各的名)
+    const HERO_ENG = {
+      researcher: "Theo", ux: "Nora", "ux-researcher": "Iris",
+      interaction: "Vera", ui: "Mia", engineer: "Leo",
+      analyst: "Ray", writer: "Sam", slides: "Ada",
+      product: "Ella", tester: "Max"
+    };
+    const heroEng = (id) => `<span class="hc-eng">${HERO_ENG[id] || "Partner"}</span>`;
     const heroLevel = (jobs) => `LV.${Math.max(3, Math.round((jobs || 60) / 10))}`;
 
     function heroStats(cells) {
@@ -9279,12 +9325,12 @@
     }
 
     // 立绘台的两个角:档案号 + 稀有度(投递中时换成「已投递」旗)
-    function heroArt(item, code, kindLabel, applied, duo) {
+    function heroArt(item, kindLabel, applied, duo) {
       return `
         <div class="hc-art">
-          <span class="hc-halo"></span>
+          <span class="hc-glow-clip"><span class="hc-halo"></span></span>
           ${heroFigure(item, duo ? "is-duo" : "")}
-          <span class="hc-code">${code}</span>
+          ${heroEng(item.id)}
           ${applied
             ? `<span class="hc-flag"><i class="ph ph-paper-plane-tilt"></i>已投递</span>`
             : `<span class="hc-kind">${kindLabel}</span>`}
@@ -9298,26 +9344,28 @@
       const cases = (lore.cases || []).slice(0, 3);
       return `
         <article class="feed-card fc-resume ${heroTone(expert.id)} ${rank ? "is-applied" : ""}" data-agent="${expert.id}" data-kind="expert" tabindex="0" aria-label="查看 ${expert.name} 的简历">
-          ${heroArt(expert, lore.code || slugOf(expert.id), "专业搭档", !!rank)}
-          <div class="hc-body">
+          ${heroArt(expert, "专业搭档", !!rank)}
+          <div class="hc-lower">
             ${rank ? feedLetter(expert.id, "expert", rank) : ""}
             <div class="hc-face">
               <span class="hc-level">${heroLevel(lore.jobs)} · ${expert.subtitle || ""}</span>
               <h4 class="hc-name">${nickOf(expert)}</h4>
-              <p class="hc-desc">${lore.pitch || expert.description}</p>
             </div>
+            <div class="hc-fold is-desc"><div><p class="hc-desc">${lore.pitch || expert.description}</p></div></div>
+            <div class="hc-fold is-detail"><div>
+              <div class="hc-detail">
+                <span class="hc-detail-label">工作方式<em>${expert.role}</em></span>
+                <ul class="hc-lines">${styleOf(expert.id).map((one) => `<li>${one}</li>`).join("")}</ul>
+                ${heroShots(cases, nickOf(expert), lore)}
+                ${feedActions(expert.id, "expert")}
+              </div>
+            </div></div>
+            ${heroStats([
+              [lore.jobs || 60, "", "交付"],
+              [lore.rate || "4.8", "★", "评分"],
+              [(expert.skills || []).length, "", "技能"]
+            ])}
           </div>
-          <div class="hc-back">
-            <span class="hc-back-label">${nickOf(expert)}<em>工作方式 · ${expert.role}</em></span>
-            <ul class="hc-lines">${styleOf(expert.id).map((one) => `<li>${one}</li>`).join("")}</ul>
-            ${heroShots(cases, nickOf(expert), lore)}
-            ${feedActions(expert.id, "expert")}
-          </div>
-          ${heroStats([
-            [lore.jobs || 60, "", "交付"],
-            [lore.rate || "4.8", "★", "评分"],
-            [(expert.skills || []).length, "", "技能"]
-          ])}
         </article>`;
     }
 
@@ -9384,10 +9432,10 @@
       const domains = new Set(members.map((one) => one.subtitle || one.role));
       const duoArt = `
         <div class="hc-art">
-          <span class="hc-halo"></span>
+          <span class="hc-glow-clip"><span class="hc-halo"></span></span>
           <span class="hc-fig is-duo">${(leads.length ? leads : members.slice(0, 1))
             .map((one) => `<img src="${marketCharacter(one)}" alt="">`).join("")}</span>
-          <span class="hc-code">${slugOf(team.id)}_SQUAD</span>
+          <span class="hc-eng">Crew</span>
           ${rank
             ? `<span class="hc-flag"><i class="ph ph-paper-plane-tilt"></i>已投递</span>`
             : `<span class="hc-kind">智囊团</span>`}
@@ -9395,37 +9443,39 @@
       return `
         <article class="feed-card fc-team is-team is-tone-squad ${rank ? "is-applied" : ""}" data-agent="${team.id}" data-kind="team" tabindex="0" aria-label="查看 ${team.name} 的团队履历">
           ${duoArt}
-          <div class="hc-body">
+          <div class="hc-lower">
             ${rank ? feedLetter(team.id, "team", rank) : ""}
             <div class="hc-face">
               <div class="hc-face-main">
                 <span class="hc-level">SQUAD · ${members.length} 人阵容</span>
                 <h4 class="hc-name">${team.name}</h4>
-                <p class="hc-desc">${team.description || "按活儿分工，上一位的产出就是下一位的输入。"}</p>
               </div>
               <div class="hc-face-side">
-                <span class="hc-back-label" style="margin-bottom:6px">阵容成员</span>
+                <span class="hc-detail-label" style="margin-bottom:6px">阵容成员</span>
                 <div class="hc-crew">${members.slice(0, 4).map((member) => `
                   <span><img src="${marketAvatar(member)}" alt="">${nickOf(member)}</span>`).join("")}</div>
               </div>
             </div>
+            <div class="hc-fold is-desc"><div><p class="hc-desc">${team.description || "按活儿分工，上一位的产出就是下一位的输入。"}</p></div></div>
+            <div class="hc-fold is-detail"><div>
+              <div class="hc-detail">
+                <div class="hc-detail-col">
+                  <span class="hc-detail-label">协作方式<em>交接点会确认</em></span>
+                  <ul class="hc-lines">${TEAM_STYLE.map((one) => `<li>${one}</li>`).join("")}</ul>
+                  ${feedActions(team.id, "team")}
+                </div>
+                <div class="hc-detail-col">
+                  <span class="hc-detail-label">联合案例<em>${lore.caseCount || cases.length} 件</em></span>
+                  ${heroShots(cases, team.name, lore)}
+                </div>
+              </div>
+            </div></div>
+            ${heroStats([
+              [members.length, "", "成员"],
+              [domains.size, "", "覆盖方向"],
+              [jobsSum, "", "合计交付"]
+            ])}
           </div>
-          <div class="hc-back">
-            <div class="hc-back-col">
-              <span class="hc-back-label">${team.name}<em>协作方式</em></span>
-              <ul class="hc-lines">${TEAM_STYLE.map((one) => `<li>${one}</li>`).join("")}</ul>
-              ${feedActions(team.id, "team")}
-            </div>
-            <div class="hc-back-col">
-              <span class="hc-back-label">联合案例<em>${lore.caseCount || cases.length} 件</em></span>
-              ${heroShots(cases, team.name, lore)}
-            </div>
-          </div>
-          ${heroStats([
-            [members.length, "", "成员"],
-            [domains.size, "", "覆盖方向"],
-            [jobsSum, "", "合计交付"]
-          ])}
         </article>`;
     }
 
