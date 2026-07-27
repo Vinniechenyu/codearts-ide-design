@@ -2162,46 +2162,47 @@
     .roster-deck {
       display: flex;
       align-items: flex-start;
-      gap: 0;
-      overflow-x: auto;
-      margin: 0 calc(var(--sp-8) * -1);
-      padding: 30px var(--sp-8) 26px;
-      scrollbar-width: none;
-      -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,0.15) 26px, #000 96px, #000 calc(100% - 96px), rgba(0,0,0,0.15) calc(100% - 26px), transparent 100%);
-      mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,0.15) 26px, #000 96px, #000 calc(100% - 96px), rgba(0,0,0,0.15) calc(100% - 26px), transparent 100%);
+      justify-content: center;
+      gap: 14px;
+      overflow: visible;
+      margin: 0;
+      padding: 26px 0 28px;
     }
-    .roster-deck::-webkit-scrollbar { display: none; }
 
     .roster-deck .roster-card {
       position: relative;
       flex: 0 0 auto;
-      width: 250px;
-      min-height: 300px;
+      width: 156px;
+      height: 392px;
       display: flex;
       flex-direction: column;
-      overflow: visible;
+      overflow: hidden;
+      margin: 0;
       padding: 0;
       border: 1px solid var(--border-default);
       border-radius: 18px;
-      box-shadow: 0 6px 16px -12px rgba(23, 16, 48, 0.16);
-      transform-origin: bottom center;
-      transition: transform 0.36s var(--ease), box-shadow 0.36s var(--ease), border-color 0.36s var(--ease);
+      box-shadow: 0 10px 24px -14px rgba(23, 16, 48, 0.26);
+      transition:
+        width 0.44s var(--ease),
+        box-shadow 0.36s var(--ease),
+        border-color 0.36s var(--ease);
       cursor: pointer;
     }
 
-    /* 叠放:统一微倾 + 负外边距重叠;卡片多时横向滚动 */
-    /* 平铺并排(不重叠、不倾斜)*/
-    .roster-deck .roster-card { margin-right: 16px; transform: none; }
+    /* 推荐位主卡:横向加宽,左侧形象 + 右侧能力与案例 */
+    .roster-deck .roster-card.is-featured {
+      flex-direction: row;
+      align-items: stretch;
+      box-shadow: 0 26px 52px -24px rgba(23, 16, 48, 0.34);
+      border-color: var(--brand-border);
+      cursor: default;
+    }
 
-
-    /* hover / 键盘聚焦:抽出、扶正、上浮、置顶 */
     .roster-deck .roster-card:hover,
     .roster-deck .roster-card:focus-visible,
     .roster-deck .roster-card:focus-within,
     .roster-deck .roster-card.is-previewing {
-      transform: translateY(-6px);
-      z-index: 10;
-      box-shadow: 0 16px 34px -18px rgba(23, 16, 48, 0.2);
+      box-shadow: 0 26px 52px -24px rgba(23, 16, 48, 0.34);
       border-color: var(--brand-border);
     }
 
@@ -2472,6 +2473,218 @@
     .case-caption { min-width: 0; text-align: left; }
     .case-caption strong { display: block; font-size: 12px; font-weight: 600; color: var(--text-primary); }
     .case-caption span { display: block; margin-top: 2px; font-size: 10.5px; color: var(--text-tertiary); line-height: 14px; }
+
+    /* ============================================================
+       推荐位 · 扇形排列(替代原自动轮播)
+       常态窄卡只露 3D 形象与名字;悬停的那张加宽成横版主卡,
+       左形象 / 右能力·案例·邀请,其余卡片按距离扇开、下沉、缩小
+       ============================================================ */
+    /* 宽度按「侧栏之外的内容区」标定,保证 5 张卡平铺不撑破面板 */
+    .roster-deck { --fan-w: 168px; --fan-w-lg: 430px; }
+    .roster-deck .roster-card { width: var(--fan-w); }
+    .roster-deck .roster-card.is-featured { width: var(--fan-w-lg); }
+
+    @media (max-width: 1500px) {
+      .roster-deck { --fan-w: 150px; --fan-w-lg: 396px; gap: 12px; }
+      .roster-deck .roster-card.is-featured .deck-portrait { flex-basis: 138px; }
+      .roster-deck .roster-card.is-featured .deck-content { padding: 16px 14px 14px; }
+      .roster-deck .roster-card.is-featured .roster-card-actions .button { padding-left: 8px; padding-right: 8px; font-size: 12px; }
+      .roster-deck .roster-card.is-featured .deck-meta { gap: 8px; }
+    }
+    @media (max-width: 1300px) {
+      .roster-deck { --fan-w: 130px; --fan-w-lg: 360px; gap: 10px; }
+      .roster-deck .roster-card { height: 372px; }
+    }
+    @media (max-width: 1150px) {
+      .roster-deck { --fan-w: 112px; --fan-w-lg: 330px; gap: 8px; }
+      .roster-deck .roster-card:not(.is-featured) .deck-desc { -webkit-line-clamp: 3; }
+    }
+
+    /* —— 常态卡:上形象 + 下名称/角色/一句话介绍 —— */
+    .roster-deck .roster-card:not(.is-featured) .deck-portrait {
+      position: relative;
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 176px;
+      padding: 0;
+      align-items: center;
+    }
+    .roster-deck .roster-card:not(.is-featured) .deck-portrait::before { inset: 0; border-radius: 0; }
+    /* 角色 PNG 四周留白很大(人物仅占画幅约 46% 宽),放大出框、由封面区裁切 */
+    .roster-deck .roster-card .deck-portrait { overflow: hidden; }
+    .roster-deck .roster-card:not(.is-featured) .deck-portrait .persona-character {
+      width: 190%;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      filter: drop-shadow(0 16px 16px rgba(76, 29, 149, 0.18));
+    }
+    .roster-deck .roster-card:not(.is-featured) .deck-portrait.is-duo .persona-character {
+      width: 104%;
+      max-height: none;
+      margin: 0 -21%;
+    }
+    .roster-deck .roster-card:not(.is-featured) .deck-content {
+      flex: 0 0 auto;
+      padding: 14px 16px 18px;
+    }
+    .roster-deck .roster-card:not(.is-featured) .deck-content h2 {
+      font-size: 16px;
+      line-height: 23px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .roster-deck .roster-card:not(.is-featured) .deck-role {
+      font-size: 11.5px;
+      line-height: 16px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .roster-deck .roster-card:not(.is-featured) .deck-desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 10px 0 0;
+      opacity: 1;
+      transform: none;
+      font-size: 11.5px;
+      line-height: 17px;
+    }
+    .roster-deck .roster-card:not(.is-featured) .card-capabilities,
+    .roster-deck .roster-card:not(.is-featured) .deck-cases,
+    .roster-deck .roster-card:not(.is-featured) .deck-meta,
+    .roster-deck .roster-card:not(.is-featured) .roster-card-actions { display: none; }
+    .roster-deck .roster-card:not(.is-featured) .deck-status {
+      top: 10px;
+      right: 10px;
+      padding: 3px 8px;
+      font-size: 10px;
+    }
+
+    /* —— 主卡:左形象栏 + 右信息栏 —— */
+    .roster-deck .roster-card.is-featured .deck-portrait {
+      flex: 0 0 158px;
+      height: auto;
+      padding: 0;
+      align-items: center;
+    }
+    .roster-deck .roster-card.is-featured .deck-portrait::before { inset: 0; border-radius: 0; }
+    .roster-deck .roster-card.is-featured .deck-portrait .persona-character {
+      width: 196%;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      filter: drop-shadow(0 18px 18px rgba(76, 29, 149, 0.18));
+    }
+    .roster-deck .roster-card.is-featured .deck-portrait.is-duo { flex-direction: column; gap: 0; }
+    .roster-deck .roster-card.is-featured .deck-portrait.is-duo .persona-character { width: 172%; max-height: none; margin: -7% 0; }
+    .roster-deck .roster-card.is-featured .deck-content {
+      flex: 1;
+      min-width: 0;
+      padding: 18px 18px 16px;
+    }
+    .roster-deck .roster-card.is-featured .deck-content h2 { font-size: 19px; line-height: 26px; }
+    .roster-deck .roster-card.is-featured .deck-desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 8px 0 0;
+      opacity: 1;
+      transform: none;
+      transition-delay: 0.12s;
+    }
+    .roster-deck .roster-card.is-featured .card-capabilities { margin-top: 12px; }
+    .roster-deck .roster-card.is-featured .deck-cases { margin-top: 14px; justify-content: flex-start; }
+    .roster-deck .roster-card.is-featured .case-caption { display: block; opacity: 1; }
+    .roster-deck .roster-card.is-featured .roster-card-actions {
+      position: static;
+      margin-top: auto;
+      padding-top: 14px;
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    /* 协作数据(仅主卡展开时可见)*/
+    .deck-meta { display: none; }
+    .roster-deck .roster-card.is-featured .deck-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border-subtle);
+    }
+    .deck-meta > div { flex: 1; min-width: 0; }
+    .deck-meta strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 19px;
+      color: var(--text-primary);
+    }
+    .deck-meta span {
+      display: block;
+      margin-top: 1px;
+      font-size: 9.5px;
+      line-height: 13px;
+      color: var(--text-tertiary);
+    }
+    .roster-deck .roster-card.is-featured .roster-card-actions .button {
+      flex: 1;
+      min-width: 0;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    /* 主卡内案例封面保持堆叠;只在悬停封面本身时轻扇开 */
+    .roster-deck .roster-card.is-featured .case-sheet.s-back { transform: rotate(-10deg) translate(-8px, 2px) scale(0.9); }
+    .roster-deck .roster-card.is-featured .case-sheet.s-2nd { transform: rotate(4deg) translate(0, 3px) scale(0.92); }
+    .roster-deck .roster-card.is-featured .case-sheet.s-mid { transform: rotate(7deg) translate(8px, 1px) scale(0.95); }
+    .roster-deck .roster-card.is-featured .case-sheet.s-front { transform: rotate(-2deg); }
+    .roster-deck .roster-card.is-featured .case-stack:hover .case-sheet.s-back { transform: rotate(-15deg) translate(-15px, -7px) scale(0.98); z-index: 4; }
+    .roster-deck .roster-card.is-featured .case-stack:hover .case-sheet.s-2nd { transform: rotate(-5deg) translate(-3px, -10px) scale(1); z-index: 5; }
+    .roster-deck .roster-card.is-featured .case-stack:hover .case-sheet.s-mid { transform: rotate(6deg) translate(13px, -10px) scale(1.02); z-index: 6; }
+    .roster-deck .roster-card.is-featured .case-stack:hover .case-sheet.s-front { transform: rotate(15deg) translate(28px, -6px) scale(1); z-index: 7; }
+
+    /* —— 推荐位页脚:指示点 + 操作提示 —— */
+    .roster-fan-foot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 0;
+    }
+    .roster-fan-dots { display: flex; align-items: center; gap: 7px; }
+    .roster-fan-dots button {
+      appearance: none;
+      width: 7px;
+      height: 7px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-full);
+      background: var(--border-default);
+      cursor: pointer;
+      transition: width var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+    }
+    .roster-fan-dots button.is-on { width: 20px; background: var(--brand); }
+    .roster-fan-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-tertiary);
+      font-size: 12px;
+    }
+    .roster-fan-hint i { font-size: 14px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .roster-deck .roster-card { transition: box-shadow 0.2s var(--ease), border-color 0.2s var(--ease); }
+    }
 
     /* 案例大图预览 · lightbox */
     .case-preview {
@@ -5729,9 +5942,9 @@
             <div id="hubBrowse">
             <div class="expert-hub-hero">
               <div>
-                <div class="eyebrow"><span class="brand-dot"></span>搭档中心 · 精选阵容</div>
+                <div class="eyebrow"><span class="brand-dot"></span>搭档中心 · 本周推荐位</div>
                 <h1>选择你的专业搭档</h1>
-                <p>浏览能力与案例,邀请加入 Work 或 Code。</p>
+                <p>推荐位常驻 5 位人选,悬停任意一位即可展开,查看能力、案例与邀请入口。</p>
               </div>
             </div>
 
@@ -5745,6 +5958,7 @@
                 <div class="deck-content">
                   <h2>体验侦探</h2>
                   <p class="deck-role">UX 专业搭档 · 体验策略师</p>
+                  <p class="deck-desc">从真实使用场景切入,定位体验断点与流失环节,输出可执行的体验策略和验收标准。</p>
                   <div class="card-capabilities" aria-label="UX 能力项">
                     <span class="cap-chip"><i class="ph ph-magnifying-glass"></i>用户洞察</span>
                     <span class="cap-chip"><i class="ph ph-path"></i>用户旅程</span>
@@ -5759,40 +5973,14 @@
                     </button>
                     <span class="case-caption"><strong>体验案例</strong><span>设计分析 · 旅程图 · 流程图</span></span>
                   </div>
+                  <div class="deck-meta" aria-label="协作数据">
+                    <div><strong>128</strong><span>次体验交付</span></div>
+                    <div><strong>4.8</strong><span>协作满意度</span></div>
+                    <div><strong>2.1 天</strong><span>平均交付周期</span></div>
+                  </div>
                   <div class="roster-card-actions">
                     <button class="button button-secondary button-compact" data-capability-profile="ux"><i class="ph ph-squares-four"></i>能力档案</button>
                     <button class="button button-accent button-compact" data-summon-kind="expert" data-summon-source="hub" data-entity-id="ux"><i class="ph ph-user-plus"></i>邀请加入</button>
-                  </div>
-                </div>
-              </article>
-
-              <article class="roster-card is-team" data-hub-group="team" data-capability-card="team" tabindex="0" aria-label="打开 UI/UX 智囊团阵型档案">
-                <span class="deck-id">TEAM-01</span>
-                <span class="deck-status is-team"><span class="status-dot dot-running"></span>推荐</span>
-                <div class="deck-portrait is-duo">
-                  <img class="persona-character" src="assets/codearts-agent/ux-partner.png" alt="UX 角色形象">
-                  <img class="persona-character" src="assets/codearts-agent/ui-partner.png" alt="UI 角色形象">
-                </div>
-                <div class="deck-content">
-                  <h2>UI/UX 智囊团</h2>
-                  <p class="deck-role">2 位角色 · 洞察定义 × 界面成型</p>
-                  <div class="card-capabilities" aria-label="智囊团能力项">
-                    <span class="cap-chip"><i class="ph ph-magnifying-glass"></i>洞察定义</span>
-                    <span class="cap-chip"><i class="ph ph-palette"></i>界面成型</span>
-                    <span class="cap-chip is-combo"><i class="ph ph-shield-check"></i>双重校验</span>
-                  </div>
-                  <div class="deck-cases" aria-label="案例封面">
-                    <button class="case-stack" onclick="showToast('智囊团 · 3 个案例:体验方案 / 界面原型 / 交付走查')">
-                      <span class="case-sheet s-back"><img src="assets/codearts-templates/doc-editorial-v2.png" alt=""></span>
-                      <span class="case-sheet s-mid"><img src="assets/codearts-templates/website-editorial-v2.png" alt=""></span>
-                      <span class="case-sheet s-front"><img src="assets/codearts-templates/ppt-editorial-v2.png" alt=""></span>
-                      <span class="case-sheet s-2nd"><img src="assets/codearts-templates/table-editorial-v2.png" alt=""></span>
-                    </button>
-                    <span class="case-caption"><strong>交付案例</strong><span>体验方案 · 界面原型 · 交付走查</span></span>
-                  </div>
-                  <div class="roster-card-actions">
-                    <button class="button button-secondary button-compact" data-capability-profile="team"><i class="ph ph-tree-structure"></i>阵型详情</button>
-                    <button class="button button-accent button-compact" data-summon-kind="team" data-summon-source="hub"><i class="ph ph-users-three"></i>组建智囊团</button>
                   </div>
                 </div>
               </article>
@@ -5806,6 +5994,7 @@
                 <div class="deck-content">
                   <h2>视觉塑形师</h2>
                   <p class="deck-role">UI 专业搭档 · 界面设计师</p>
+                  <p class="deck-desc">把结构与信息翻译成界面语言,产出可复用的视觉稿、组件规范与高保真原型。</p>
                   <div class="card-capabilities" aria-label="UI 能力项">
                     <span class="cap-chip"><i class="ph ph-palette"></i>UI 设计</span>
                     <span class="cap-chip"><i class="ph ph-stack"></i>视觉层级</span>
@@ -5820,9 +6009,51 @@
                     </button>
                     <span class="case-caption"><strong>界面案例</strong><span>视觉稿 · 组件规范 · 高保真</span></span>
                   </div>
+                  <div class="deck-meta" aria-label="协作数据">
+                    <div><strong>96</strong><span>次界面交付</span></div>
+                    <div><strong>4.7</strong><span>协作满意度</span></div>
+                    <div><strong>1.6 天</strong><span>平均交付周期</span></div>
+                  </div>
                   <div class="roster-card-actions">
                     <button class="button button-secondary button-compact" data-capability-profile="ui"><i class="ph ph-squares-four"></i>能力档案</button>
                     <button class="button button-accent button-compact" data-summon-kind="expert" data-summon-source="hub" data-entity-id="ui"><i class="ph ph-user-plus"></i>邀请加入</button>
+                  </div>
+                </div>
+              </article>
+
+              <article class="roster-card is-team is-featured" data-hub-group="team" data-capability-card="team" tabindex="0" aria-label="打开 UI/UX 智囊团阵型档案">
+                <span class="deck-id">TEAM-01</span>
+                <span class="deck-status is-team"><span class="status-dot dot-running"></span>推荐</span>
+                <div class="deck-portrait is-duo">
+                  <img class="persona-character" src="assets/codearts-agent/ux-partner.png" alt="UX 角色形象">
+                  <img class="persona-character" src="assets/codearts-agent/ui-partner.png" alt="UI 角色形象">
+                </div>
+                <div class="deck-content">
+                  <h2>UI/UX 智囊团</h2>
+                  <p class="deck-role">2 位角色 · 洞察定义 × 界面成型</p>
+                  <p class="deck-desc">UX 先定义问题、UI 再落地界面,两位角色交叉校验,一次拿到体验方案、界面原型和交付走查清单。</p>
+                  <div class="card-capabilities" aria-label="智囊团能力项">
+                    <span class="cap-chip"><i class="ph ph-magnifying-glass"></i>洞察定义</span>
+                    <span class="cap-chip"><i class="ph ph-palette"></i>界面成型</span>
+                    <span class="cap-chip is-combo"><i class="ph ph-shield-check"></i>双重校验</span>
+                  </div>
+                  <div class="deck-cases" aria-label="案例封面">
+                    <button class="case-stack" onclick="showToast('智囊团 · 3 个案例:体验方案 / 界面原型 / 交付走查')">
+                      <span class="case-sheet s-back"><img src="assets/codearts-templates/doc-editorial-v2.png" alt=""></span>
+                      <span class="case-sheet s-mid"><img src="assets/codearts-templates/website-editorial-v2.png" alt=""></span>
+                      <span class="case-sheet s-front"><img src="assets/codearts-templates/ppt-editorial-v2.png" alt=""></span>
+                      <span class="case-sheet s-2nd"><img src="assets/codearts-templates/table-editorial-v2.png" alt=""></span>
+                    </button>
+                    <span class="case-caption"><strong>交付案例</strong><span>体验方案 · 界面原型 · 交付走查</span></span>
+                  </div>
+                  <div class="deck-meta" aria-label="协作数据">
+                    <div><strong>64</strong><span>次团队协作</span></div>
+                    <div><strong>4.9</strong><span>协作满意度</span></div>
+                    <div><strong>3.2 天</strong><span>平均交付周期</span></div>
+                  </div>
+                  <div class="roster-card-actions">
+                    <button class="button button-secondary button-compact" data-capability-profile="team"><i class="ph ph-tree-structure"></i>阵型详情</button>
+                    <button class="button button-accent button-compact" data-summon-kind="team" data-summon-source="hub"><i class="ph ph-users-three"></i>组建智囊团</button>
                   </div>
                 </div>
               </article>
@@ -5836,6 +6067,7 @@
                 <div class="deck-content">
                   <h2>洞察猎手</h2>
                   <p class="deck-role">用户研究搭档 · 洞察研究员</p>
+                  <p class="deck-desc">做用户画像与竞品拆解,把散落的反馈收敛成机会点,并给出优先级建议。</p>
                   <div class="card-capabilities" aria-label="用户研究能力项">
                     <span class="cap-chip"><i class="ph ph-users"></i>场景分析</span>
                     <span class="cap-chip"><i class="ph ph-pulse"></i>行为洞察</span>
@@ -5849,6 +6081,11 @@
                       <span class="case-sheet s-2nd"><img src="assets/codearts-templates/ppt-editorial-v2.png" alt=""></span>
                     </button>
                     <span class="case-caption"><strong>研究案例</strong><span>用户画像 · 竞品分析 · 可用性</span></span>
+                  </div>
+                  <div class="deck-meta" aria-label="协作数据">
+                    <div><strong>73</strong><span>次研究交付</span></div>
+                    <div><strong>4.6</strong><span>协作满意度</span></div>
+                    <div><strong>2.4 天</strong><span>平均交付周期</span></div>
                   </div>
                   <div class="roster-card-actions">
                     <button class="button button-secondary button-compact" onclick="showToast('用户研究搭档 · 能力档案(完整版)')"><i class="ph ph-squares-four"></i>能力档案</button>
@@ -5866,6 +6103,7 @@
                 <div class="deck-content">
                   <h2>光影匠人</h2>
                   <p class="deck-role">视觉设计搭档 · 视觉设计师</p>
+                  <p class="deck-desc">统一视觉层级与品牌调性,沉淀设计系统与组件库,保证多页面表达一致。</p>
                   <div class="card-capabilities" aria-label="视觉设计能力项">
                     <span class="cap-chip"><i class="ph ph-stack"></i>视觉层级</span>
                     <span class="cap-chip"><i class="ph ph-squares-four"></i>组件规范</span>
@@ -5880,12 +6118,22 @@
                     </button>
                     <span class="case-caption"><strong>视觉案例</strong><span>视觉稿 · 设计系统 · 组件库</span></span>
                   </div>
+                  <div class="deck-meta" aria-label="协作数据">
+                    <div><strong>88</strong><span>次视觉交付</span></div>
+                    <div><strong>4.7</strong><span>协作满意度</span></div>
+                    <div><strong>1.8 天</strong><span>平均交付周期</span></div>
+                  </div>
                   <div class="roster-card-actions">
                     <button class="button button-secondary button-compact" onclick="showToast('视觉设计搭档 · 能力档案(完整版)')"><i class="ph ph-squares-four"></i>能力档案</button>
                     <button class="button button-accent button-compact" onclick="showToast('视觉设计搭档 · 可在完整版邀请')"><i class="ph ph-user-plus"></i>邀请加入</button>
                   </div>
                 </div>
               </article>
+            </div>
+
+            <div class="roster-fan-foot">
+              <div class="roster-fan-dots" id="rosterFanDots" role="tablist" aria-label="推荐位切换"></div>
+              <span class="roster-fan-hint"><i class="ph ph-cursor"></i>悬停展开卡片,查看能力与案例</span>
             </div>
 
             <div class="hub-market">
@@ -9205,35 +9453,83 @@
     renderParallelGrid();
     bindAudienceButtons();
 
-    // 搭档中心 · 自动轮播(复制一份实现无缝循环;hover / 按下时暂停)
+    // 搭档中心 · 推荐位扇形排列(替代自动轮播)
+    // 悬停/聚焦任意一张即成为主卡:加宽为横版并展开能力与案例;其余按距离扇开下沉
     (function () {
       const deck = el("rosterDeck");
       if (!deck) return;
-      [...deck.children].forEach((node) => {
-        const clone = node.cloneNode(true);
-        clone.setAttribute("aria-hidden", "true");
-        clone.setAttribute("tabindex", "-1");
-        clone.querySelectorAll("[tabindex]").forEach((n) => n.setAttribute("tabindex", "-1"));
-        deck.appendChild(clone);
-      });
-      let paused = false;
-      const speed = 0.55;
-      deck.addEventListener("mouseenter", () => { paused = true; });
-      deck.addEventListener("mouseleave", () => { paused = false; });
-      deck.addEventListener("pointerdown", () => { paused = true; });
-      window.addEventListener("pointerup", () => { paused = false; });
-      function tick() {
-        if (!paused && deck.clientWidth > 0) {
-          const kids = deck.children;
-          const half = kids.length >= 2 ? kids[kids.length >> 1].offsetLeft - kids[0].offsetLeft : 0;
-          if (half > 0) {
-            deck.scrollLeft += speed;
-            if (deck.scrollLeft >= half) deck.scrollLeft -= half;
-          }
-        }
-        requestAnimationFrame(tick);
+      const cards = [...deck.querySelectorAll(".roster-card")];
+      if (!cards.length) return;
+      const dotsBox = el("rosterFanDots");
+      let active = Math.max(0, cards.findIndex((card) => card.classList.contains("is-featured")));
+
+      if (dotsBox) {
+        dotsBox.innerHTML = cards.map((card, i) =>
+          `<button type="button" role="tab" data-fan-dot="${i}" aria-label="查看 ${card.querySelector("h2")?.textContent || "推荐搭档"}"></button>`
+        ).join("");
+        dotsBox.addEventListener("click", (event) => {
+          const dot = event.target.closest("[data-fan-dot]");
+          if (dot) setActive(Number(dot.dataset.fanDot));
+        });
+        dotsBox.addEventListener("mouseover", (event) => {
+          const dot = event.target.closest("[data-fan-dot]");
+          if (dot) setActive(Number(dot.dataset.fanDot));
+        });
       }
-      requestAnimationFrame(tick);
+
+      // 平铺:5 张卡上下对齐、等高,只有主卡横向加宽
+      function layout() {
+        cards.forEach((card, i) => {
+          const isActive = i === active;
+          card.classList.toggle("is-featured", isActive);
+          card.style.zIndex = String(isActive ? 3 : 1);
+          card.setAttribute("aria-expanded", String(isActive));
+        });
+        if (dotsBox) [...dotsBox.children].forEach((dot, i) => dot.classList.toggle("is-on", i === active));
+      }
+
+      function setActive(index) {
+        if (index === active || index < 0 || index >= cards.length) return;
+        active = index;
+        layout();
+      }
+
+      // 自动轮换主卡;悬停 / 键盘聚焦时暂停,移开后恢复
+      const AUTO_INTERVAL = 3000;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let autoTimer = null;
+      function startAuto() {
+        if (autoTimer || reduceMotion) return;
+        autoTimer = setInterval(() => {
+          if (document.hidden || el("expertHubView")?.hidden) return;
+          setActive((active + 1) % cards.length);
+        }, AUTO_INTERVAL);
+      }
+      function stopAuto() {
+        if (!autoTimer) return;
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+      deck.addEventListener("mouseenter", stopAuto);
+      deck.addEventListener("mouseleave", startAuto);
+      deck.addEventListener("focusin", stopAuto);
+      deck.addEventListener("focusout", startAuto);
+      dotsBox?.addEventListener("mouseenter", stopAuto);
+      dotsBox?.addEventListener("mouseleave", startAuto);
+
+      cards.forEach((card, i) => {
+        card.addEventListener("mouseenter", () => setActive(i));
+        card.addEventListener("focusin", () => setActive(i));
+        // 点击非主卡时先展开它,不直接跳能力档案
+        card.addEventListener("click", (event) => {
+          if (i === active) return;
+          event.stopPropagation();
+          setActive(i);
+        }, true);
+      });
+
+      layout();
+      startAuto();
     })();
 
     // 案例封面 · 大图预览画廊(文字说明 + 左右切换 + 自动播放 + 跑马灯进度)
