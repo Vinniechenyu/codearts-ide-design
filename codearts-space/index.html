@@ -2756,7 +2756,7 @@
       font-family: inherit;
       /* 卡面整体是中性灰白,颜色只当点缀:立绘身后的光晕、等级字、细节里的小色块 */
       --art-h: 140px;
-      --art-hover: 54px;
+      --art-hover: 96px;
       /* 展开是「长高」不是弹出,所以走一条更长更缓的曲线 */
       --hc-slide: 380ms;
       --hc-fade: 240ms;
@@ -2858,7 +2858,7 @@
       object-fit: contain; object-position: center bottom;
       filter: drop-shadow(0 14px 14px rgba(23, 16, 48, .24));
     }
-    .feed-card:hover .hc-fig { transform: translateX(-50%) scale(.6); }
+    .feed-card:hover .hc-fig { transform: translateX(-50%) scale(.82); }
     /* 双人:两个角色一左一右站台上,前后错开一点才像一队人 */
     .hc-fig.is-duo { width: 372px; height: 216px; bottom: -22px; display: flex; justify-content: center; align-items: flex-end; }
     .hc-fig.is-duo img { width: 226px; height: 100%; }
@@ -2913,15 +2913,18 @@
       background: var(--card-face);
       border-radius: 0 0 14px 14px;
       text-align: center;
-      box-shadow: 0 14px 26px -20px rgba(23, 16, 48, .5);
-      transition: top var(--hc-slide) var(--hc-ease);
+      transition: top var(--hc-slide) var(--hc-ease), min-height var(--hc-slide) var(--hc-ease);
     }
     /* 平时:名字这一块在白身里居中(上下各留一半余量),不是「顶上去、下面空一片」;
        hover:展开区吃掉余量,两个 auto 自然归零 */
     /* 立绘台收窄多少,这一叠就跟着上移多少 —— 少了这条,白身会原地不动,
        上面留出一条空白、下面把内容顶出卡外(自测时被调试样式补上过,漏了整整两轮) */
     .feed-card:hover .hc-lower,
-    .feed-card:focus-within .hc-lower { top: var(--art-hover); }
+    .feed-card:focus-within .hc-lower {
+      top: var(--art-hover);
+      /* 高度同时补齐到卡底,否则白身比卡短一截,露出下面卡自己的圆角 = 看着像两层卡 */
+      min-height: calc(100% - var(--art-hover));
+    }
 
     .hc-face { flex: 0 0 auto; margin-top: auto; }
     .hc-level {
@@ -2944,13 +2947,17 @@
     }
     .hc-fold > * { min-height: 0; overflow: hidden; }
     .hc-fold.is-detail { grid-template-rows: 0fr; opacity: 0; }
+    /* 数值条:平时压在最下沿,hover 收起来把地方让给细节 */
+    .hc-fold.is-stats { margin: auto -16px 0; }
+    .feed-card:hover .hc-fold.is-stats,
+    .feed-card:focus-within .hc-fold.is-stats { grid-template-rows: 0fr; opacity: 0; }
     .feed-card:hover .hc-fold.is-desc,
     .feed-card:focus-within .hc-fold.is-desc { grid-template-rows: 0fr; opacity: 0; }
     .feed-card:hover .hc-fold.is-detail,
     .feed-card:focus-within .hc-fold.is-detail { grid-template-rows: 1fr; opacity: 1; }
 
     /* 展开区 · 他怎么干活 + 作品 + 操作 */
-    .hc-detail { display: flex; flex-direction: column; gap: 5px; padding-top: 7px; text-align: left; }
+    .hc-detail { display: flex; flex-direction: column; gap: 6px; padding-top: 9px; text-align: left; }
     .hc-detail-label {
       display: flex; align-items: baseline; gap: 6px;
       font-family: var(--mono); font-size: 9px; font-weight: 600;
@@ -2980,7 +2987,7 @@
       flex: 1 1 0; min-width: 0;
     }
     .hc-shot span {
-      display: block; height: 28px; overflow: hidden; border-radius: 4px;
+      display: block; height: 38px; overflow: hidden; border-radius: 4px;
       border: 1px solid var(--tone-line); background: #fff;
       transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
@@ -2992,14 +2999,13 @@
     /* ---- 底部数值条 · 一眼可比的三个数,底色仍是中性的 ---- */
     .hc-stats {
       display: flex; flex: 0 0 auto; position: relative; z-index: 4;
-      margin: 11px -16px 0; /* 抵掉 .hc-lower 的左右内边距,数值条要通栏 */
+      margin: 11px 0 0;
       background: var(--art-1);
       border-top: 1px solid var(--tone-line);
       border-radius: 0 0 14px 14px;
       overflow: hidden;
     }
-    /* 内容不满时,数值条压在这一叠的最下沿 */
-    .hc-lower > .hc-stats:last-child { margin-top: auto; }
+
     .hc-stats div {
       flex: 1 1 0; min-width: 0; padding: 8px 4px 9px;
       text-align: center; color: var(--text-primary);
@@ -3016,7 +3022,7 @@
     }
 
     /* ---- 智囊团 · 占两个卡位的「阵容卡」 ---- */
-    .feed-card.fc-team { --art-h: 150px; --art-hover: 54px; min-height: 352px; }
+    .feed-card.fc-team { --art-h: 150px; --art-hover: 104px; min-height: 352px; }
     .feed-card.fc-team .hc-halo { width: 300px; height: 176px; }
     .feed-card.fc-team .hc-lower { text-align: left; }
     .feed-card.fc-team .hc-face { display: flex; gap: 20px; align-items: flex-start; }
@@ -3024,7 +3030,13 @@
     .feed-card.fc-team .hc-face-side { flex: 0 0 45%; min-width: 0; padding-top: 2px; }
     .feed-card.fc-team .hc-name { font-size: 20px; }
     .feed-card.fc-team .hc-detail { flex-direction: row; gap: 20px; }
+    /* 两栏的分栏比例要和上面「阵容成员」那一行一致(1 : 45%),否则右栏左边缘对不上 */
     .feed-card.fc-team .hc-detail-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+    .feed-card.fc-team .hc-detail-col:last-child { flex: 0 0 45%; }
+    /* 团队卡的案例封面吃满右栏高度,否则右下角空一大块 */
+    .feed-card.fc-team .hc-detail-col .hc-shots { flex: 1 1 auto; min-height: 64px; }
+    .feed-card.fc-team .hc-shot { display: flex; }
+    .feed-card.fc-team .hc-shot span { height: auto; width: 100%; }
     .hc-crew { display: flex; flex-wrap: wrap; gap: 5px; }
     .hc-crew span {
       display: inline-flex; align-items: center; gap: 5px;
@@ -9365,11 +9377,11 @@
                 ${feedActions(expert.id, "expert")}
               </div>
             </div></div>
-            ${heroStats([
+            <div class="hc-fold is-stats"><div>${heroStats([
               [lore.jobs || 60, "", "交付"],
               [lore.rate || "4.8", "★", "评分"],
               [(expert.skills || []).length, "", "技能"]
-            ])}
+            ])}</div></div>
           </div>
         </article>`;
     }
@@ -9475,11 +9487,11 @@
                 </div>
               </div>
             </div></div>
-            ${heroStats([
+            <div class="hc-fold is-stats"><div>${heroStats([
               [members.length, "", "成员"],
               [domains.size, "", "覆盖方向"],
               [jobsSum, "", "合计交付"]
-            ])}
+            ])}</div></div>
           </div>
         </article>`;
     }
