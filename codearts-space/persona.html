@@ -1009,6 +1009,9 @@
       width: min(880px, 100%);
     }
 
+    /* 新任务页:标题+输入框不贴顶,整块往下坐,首屏留白更像「起手」而不是「表单」 */
+    .workspace.is-compose .compose-view { padding-top: clamp(24px, 9vh, 96px); }
+
     .hero {
       margin-bottom: var(--sp-8);
     }
@@ -1123,6 +1126,73 @@
       background: transparent;
       border-radius: var(--radius-sm);
     }
+
+    /* 环境条 · 贴在输入框下沿的一层浅灰托盘:在哪跑(本地 / Worktree) + 哪个项目文件夹 */
+    .compose-shell {
+      position: relative;
+      padding-bottom: 42px;
+      background: var(--surface-hover);
+      border-radius: var(--radius-lg);
+    }
+    .compose-shell > .composer { position: relative; z-index: 1; }
+    .composer-env {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-1);
+      height: 42px;
+      padding: 0 var(--sp-3) 2px;
+    }
+    .env-wrap { position: relative; }
+    .env-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 8px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 0;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+    }
+    .env-button:hover { color: var(--text-primary); background: var(--surface-primary); }
+    .env-button i:first-child { font-size: 14px; color: var(--icon-secondary); }
+    .env-button .env-caret { font-size: 11px; color: var(--icon-secondary); }
+    .env-button.is-empty { color: var(--text-disabled); }
+    .env-button.is-empty i:first-child { color: var(--text-disabled); }
+    .env-menu {
+      position: absolute;
+      z-index: 40;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 232px;
+      padding: 5px;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      box-shadow: var(--elevation-3);
+    }
+    .env-menu-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+      padding: 7px 8px;
+      color: var(--text-primary);
+      background: transparent;
+      border: 0;
+      border-radius: var(--radius-sm);
+      text-align: left;
+    }
+    .env-menu-item:hover { background: var(--surface-hover); }
+    .env-menu-item i { margin-top: 1px; font-size: 14px; color: var(--icon-secondary); }
+    .env-menu-item strong { display: block; font-size: 12.5px; font-weight: 550; line-height: 18px; }
+    .env-menu-item span { display: block; font-size: 11.5px; line-height: 16px; color: var(--text-tertiary); }
+    .env-menu-item.is-checked strong { color: var(--brand-text); }
+    .env-menu-item.is-checked i { color: var(--brand-text); }
 
     .composer-toolbar {
       display: flex;
@@ -1283,11 +1353,14 @@
       border-color: var(--border-hover);
     }
 
+    /* 选中态弱一点:不是纯黑实心,而是浅底 + 主色字 */
     .template-type-tab.is-selected {
-      color: var(--on-fill);
-      background: var(--gray-1000);
-      border-color: var(--gray-1000);
+      color: var(--brand-text);
+      background: var(--brand-soft);
+      border-color: var(--brand-border);
+      font-weight: 550;
     }
+    .template-type-tab.is-selected i { color: var(--brand-text); }
 
     .task-template-grid {
       display: grid;
@@ -1297,7 +1370,6 @@
 
     .task-template-card {
       display: block;
-      min-height: 178px;
       padding: 0;
       overflow: hidden;
       color: var(--text-primary);
@@ -1324,8 +1396,9 @@
     }
 
     .task-template-cover {
+      display: block;      /* span 默认 inline,不给 display 高度根本不生效 —— 封面原来撑得过大就是这个原因 */
       position: relative;
-      height: 110px;
+      aspect-ratio: 16 / 9;   /* 产物样张统一 16:9 */
       overflow: hidden;
       background: var(--surface-hover);
       border-bottom: 1px solid var(--border-subtle);
@@ -1349,6 +1422,92 @@
     .task-template-cover.variant-3 .task-template-image {
       object-position: 72% center;
     }
+
+    /* ============================================================
+       模板封面 · 不用一张通用配图,按产物类型现画一张「样张」:
+       PPT 是一页幻灯片、Website 是一个页面、Table 是一张看板、Doc 是一页文稿。
+       用真实模板标题做样张里的标题,一眼看出这次会产出什么东西。
+       ============================================================ */
+    .tpl-mock {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 11px 13px;
+      background: linear-gradient(150deg, var(--mk-1) 0%, var(--mk-2) 100%);
+      --mk-1: #eceaf5; --mk-2: #e2dff0; --mk-ink: #5b4bb5; --mk-ink-2: #8d84c9;
+    }
+    .tpl-mock.tone-2 { --mk-1: #e7f0f7; --mk-2: #dbe8f4; --mk-ink: #2d6ba8; --mk-ink-2: #7fa6c9; }
+    .tpl-mock.tone-3 { --mk-1: #f6efe6; --mk-2: #f0e5d6; --mk-ink: #a9702c; --mk-ink-2: #c9a677; }
+    :root[data-theme="dark"] .tpl-mock { --mk-1: #2a2738; --mk-2: #232030; --mk-ink: #b9a8ff; --mk-ink-2: #6f689a; }
+    :root[data-theme="dark"] .tpl-mock.tone-2 { --mk-1: #1f2b38; --mk-2: #1b2531; --mk-ink: #8fbde8; --mk-ink-2: #5c7c99; }
+    :root[data-theme="dark"] .tpl-mock.tone-3 { --mk-1: #35291c; --mk-2: #2c2217; --mk-ink: #e0b276; --mk-ink-2: #8f7550; }
+
+    /* 纸面 · 所有样张都画在这张「纸」上 */
+    .mk-paper {
+      position: relative;
+      width: 100%; height: 100%;
+      padding: 9px 11px;
+      overflow: hidden;
+      background: #fff;
+      border-radius: 3px;
+      box-shadow: 0 5px 12px -6px rgba(23, 16, 48, .34);
+    }
+    :root[data-theme="dark"] .mk-paper { background: #16141f; }
+    .mk-title {
+      font-size: 8.5px; font-weight: 700; line-height: 12px; letter-spacing: -.01em;
+      color: var(--text-primary);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .mk-kicker { font-size: 6px; font-weight: 700; letter-spacing: .16em; color: var(--mk-ink); margin-bottom: 2px; }
+    .mk-line { height: 2.5px; border-radius: 1px; background: var(--border-default); }
+    .mk-lines { display: flex; flex-direction: column; gap: 2.5px; margin-top: 4px; }
+    .mk-rule { height: 1px; background: var(--border-subtle); margin: 5px 0; }
+
+    /* PPT · 左字右图的一页 */
+    .mk-slide { display: flex; gap: 7px; height: 100%; }
+    .mk-slide-l { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+    .mk-slide-r { flex: 0 0 38%; display: flex; align-items: flex-end; gap: 2.5px; }
+    .mk-bar { flex: 1 1 0; border-radius: 1px 1px 0 0; background: var(--mk-ink); opacity: .85; }
+    .mk-bar:nth-child(1) { height: 38%; opacity: .35; }
+    .mk-bar:nth-child(2) { height: 58%; opacity: .5; }
+    .mk-bar:nth-child(3) { height: 76%; opacity: .7; }
+    .mk-bar:nth-child(4) { height: 100%; }
+    .mk-kpis { display: flex; gap: 6px; margin-top: auto; }
+    .mk-kpi strong { display: block; font-size: 12px; font-weight: 700; line-height: 15px; color: var(--mk-ink); }
+    .mk-kpi span { display: block; width: 14px; height: 1.5px; margin-top: 2px; border-radius: 1px; background: var(--border-default); }
+    .mk-donut {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: conic-gradient(var(--mk-ink) 0 62%, var(--mk-ink-2) 62% 84%, var(--border-default) 84% 100%);
+      margin-left: auto;
+    }
+    .mk-donut::after { content: ""; display: block; width: 16px; height: 16px; margin: 9px; border-radius: 50%; background: #fff; }
+    :root[data-theme="dark"] .mk-donut::after { background: #16141f; }
+
+    /* Website · 一个页面 */
+    .mk-web { display: flex; flex-direction: column; height: 100%; }
+    .mk-chrome { display: flex; align-items: center; gap: 2px; padding-bottom: 4px; }
+    .mk-dot { width: 2.5px; height: 2.5px; border-radius: 50%; background: var(--border-default); }
+    .mk-chrome-bar { flex: 1; height: 3px; margin-left: 4px; border-radius: 2px; background: var(--surface-hover); }
+    .mk-hero { padding: 5px 6px; border-radius: 2px; background: linear-gradient(120deg, var(--mk-1), var(--mk-2)); }
+    .mk-cards { display: flex; gap: 3px; margin-top: 4px; }
+    .mk-card { flex: 1; height: 22px; border-radius: 2px; background: var(--surface-hover); border: 1px solid var(--border-subtle); }
+    .mk-cta { width: 24px; height: 5px; margin-top: 3px; border-radius: 2px; background: var(--mk-ink); }
+
+    /* Table · 一张看板 */
+    .mk-table { display: flex; flex-direction: column; height: 100%; }
+    .mk-th { display: flex; gap: 3px; padding-bottom: 3px; border-bottom: 1px solid var(--border-default); }
+    .mk-th span { flex: 1; height: 2px; border-radius: 1px; background: var(--mk-ink); opacity: .55; }
+    .mk-tr { display: flex; gap: 3px; padding: 3px 0; border-bottom: 1px solid var(--border-subtle); }
+    .mk-tr span { flex: 1; height: 2px; border-radius: 1px; background: var(--border-default); }
+    .mk-tr span:last-child { flex: 0 0 18%; background: var(--mk-ink); opacity: .3; }
+    .mk-spark { display: flex; align-items: flex-end; gap: 2px; height: 30px; margin-top: auto; }
+    .mk-spark i { flex: 1; border-radius: .5px; background: var(--mk-ink); opacity: .45; }
+
+    /* Doc · 一页文稿 */
+    .mk-doc { display: flex; flex-direction: column; height: 100%; }
+    .mk-quote { margin-top: 4px; padding: 4px 5px; border-left: 2px solid var(--mk-ink); background: var(--surface-hover); border-radius: 0 2px 2px 0; }
+    .mk-tags { display: flex; gap: 3px; margin-top: auto; }
+    .mk-tags span { width: 18px; height: 5px; border-radius: 2px; background: var(--mk-ink); opacity: .28; }
+    .mk-tags span:first-child { width: 26px; opacity: .5; }
 
     .task-template-badge {
       position: absolute;
@@ -1824,12 +1983,13 @@
     }
 
     .expert-hub-hero p {
-      max-width: 60ch;
+      max-width: 68ch;
       margin: var(--sp-2) 0 0;
       color: var(--text-secondary);
       font-size: 13px;
       line-height: 21px;
     }
+    .expert-hub-hero p b { font-weight: 600; color: var(--text-primary); }
 
     .hub-tabs {
       display: flex;
@@ -2628,7 +2788,7 @@
     /* ============================================================
        Agent 简历市场 · feed 流(瀑布流 · 多类型简历卡)
        ============================================================ */
-    .hero-line { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-6); }
+    .hero-line { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); }
     .hub-tools { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
     .hub-search {
       display: inline-flex; align-items: center; gap: 7px;
@@ -2694,6 +2854,21 @@
     }
     .brief-posted button:hover { color: var(--text-primary); }
 
+    /* 筛选条 · banner 之下、feed 之上:左领域 tab,右计数+搜索+类型 */
+    .hub-filterbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; gap: var(--sp-6);
+      max-width: 1080px; margin: 26px auto 0;
+      padding: 10px 0;
+      background: var(--surface-primary);
+    }
+    .hub-filterbar .feed-cats { flex: 1 1 auto; min-width: 0; }
+    .hub-filterbar .hub-search { flex: 0 0 auto; }
+    @media (max-width: 1180px) {
+      .hub-filterbar { flex-wrap: wrap; gap: var(--sp-3); }
+      .hub-filterbar .hub-search { width: 100%; }
+    }
+
     .feed-catbar { display: flex; align-items: center; gap: var(--sp-4); margin-top: 10px; }
     .feed-cats { display: flex; flex-wrap: wrap; gap: 4px; }
     .feed-cats button {
@@ -2707,10 +2882,189 @@
     .feed-cats button.is-selected { color: var(--text-primary); background: var(--surface-subtle); border-color: var(--border-subtle); font-weight: 600; }
     .feed-count { margin-left: auto; flex: 0 0 auto; font-size: 11.5px; color: var(--text-tertiary); white-space: nowrap; }
 
+    /* ============================================================
+       推荐 banner · 顶部横幅轮播:本周热点 / 编辑推荐的搭档与智囊团
+       一屏一位,左文右像;自动播,hover 暂停
+       ============================================================ */
+    .hub-banner {
+      position: relative;
+      max-width: 1080px;
+      margin: 22px auto 0;
+      height: 176px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    :root[data-theme="dark"] .hub-banner { background: rgba(255, 255, 255, .04); }
+    .bn-track { position: absolute; inset: 0; }
+
+    .bn-slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; gap: 24px;
+      padding: 0 0 0 34px;
+      background: linear-gradient(105deg, var(--bn-1) 0%, var(--bn-2) 62%, var(--bn-3) 100%);
+      opacity: 0; transform: scale(1.015);
+      transition: opacity 620ms var(--ease), transform 900ms var(--ease);
+      pointer-events: none;
+    }
+    .bn-slide.is-on { opacity: 1; transform: none; pointer-events: auto; }
+    /* 底纹:斜向细网点,和卡片的纸感呼应但更轻 */
+    .bn-slide::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(currentColor 1px, transparent 1px);
+      background-size: 14px 14px; color: var(--bn-ink); opacity: .07;
+    }
+    .bn-body { position: relative; z-index: 1; flex: 1 1 auto; min-width: 0; }
+    .bn-kicker {
+      display: inline-flex; align-items: center; gap: 6px; margin-bottom: 9px;
+      padding: 3px 10px 3px 8px; border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, .72);
+      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
+      letter-spacing: .1em; color: var(--bn-ink); white-space: nowrap;
+    }
+    .bn-kicker i { font-size: 12px; }
+    :root[data-theme="dark"] .bn-kicker { background: rgba(0, 0, 0, .3); }
+    .bn-title {
+      display: flex; align-items: baseline; gap: 10px; min-width: 0;
+      margin: 0 0 6px;
+      font-size: 21px; font-weight: 650; line-height: 28px;
+      letter-spacing: -.01em; color: var(--text-primary);
+      white-space: nowrap; overflow: hidden;
+    }
+    .bn-title em {
+      flex: 0 0 auto; font-style: italic; font-weight: 600;
+      font-family: "Bradley Hand", "Snell Roundhand", "Segoe Script", cursive;
+      font-size: 17px; color: var(--text-tertiary);
+    }
+    .bn-copy {
+      margin: 0; max-width: 46ch;
+      font-size: 12.5px; line-height: 19px; color: var(--text-secondary);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .bn-foot { display: flex; align-items: center; gap: 10px; margin-top: 13px; }
+    .bn-tags { display: flex; gap: 5px; min-width: 0; overflow: hidden; }
+    .bn-tags span {
+      flex: 0 0 auto; padding: 3px 9px; border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, .6); border: 1px solid rgba(23, 16, 48, .07);
+      font-size: 10.5px; color: var(--text-secondary); white-space: nowrap;
+    }
+    :root[data-theme="dark"] .bn-tags span { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .1); }
+
+    /* 右侧舞台 · 搭档=立绘+能力气泡;智囊团=散开的成员头像 */
+    .bn-stage {
+      position: relative; z-index: 1; flex: 0 0 auto;
+      width: 520px; height: 100%; margin-right: 40px;
+    }
+    .bn-figure {
+      position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%);
+      display: flex; align-items: flex-end;
+    }
+    .bn-figure img {
+      height: 178px; width: auto; max-width: 168px; object-fit: contain;
+      filter: drop-shadow(0 16px 22px rgba(23, 16, 48, .22));
+    }
+    .bn-figure img + img { margin-left: -18px; height: 146px; }
+
+    /* 能力气泡 · 白片 + 小头像,浮在立绘四周 */
+    .bn-bubble {
+      position: absolute; z-index: 2;
+      max-width: 138px;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px 4px 4px; border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(23, 16, 48, .06);
+      box-shadow: 0 8px 18px -10px rgba(23, 16, 48, .35);
+      font-size: 11.5px; color: var(--text-primary); white-space: nowrap;
+      overflow: hidden;
+      opacity: 0; transform: translateY(6px) scale(.94);
+      transition: opacity 460ms var(--ease) var(--d, 0ms), transform 620ms cubic-bezier(.34, 1.3, .5, 1) var(--d, 0ms);
+      animation: bnFloat 5.5s ease-in-out infinite;
+      animation-delay: var(--d, 0ms);
+    }
+    .bn-bubble i {
+      display: flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%; flex: 0 0 auto;
+      background: var(--surface-subtle); color: var(--brand-text); font-size: 13px;
+    }
+    :root[data-theme="dark"] .bn-bubble i { background: rgba(255, 255, 255, .1); }
+    /* 从中线往外推一个净空带(--gap),气泡就贴着人物而不是贴着舞台边 */
+    .bn-stage { --gap: 86px; }
+    .bn-bubble.is-l { right: calc(50% + var(--gap) + var(--x, 0px)); }
+    .bn-bubble.is-r { left: calc(50% + var(--gap) + var(--x, 0px)); }
+    .bn-slide.is-on .bn-bubble { opacity: 1; transform: none; }
+    :root[data-theme="dark"] .bn-bubble { background: rgba(38, 36, 48, .94); border-color: rgba(255, 255, 255, .1); }
+
+    /* 智囊团 · 一群人散开;大小不一,才不像列表 */
+    .bn-face {
+      position: absolute; z-index: 2;
+      width: var(--s, 44px); height: var(--s, 44px);
+      margin-left: calc(var(--s, 44px) / -2);
+      border-radius: 50%; overflow: hidden;
+      background: #f0eff4;
+      border: 2px solid rgba(255, 255, 255, .9);
+      box-shadow: 0 10px 20px -10px rgba(23, 16, 48, .4);
+      opacity: 0; transform: translateY(8px) scale(.9);
+      transition: opacity 460ms var(--ease) var(--d, 0ms), transform 660ms cubic-bezier(.34, 1.3, .5, 1) var(--d, 0ms);
+      animation: bnFloat 6.5s ease-in-out infinite;
+      animation-delay: var(--d, 0ms);
+    }
+    .bn-face img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .bn-slide.is-on .bn-face { opacity: 1; transform: none; }
+    :root[data-theme="dark"] .bn-face { border-color: rgba(255, 255, 255, .16); }
+
+    @keyframes bnFloat {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -6px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bn-bubble, .bn-face { animation: none; }
+    }
+
+    /* 翻页箭头 · 常态半隐,hover 才明显 */
+    .bn-arrow {
+      position: absolute; top: 50%; z-index: 3;
+      width: 30px; height: 30px; margin-top: -15px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; cursor: pointer;
+      background: rgba(255, 255, 255, .82); border: 1px solid rgba(23, 16, 48, .08);
+      color: var(--text-secondary); font-size: 15px;
+      opacity: 0; transition: opacity var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+    }
+    .hub-banner:hover .bn-arrow { opacity: 1; }
+    .bn-arrow:hover { background: #fff; color: var(--text-primary); }
+    .bn-arrow.is-prev { left: 12px; }
+    .bn-arrow.is-next { right: 12px; }
+    :root[data-theme="dark"] .bn-arrow { background: rgba(20, 19, 26, .8); border-color: rgba(255, 255, 255, .14); }
+
+    /* 进度点 · 当前那颗拉长成进度条,自动播时走完一圈 */
+    .bn-dots {
+      position: absolute; right: 34px; bottom: 18px; z-index: 3;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .bn-dots button {
+      appearance: none; padding: 0; cursor: pointer;
+      width: 7px; height: 7px; border-radius: var(--radius-full);
+      border: 0; background: rgba(23, 16, 48, .18);
+      transition: width var(--motion-normal) var(--ease), background var(--motion-fast) var(--ease);
+    }
+    .bn-dots button:hover { background: rgba(23, 16, 48, .32); }
+    .bn-dots button.is-on { width: 26px; background: rgba(23, 16, 48, .38); }
+    :root[data-theme="dark"] .bn-dots button { background: rgba(255, 255, 255, .24); }
+    :root[data-theme="dark"] .bn-dots button.is-on { background: rgba(255, 255, 255, .5); }
+
+    @media (max-width: 860px) {
+      .hub-banner { height: auto; }
+      .bn-slide { position: relative; padding: 22px 24px; }
+      .bn-slide:not(.is-on) { display: none; }
+      .bn-stage { display: none; }
+      .bn-dots { position: static; margin: 0 0 16px 24px; }
+    }
+
     /* 满铺画布:浅灰底 + 白卡,形成 feed「墙」的感觉 */
     .feed-canvas {
       margin: 0 calc(var(--sp-8) * -1);
-      padding: 22px var(--sp-8) 52px;
+      padding: 14px var(--sp-8) 52px;
       background: transparent;
       min-height: 62vh;
     }
@@ -6224,6 +6578,7 @@
               <p id="heroDescription">描述目标，或选择一个模板快速开始；需要专业协作时再邀请搭档加入。</p>
             </div>
 
+            <div class="compose-shell">
             <div class="composer">
               <textarea id="taskPrompt" aria-label="任务描述" placeholder="描述你想完成的任务，或从下方选择一个模板…"></textarea>
               <div class="composer-context" id="contextTags"></div>
@@ -6263,6 +6618,22 @@
                 </div>
               </div>
             </div>
+            <!-- 环境条 · 这次任务在哪跑、动哪个项目 -->
+            <div class="composer-env">
+              <div class="env-wrap">
+                <button class="env-button" id="envRunButton" aria-haspopup="true" aria-expanded="false">
+                  <i class="ph ph-desktop"></i><span id="envRunLabel">本地</span><i class="ph ph-caret-down env-caret"></i>
+                </button>
+                <div class="env-menu" id="envRunMenu" hidden></div>
+              </div>
+              <div class="env-wrap">
+                <button class="env-button is-empty" id="envFolderButton" aria-haspopup="true" aria-expanded="false">
+                  <i class="ph ph-folder-plus"></i><span id="envFolderLabel">选择文件夹（可选）</span><i class="ph ph-caret-down env-caret"></i>
+                </button>
+                <div class="env-menu" id="envFolderMenu" hidden></div>
+              </div>
+            </div>
+            </div>
 
             <section class="template-section" aria-label="选择产物类型与模板">
               <div class="template-type-tabs" id="templateTypeTabs" role="tablist" aria-label="模板类型"></div>
@@ -6292,27 +6663,31 @@
               <div>
                 <div class="hero-line">
                   <div class="hero-text">
-                    <div class="eyebrow"><span class="brand-dot"></span>搭档中心 · Agent 简历市场</div>
-                    <h1>翻简历，挑搭档</h1>
-                    <p>先看他交付过什么，再看他怎么干活。看得中，直接邀请进 Work 或 Code。</p>
+                    <h1>搭档中心</h1>
+                    <p><b>翻简历，挑搭档。</b>先看他交付过什么，再看他怎么干活。看得中，直接邀请进 Work 或 Code。</p>
                   </div>
-                  <div class="hub-tools">
-                    <label class="hub-search">
-                      <i class="ph ph-magnifying-glass"></i>
-                      <input id="feedSearch" type="search" placeholder="搜索能力 / 角色 / 作品" aria-label="搜索 Agent 简历">
-                    </label>
-                    <div class="hub-filter" role="tablist" aria-label="按类型筛选">
-                      <button role="tab" class="is-selected" aria-selected="true" data-feed-kind="all">全部</button>
-                      <button role="tab" aria-selected="false" data-feed-kind="partner">专业搭档</button>
-                      <button role="tab" aria-selected="false" data-feed-kind="team">智囊团</button>
-                    </div>
+                  <div class="hub-filter" role="tablist" aria-label="按类型筛选">
+                    <button role="tab" class="is-selected" aria-selected="true" data-feed-kind="all">全部</button>
+                    <button role="tab" aria-selected="false" data-feed-kind="partner">专业搭档</button>
+                    <button role="tab" aria-selected="false" data-feed-kind="team">智囊团</button>
                   </div>
-                </div>
-                <div class="feed-catbar">
-                  <div class="feed-cats" id="feedCats" role="tablist" aria-label="按领域筛选"></div>
-                  <span class="feed-count" id="feedCount"></span>
                 </div>
               </div>
+            </div>
+
+            <div class="hub-banner" id="hubBanner">
+              <div class="bn-track" id="bnTrack"></div>
+              <button class="bn-arrow is-prev" id="bnPrev" aria-label="上一条推荐"><i class="ph ph-caret-left"></i></button>
+              <button class="bn-arrow is-next" id="bnNext" aria-label="下一条推荐"><i class="ph ph-caret-right"></i></button>
+              <div class="bn-dots" id="bnDots" role="tablist" aria-label="推荐位"></div>
+            </div>
+
+            <div class="hub-filterbar">
+              <div class="feed-cats" id="feedCats" role="tablist" aria-label="按领域筛选"></div>
+              <label class="hub-search">
+                <i class="ph ph-magnifying-glass"></i>
+                <input id="feedSearch" type="search" placeholder="搜索能力 / 角色 / 作品" aria-label="搜索 Agent 简历">
+              </label>
             </div>
 
             <div class="feed-canvas">
@@ -7483,6 +7858,8 @@
       summonTarget: "current",
       selectedTemplateType: "ppt",
       selectedTemplateId: null,
+      runEnv: "local",      // 这次任务在哪跑:本地 / worktree
+      projectFolder: null,  // 动哪个项目文件夹
       scheduleTab: "tasks",
       skillFilter: "全部",
       connectorFilter: "全部",
@@ -7662,6 +8039,102 @@
       context.appendChild(tag);
     }
 
+    /* ============================================================
+       环境条 · 在哪跑 + 动哪个项目文件夹
+       只挂在新任务页的输入框下沿;加号菜单那套逻辑不动
+       ============================================================ */
+    const RUN_ENVS = [
+      { id: "local", icon: "ph-desktop", label: "本地", desc: "直接在当前工作区里改动" },
+      { id: "worktree", icon: "ph-git-branch", label: "Worktree", desc: "开一个隔离工作树，改完再合回来" }
+    ];
+    const PROJECT_FOLDERS = [
+      { id: "codearts", icon: "ph-folder", label: "CodeArts AI IDE", desc: "3 个进行中的任务" },
+      { id: "agentspace", icon: "ph-folder", label: "AgentSpace", desc: "上次打开：昨天" },
+      { id: "desktop", icon: "ph-folder", label: "Desktop", desc: "上次打开：本周" }
+    ];
+
+    function closeEnvMenus(except) {
+      ["envRunMenu", "envFolderMenu"].forEach((id) => {
+        if (id === except) return;
+        const menu = el(id);
+        if (menu) menu.hidden = true;
+      });
+      ["envRunButton", "envFolderButton"].forEach((id) => {
+        const button = el(id);
+        if (button && (!except || button.id !== except.replace("Menu", "Button"))) {
+          button.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
+
+    function renderEnvBar() {
+      const runButton = el("envRunButton");
+      if (!runButton) return;
+      const env = RUN_ENVS.find((one) => one.id === state.runEnv) || RUN_ENVS[0];
+      runButton.querySelector("i:first-child").className = `ph ${env.icon}`;
+      el("envRunLabel").textContent = env.label;
+
+      const folder = PROJECT_FOLDERS.find((one) => one.id === state.projectFolder);
+      const folderButton = el("envFolderButton");
+      folderButton.classList.toggle("is-empty", !folder);
+      folderButton.querySelector("i:first-child").className = `ph ${folder ? "ph-folder" : "ph-folder-plus"}`;
+      el("envFolderLabel").textContent = folder ? folder.label : "选择文件夹（可选）";
+
+      el("envRunMenu").innerHTML = RUN_ENVS.map((one) => `
+        <button class="env-menu-item ${one.id === state.runEnv ? "is-checked" : ""}" data-run-env="${one.id}">
+          <i class="ph ${one.icon}"></i>
+          <span><strong>${one.label}</strong><span>${one.desc}</span></span>
+        </button>`).join("");
+      el("envFolderMenu").innerHTML = PROJECT_FOLDERS.map((one) => `
+        <button class="env-menu-item ${one.id === state.projectFolder ? "is-checked" : ""}" data-project-folder="${one.id}">
+          <i class="ph ${one.icon}"></i>
+          <span><strong>${one.label}</strong><span>${one.desc}</span></span>
+        </button>`).join("") + (state.projectFolder ? `
+        <button class="env-menu-item" data-project-folder="">
+          <i class="ph ph-x"></i><span><strong>不指定文件夹</strong><span>让搭档自己判断范围</span></span>
+        </button>` : "");
+    }
+
+    function bindEnvBar() {
+      const runButton = el("envRunButton");
+      if (!runButton) return;
+      const toggle = (buttonId, menuId) => {
+        el(buttonId).addEventListener("click", (event) => {
+          event.stopPropagation();
+          const menu = el(menuId);
+          const next = menu.hidden;
+          closeEnvMenus();
+          menu.hidden = !next;
+          el(buttonId).setAttribute("aria-expanded", String(next));
+        });
+      };
+      toggle("envRunButton", "envRunMenu");
+      toggle("envFolderButton", "envFolderMenu");
+
+      el("envRunMenu").addEventListener("click", (event) => {
+        const item = event.target.closest("[data-run-env]");
+        if (!item) return;
+        state.runEnv = item.dataset.runEnv;
+        closeEnvMenus();
+        renderEnvBar();
+        const env = RUN_ENVS.find((one) => one.id === state.runEnv);
+        showToast(state.runEnv === "worktree" ? "将在隔离 Worktree 中执行，改动可单独回滚" : `将在${env.label}工作区执行`);
+      });
+      el("envFolderMenu").addEventListener("click", (event) => {
+        const item = event.target.closest("[data-project-folder]");
+        if (!item) return;
+        state.projectFolder = item.dataset.projectFolder || null;
+        closeEnvMenus();
+        renderEnvBar();
+        const folder = PROJECT_FOLDERS.find((one) => one.id === state.projectFolder);
+        showToast(folder ? `任务范围已限定在「${folder.label}」` : "已取消文件夹限定");
+      });
+      document.addEventListener("click", (event) => {
+        if (event.target.closest(".env-wrap")) return;
+        closeEnvMenus();
+      });
+    }
+
     function closeComposerAddMenu() {
       el("composerAddMenu").hidden = true;
       el("composerPlusButton").setAttribute("aria-expanded", "false");
@@ -7701,6 +8174,65 @@
       showToast(option.toast);
     }
 
+    // 模板封面 · 按产物类型现画一张样张(见 .tpl-mock 那段 CSS)
+    function templateMock(type, index, template) {
+      const tone = `tone-${index + 1}`;
+      const title = escapeHtml(template.title);
+      const kicker = escapeHtml((template.description || "").split(" · ")[0] || "");
+      const lines = (n) => `<div class="mk-lines">${Array.from({ length: n }, (_, i) =>
+        `<span class="mk-line" style="width:${[100, 84, 92, 68][i % 4]}%"></span>`).join("")}</div>`;
+      let paper = "";
+      if (type === "ppt") {
+        const right = index === 0
+          ? `<div class="mk-slide-r"><i class="mk-bar"></i><i class="mk-bar"></i><i class="mk-bar"></i><i class="mk-bar"></i></div>`
+          : index === 1
+            ? `<div class="mk-slide-r"><span class="mk-donut"></span></div>`
+            : `<div class="mk-slide-r"><i class="mk-bar"></i><i class="mk-bar"></i><i class="mk-bar"></i></div>`;
+        paper = `
+          <div class="mk-slide">
+            <div class="mk-slide-l">
+              <div class="mk-kicker">${kicker}</div>
+              <div class="mk-title">${title}</div>
+              ${lines(2)}
+              <div class="mk-kpis">
+                <div class="mk-kpi"><strong>62%</strong><span></span></div>
+                <div class="mk-kpi"><strong>3.4x</strong><span></span></div>
+              </div>
+            </div>
+            ${right}
+          </div>`;
+      } else if (type === "website") {
+        paper = `
+          <div class="mk-web">
+            <div class="mk-chrome"><i class="mk-dot"></i><i class="mk-dot"></i><i class="mk-dot"></i><span class="mk-chrome-bar"></span></div>
+            <div class="mk-hero">
+              <div class="mk-title">${title}</div>
+              <div class="mk-cta"></div>
+            </div>
+            <div class="mk-cards"><i class="mk-card"></i><i class="mk-card"></i><i class="mk-card"></i></div>
+          </div>`;
+      } else if (type === "table") {
+        paper = `
+          <div class="mk-table">
+            <div class="mk-kicker">${kicker}</div>
+            <div class="mk-th"><span></span><span></span><span></span><span></span></div>
+            ${[0, 1, 2].map(() => `<div class="mk-tr"><span></span><span></span><span></span><span></span></div>`).join("")}
+            <div class="mk-spark">${[34, 52, 40, 66, 58, 78, 70, 92].map((h) =>
+              `<i style="height:${h}%"></i>`).join("")}</div>
+          </div>`;
+      } else {
+        paper = `
+          <div class="mk-doc">
+            <div class="mk-kicker">${kicker}</div>
+            <div class="mk-title">${title}</div>
+            ${lines(3)}
+            <div class="mk-quote">${lines(2)}</div>
+            <div class="mk-tags"><span></span><span></span><span></span></div>
+          </div>`;
+      }
+      return `<span class="tpl-mock ${tone}"><span class="mk-paper">${paper}</span></span>`;
+    }
+
     function renderTaskTemplates() {
       const container = el("taskTemplateGrid");
       if (!container) return;
@@ -7725,8 +8257,8 @@
       const templates = taskTemplates[state.mode][state.selectedTemplateType] || [];
       container.innerHTML = templates.map((template, index) => `
         <button class="task-template-card ${state.selectedTemplateId === template.id ? "is-selected" : ""}" data-template-id="${template.id}">
-          <span class="task-template-cover has-image is-${state.selectedTemplateType} variant-${index + 1}">
-            <img class="task-template-image" src="assets/template-covers/${state.selectedTemplateType}.png" alt="">
+          <span class="task-template-cover is-${state.selectedTemplateType} variant-${index + 1}">
+            ${templateMock(state.selectedTemplateType, index, template)}
             <span class="task-template-badge">
               <i class="ph ${templateTypes.find((type) => type.id === state.selectedTemplateType)?.icon || "ph-file"}"></i>
               ${templateTypes.find((type) => type.id === state.selectedTemplateType)?.label || "模板"}
@@ -8797,7 +9329,8 @@
       const list = ["全部"];
       [...experts, ...(typeof teams !== "undefined" ? teams : [])].forEach((item) => {
         (item.categories || []).forEach((cat) => {
-          if (cat !== "全部" && !list.includes(cat)) list.push(cat);
+          // 「推荐」已经由顶部 banner 承担,不再占一个领域 tab
+          if (cat !== "全部" && cat !== "推荐" && !list.includes(cat)) list.push(cat);
         });
       });
       return list;
@@ -9250,6 +9783,195 @@
       return `<div class="feed-sec ${opts.rest ? "is-rest" : ""}">${bar}<div class="feed-grid">${cards}</div></div>`;
     }
 
+    const SKILL_ICONS = {
+      "多源检索": "ph-magnifying-glass", "事实核验": "ph-shield-check", "研究报告": "ph-file-text",
+      "用户洞察": "ph-magnifying-glass", "用户旅程": "ph-path", "信息架构": "ph-tree-structure",
+      "交互设计": "ph-cursor-click", "体验诊断": "ph-heartbeat", "场景分析": "ph-users",
+      "行为洞察": "ph-pulse", "机会识别": "ph-target", "任务流程": "ph-flow-arrow",
+      "状态设计": "ph-squares-four", "UI 设计": "ph-palette", "视觉层级": "ph-stack",
+      "组件规范": "ph-squares-four", "原型表达": "ph-monitor-play", "前后端": "ph-code",
+      "测试": "ph-bug", "代码审查": "ph-git-diff", "数据清洗": "ph-broom",
+      "统计分析": "ph-chart-line", "可视化": "ph-chart-bar", "结构化写作": "ph-article",
+      "编辑": "ph-pencil-simple", "本地化": "ph-translate", "叙事结构": "ph-book-open",
+      "演示设计": "ph-projector-screen", "演讲稿": "ph-microphone", "机会判断": "ph-target",
+      "优先级": "ph-list-numbers", "产品策略": "ph-compass", "测试设计": "ph-test-tube",
+      "质量门禁": "ph-shield-check", "风险分析": "ph-warning"
+    };
+
+    // ============================================================
+    // 推荐 banner · 顶部横幅轮播
+    // 推荐位说的是「这周为什么该看他」,不是复述简历里已有的话
+    // ============================================================
+    const BANNER_SLOTS = [
+      { id: "ux", kind: "expert", icon: "ph-fire", kicker: "本周最抢手",
+        copy: "这周被邀请进任务 23 次，最常被叫去做的事：把一句「不好用」拆成能定位、能验收的问题。",
+        tags: ["体验诊断 23 次", "平均 1.5 轮交付", "本周活跃"],
+        tone: ["#efe8ff", "#f6f2ff", "#fbfaff"] },
+      { id: "creative", kind: "team", icon: "ph-users-three", kicker: "编辑推荐 · 智囊团",
+        copy: "从用户问题一路做到可点的原型：UX 定问题与关键状态，UI 接手落界面与组件规范，交接点双方都签字。",
+        tags: ["2 位成员", "接力交付", "交叉校验"],
+        tone: ["#e6f4f9", "#eff8fb", "#fafdfe"] },
+      { id: "researcher", kind: "expert", icon: "ph-trend-up", kicker: "新晋上榜",
+        copy: "本月新增 9 份带引用的研究报告，每句判断都能顺着链接点回原文——冲突的地方他会标出来，不替你抹平。",
+        tags: ["新增 9 份报告", "结论可溯源", "多源交叉"],
+        tone: ["#f7f1e6", "#fbf7f0", "#fefdfb"] },
+      { id: "smart", kind: "team", icon: "ph-sparkle", kicker: "试试智能组建",
+        copy: "说清楚要干的活，系统按跨领域需要现场组一队，并把谁交给谁、在哪一步等你拍板都画出来。",
+        tags: ["按任务编队", "分工可见", "可存为固定阵容"],
+        tone: ["#eaf0fa", "#f2f5fc", "#fbfcfe"] }
+    ];
+
+    let bannerIndex = 0;
+    let bannerTimer = null;
+
+    // 能力气泡落点 · 左右镜像:同一纵向位置在两侧各一个,中间留净空带给立绘
+    const BN_ROWS = [8, 44, 78];   // 纵向三档(%)
+    function bubbleSpots(count) {
+      const spots = [];
+      // ≤3 个:左右交替 + 纵向逐档下移,免得全挤在上半部;更多时同一档左右成对
+      const zigzag = count <= 3;
+      for (let i = 0; i < count; i += 1) {
+        const rowIndex = zigzag ? i : Math.floor(i / 2);
+        const row = BN_ROWS[rowIndex % BN_ROWS.length];
+        spots.push({
+          top: row,
+          side: i % 2 === 0 ? "l" : "r",
+          nudge: row === BN_ROWS[1] ? 12 : 0
+        });
+      }
+      return spots;
+    }
+    // 成员头像 · 落点按人数排布,全部落在中线两侧的净空带内(x 是相对中线的像素偏移)
+    const BN_FACE_SETS = {
+      2: [{ x: -40, top: 26, size: 74 }, { x: 40, top: 52, size: 74 }],
+      3: [{ x: -46, top: 20, size: 62 }, { x: 44, top: 34, size: 58 }, { x: -14, top: 64, size: 54 }],
+      4: [{ x: -48, top: 16, size: 56 }, { x: 40, top: 24, size: 52 },
+          { x: -30, top: 60, size: 48 }, { x: 52, top: 66, size: 50 }],
+      5: [{ x: -52, top: 12, size: 52 }, { x: 34, top: 18, size: 48 }, { x: -14, top: 44, size: 56 },
+          { x: -50, top: 72, size: 44 }, { x: 46, top: 66, size: 46 }],
+      6: [{ x: -54, top: 10, size: 48 }, { x: 28, top: 14, size: 44 }, { x: -20, top: 40, size: 52 },
+          { x: 58, top: 44, size: 42 }, { x: -50, top: 72, size: 42 }, { x: 30, top: 74, size: 46 }]
+    };
+    const faceSpots = (count) => BN_FACE_SETS[Math.min(6, Math.max(2, count))] || BN_FACE_SETS[6];
+    const TEAM_BUBBLE_MAX = 5; // 超过这个人数 → 只散头像,不再挂技能气泡
+
+    function skillBubbles(skills) {
+      const list = [...new Set(skills)].slice(0, 6);
+      const spots = bubbleSpots(list.length);
+      return list.map((skill, index) => ({
+        ...spots[index], label: skill, icon: SKILL_ICONS[skill] || "ph-sparkle"
+      }));
+    }
+
+    function bannerEntity(slot) {
+      if (slot.kind === "team") {
+        const team = (typeof teams !== "undefined" ? teams : []).find((one) => one.id === slot.id);
+        if (!team) return null;
+        const members = (team.memberIds || []).map(expertById).filter(Boolean);
+        if (!members.length) return null;
+        // 团队一律用头像(不带场景),人少就放大;人多到一定程度就把气泡收掉,免得糊成一片
+        const spots = faceSpots(members.length);
+        const faces = members.slice(0, spots.length).map((member, index) => ({
+          ...spots[index], avatar: marketAvatar(member), name: nickOf(member)
+        }));
+        // 人少时每人多摊几个技能,气泡数量才撑得住场面(目标 6 个)
+        const perMember = Math.max(1, Math.ceil(6 / members.length));
+        return {
+          sign: signOf(team.id), name: team.name, faces,
+          bubbles: members.length > TEAM_BUBBLE_MAX
+            ? []
+            : skillBubbles(members.flatMap((one) => (one.skills || []).slice(0, perMember)))
+        };
+      }
+      const expert = expertById(slot.id);
+      if (!expert) return null;
+      return {
+        sign: signOf(expert.id), name: expert.name,
+        figures: [marketCharacter(expert)],
+        bubbles: skillBubbles(expert.skills || [])
+      };
+    }
+
+    function bannerStage(entity) {
+      const bubbles = (entity.bubbles || []).map((one, index) => `
+        <span class="bn-bubble is-${one.side}" style="top:${one.top}%; --x:${one.nudge}px; --d:${index * 80}ms">
+          <i class="ph ${one.icon}"></i>${one.label}
+        </span>`).join("");
+      const faces = (entity.faces || []).map((one, index) => `
+        <span class="bn-face" style="top:${one.top}%; left:calc(50% + ${one.x}px); --s:${one.size}px; --d:${index * 90}ms">
+          <img src="${one.avatar}" alt="${one.name}">
+        </span>`).join("");
+      const figure = (entity.figures || []).length
+        ? `<span class="bn-figure">${entity.figures.map((src) => `<img src="${src}" alt="">`).join("")}</span>`
+        : "";
+      return `<div class="bn-stage">${bubbles}${faces}${figure}</div>`;
+    }
+
+    function renderBanner() {
+      const track = el("bnTrack");
+      const dots = el("bnDots");
+      if (!track || !dots) return;
+      const slots = BANNER_SLOTS.map((slot) => ({ slot, entity: bannerEntity(slot) })).filter((one) => one.entity);
+      if (!slots.length) { el("hubBanner").hidden = true; return; }
+
+      track.innerHTML = slots.map(({ slot, entity }, index) => `
+        <article class="bn-slide ${index === 0 ? "is-on" : ""}" data-bn-go="${slot.id}" data-bn-kind="${slot.kind}"
+                 style="--bn-1:${slot.tone[0]}; --bn-2:${slot.tone[1]}; --bn-3:${slot.tone[2]}; --bn-ink:var(--brand-text)">
+          <div class="bn-body">
+            <span class="bn-kicker"><i class="ph ${slot.icon}"></i>${slot.kicker}</span>
+            <h2 class="bn-title">${entity.name}<em>${entity.sign}</em></h2>
+            <p class="bn-copy">${slot.copy}</p>
+            <div class="bn-foot">
+              <div class="bn-tags">${slot.tags.map((one) => `<span>${one}</span>`).join("")}</div>
+            </div>
+          </div>
+          ${bannerStage(entity)}
+        </article>`).join("");
+
+      dots.innerHTML = slots.map((one, index) =>
+        `<button role="tab" class="${index === 0 ? "is-on" : ""}" data-bn-dot="${index}" aria-label="第 ${index + 1} 条推荐"></button>`).join("");
+      bannerIndex = 0;
+      startBanner();
+    }
+
+    function goBanner(next) {
+      const slides = qsa("#bnTrack .bn-slide");
+      const dots = qsa("#bnDots button");
+      if (!slides.length) return;
+      const target = (next + slides.length) % slides.length;
+      slides[bannerIndex]?.classList.remove("is-on");
+      dots[bannerIndex]?.classList.remove("is-on");
+      bannerIndex = target;
+      slides[target]?.classList.add("is-on");
+      dots[target]?.classList.add("is-on");
+    }
+
+    function startBanner() {
+      clearInterval(bannerTimer);
+      bannerTimer = setInterval(() => goBanner(bannerIndex + 1), 5200);
+    }
+
+    (function bindBanner() {
+      const banner = el("hubBanner");
+      if (!banner) return;
+      // 停在上面就别自己翻页,给人看完的时间
+      banner.addEventListener("mouseenter", () => clearInterval(bannerTimer));
+      banner.addEventListener("mouseleave", startBanner);
+      el("bnPrev")?.addEventListener("click", () => { goBanner(bannerIndex - 1); startBanner(); });
+      el("bnNext")?.addEventListener("click", () => { goBanner(bannerIndex + 1); startBanner(); });
+      el("bnDots")?.addEventListener("click", (event) => {
+        const dot = event.target.closest("[data-bn-dot]");
+        if (!dot) return;
+        goBanner(Number(dot.dataset.bnDot));
+        startBanner();
+      });
+      el("bnTrack")?.addEventListener("click", (event) => {
+        if (event.target.closest("button")) return;
+        const slide = event.target.closest("[data-bn-go]");
+        if (slide) openResumeDetail(slide.dataset.bnGo);
+      });
+    })();
+
     function renderResumeFeed() {
       const feed = el("resumeFeed");
       const cats = el("feedCats");
@@ -9282,9 +10004,6 @@
       } else if (el("feedEmpty")) {
         el("feedEmpty").hidden = items.length > 0;
       }
-      const partnerCount = items.filter((item) => item.kind === "partner").length;
-      const teamCount = items.length - partnerCount;
-      if (el("feedCount")) el("feedCount").textContent = items.length ? `${partnerCount} 位专业搭档 · ${teamCount} 个智囊团` : "";
       qsa("[data-feed-kind]").forEach((button) => {
         const selected = button.dataset.feedKind === feedKind;
         button.classList.toggle("is-selected", selected);
@@ -9325,20 +10044,6 @@
 
     // 简历详情 · 没有手工档案的角色,按简历数据即时生成一份
     const PROFILE_ALIAS = { creative: "team" };
-    const SKILL_ICONS = {
-      "多源检索": "ph-magnifying-glass", "事实核验": "ph-shield-check", "研究报告": "ph-file-text",
-      "用户洞察": "ph-magnifying-glass", "用户旅程": "ph-path", "信息架构": "ph-tree-structure",
-      "交互设计": "ph-cursor-click", "体验诊断": "ph-heartbeat", "场景分析": "ph-users",
-      "行为洞察": "ph-pulse", "机会识别": "ph-target", "任务流程": "ph-flow-arrow",
-      "状态设计": "ph-squares-four", "UI 设计": "ph-palette", "视觉层级": "ph-stack",
-      "组件规范": "ph-squares-four", "原型表达": "ph-monitor-play", "前后端": "ph-code",
-      "测试": "ph-bug", "代码审查": "ph-git-diff", "数据清洗": "ph-broom",
-      "统计分析": "ph-chart-line", "可视化": "ph-chart-bar", "结构化写作": "ph-article",
-      "编辑": "ph-pencil-simple", "本地化": "ph-translate", "叙事结构": "ph-book-open",
-      "演示设计": "ph-projector-screen", "演讲稿": "ph-microphone", "机会判断": "ph-target",
-      "优先级": "ph-list-numbers", "产品策略": "ph-compass", "测试设计": "ph-test-tube",
-      "质量门禁": "ph-shield-check", "风险分析": "ph-warning"
-    };
 
     function buildExpertProfile(expert) {
       const lore = loreOf(expert.id);
@@ -9552,6 +10257,7 @@
       if (el("hubDetailView")) el("hubDetailView").hidden = true;
       if (el("hubBrowse")) el("hubBrowse").hidden = false;
       renderBriefBar();
+      renderBanner();
       renderResumeFeed();
       el("breadcrumbTitle").textContent = "搭档中心";
       setArtifactView("selection");
@@ -10578,6 +11284,8 @@
     switchMode("work", true);
     renderParallelGrid();
     bindAudienceButtons();
+    renderEnvBar();
+    bindEnvBar();
 
     // 搭档中心 · 自动轮播(复制一份实现无缝循环;hover / 按下时暂停)
     (function () {
