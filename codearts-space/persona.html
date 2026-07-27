@@ -2734,7 +2734,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       grid-auto-flow: row dense;
-      gap: 18px 16px;
+      gap: 32px 26px;
       align-items: stretch;
     }
 
@@ -2751,32 +2751,64 @@
       text-align: left;
       font-family: inherit;
       --tone: var(--brand-text);
-      --tone-wash: #f6f6f9;
+      --tone-wash: #f8f8fb;
       --tone-line: rgba(23, 16, 48, 0.08);
       padding: 18px 18px 20px;
-      background: var(--tone-wash);
+      background-color: var(--tone-wash);
       border: 1px solid transparent;
       border-radius: 16px;
       overflow: visible;
       cursor: pointer;
       transition: transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
     }
-    .feed-card:hover { transform: translateY(-3px); box-shadow: 0 20px 34px -22px rgba(23, 16, 48, 0.5); z-index: 3; }
+    .feed-card:hover { transform: translateY(-3px); z-index: 3; }
     .feed-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 
     /* 智囊团只用一档更深的同色灰来区分,不换色相 —— 一屏不要花花绿绿 */
-    .feed-card.is-team { --tone-wash: #f0f0f5; }
+    .feed-card.is-team { --tone-wash: #f2f2f7; }
     :root[data-theme="dark"] .feed-card { --tone: #b795f5; --tone-wash: #201d2b; --tone-line: rgba(255, 255, 255, .12); }
     :root[data-theme="dark"] .feed-card.is-team { --tone-wash: #262232; }
 
-    /* 井号标签 · 这位搭档是哪一类人 */
-    .fc-tag {
-      display: block; margin-bottom: 11px;
-      font-family: var(--mono); font-size: 10px; font-weight: 600;
-      letter-spacing: .06em; color: var(--tone);
+    /* 卷边 · 左上角沿折痕翻折。
+       ⚠️不能用 mask 在卡片上切缺口 —— mask 会把溢出卡片的子元素(右上角拍立得)一起裁掉。
+       改成两片伪元素:::before 铺页面底色伪装缺口,::after 画掀起来的那片纸 */
+    @property --curl { syntax: "<length>"; inherits: false; initial-value: 38px; }
+    .feed-card { --curl: 38px; }
+    .feed-card::before {
+      content: ""; position: absolute; left: -1px; top: -1px; z-index: 2;
+      width: var(--curl); height: var(--curl);
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      border-radius: 16px 0 0 0;
+      background: var(--surface-primary);
+      transition: width var(--motion-normal) var(--ease), height var(--motion-normal) var(--ease);
+    }
+    .feed-card::after {
+      content: ""; position: absolute; left: 0; top: 0; z-index: 3;
+      width: var(--curl); height: var(--curl);
+      /* 折痕 = (右上)→(左下) 那条线,掀起来的纸落在它右下侧 */
+      clip-path: polygon(100% 0, 0 100%, 100% 100%);
+      /* 尖端(右下)是纸背受光面,越靠折痕越暗 */
+      background: linear-gradient(315deg, #ffffff 0%, #f6f5f9 46%, #e2dfeb 80%, #cfcbdd 100%);
+      /* clip-path 会把 box-shadow 一起裁掉,阴影只能用 filter */
+      filter: drop-shadow(1px 2px 3px rgba(23, 16, 48, .26));
+      transition: width var(--motion-normal) var(--ease), height var(--motion-normal) var(--ease);
+    }
+    :root[data-theme="dark"] .feed-card::after {
+      background: linear-gradient(315deg, #4e4964 0%, #3d3853 46%, #272334 80%, #1b1825 100%);
+      filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, .7));
     }
 
-    /* 拍立得 · 斜插在卡右上角并溢出边界,是这套卡最出彩的一笔 */
+    /* 纸质感 · 极细纸纹直接铺在底色上(两个伪元素都让给卷边了) */
+    .feed-card, .fc-detail {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='.14'/%3E%3C/svg%3E");
+      background-blend-mode: multiply;
+    }
+    :root[data-theme="dark"] .feed-card,
+    :root[data-theme="dark"] .fc-detail { background-blend-mode: soft-light; }
+    .feed-card { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7); }
+    .feed-card:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 20px 34px -22px rgba(23, 16, 48, 0.5); }
+    :root[data-theme="dark"] .feed-card { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
+
     .fc-polaroid {
       position: absolute; top: -14px; right: -12px; z-index: 2;
       width: 84px; padding: 5px 5px 14px;
@@ -2787,30 +2819,52 @@
     }
     .feed-card:hover .fc-polaroid { transform: rotate(1.5deg) translateY(-2px); }
     .fc-polaroid-inner {
+      display: block;
       position: relative; height: 84px; overflow: hidden; border-radius: 1px;
       background: var(--tone-wash);
-      display: flex; align-items: stretch;
     }
-    .fc-polaroid img { flex: 1 1 0; min-width: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 14%; }
-    .fc-polaroid.is-duo img { object-position: center 12%; }
+    .fc-polaroid img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; object-position: center 14%;
+      opacity: 0;
+      transition: opacity 620ms cubic-bezier(.4, 0, .2, 1), transform 900ms cubic-bezier(.34, 1.2, .5, 1);
+      transform: scale(1.06);
+    }
+    .fc-polaroid img.is-on { opacity: 1; transform: none; }
+
+    /* 智囊团 · 后面垫两张相片,做成「一摞照片」;hover 时最上面那张自动换人。
+       白纸垫白纸看不出层次,所以每张都要有边 + 投影,错位也要拉开 */
+    .fc-polaroid.is-stack::before,
+    .fc-polaroid.is-stack::after {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      border-radius: 2px; background: #fff;
+      border: 1px solid rgba(23, 16, 48, .1);
+      box-shadow: 0 10px 18px -12px rgba(23, 16, 48, .55);
+      transition: transform var(--motion-normal) var(--ease);
+    }
+    .fc-polaroid.is-stack::before { transform: rotate(-11deg) translate(-14px, -8px); }
+    .fc-polaroid.is-stack::after { transform: rotate(-5.5deg) translate(-8px, -4px); }
+    .feed-card:hover .fc-polaroid.is-stack::before { transform: rotate(-16deg) translate(-21px, -11px); }
+    .feed-card:hover .fc-polaroid.is-stack::after { transform: rotate(-8deg) translate(-11px, -6px); }
+    :root[data-theme="dark"] .fc-polaroid.is-stack::before,
+    :root[data-theme="dark"] .fc-polaroid.is-stack::after { background: #f2f0f5; border-color: rgba(0, 0, 0, .3); }
     :root[data-theme="dark"] .fc-polaroid { background: #f2f0f5; }
 
-    /* 字段头 · LABEL 在上,大字值在下 */
-    .fc-heads { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 13px; padding-right: 78px; }
-    .fc-head-cell { min-width: 0; }
-    .fc-head-cell:first-child { flex: 1 1 auto; }
-    .fc-head-cell + .fc-head-cell { flex: 0 0 auto; }
-    .fc-head-cell dt {
-      font-family: var(--mono); font-size: 9.5px; font-weight: 600;
-      letter-spacing: .1em; color: var(--tone); margin-bottom: 3px;
+    /* 身份 · 手写签名 + 职位,两行叠在左侧,正好和右上角的拍立得对称 */
+    .fc-id { padding-right: 80px; margin-bottom: 14px; }
+    .fc-sign {
+      display: block; padding-left: 26px;
+      font-family: "Bradley Hand", "Snell Roundhand", "Segoe Script", "Comic Sans MS", cursive;
+      font-size: 27px; font-style: italic; font-weight: 600; line-height: 34px;
+      letter-spacing: .01em; color: var(--text-tertiary);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .fc-head-cell dd {
-      margin: 0; font-size: 19.5px; font-weight: 650; line-height: 26px;
+    .fc-post {
+      display: block; margin-top: 1px;
+      font-size: 15px; font-weight: 650; line-height: 21px;
       letter-spacing: -.01em; color: var(--text-primary);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .fc-head-cell dd small { font-size: 12px; font-weight: 500; color: var(--text-tertiary); margin-left: 3px; }
-    .feed-card.fc-team .fc-heads { padding-right: 76px; }
 
     .fc-block-label {
       display: flex; align-items: baseline; gap: 7px; margin-bottom: 8px;
@@ -2820,17 +2874,17 @@
     .fc-block-label em { font-style: normal; font-family: inherit; color: var(--text-tertiary); letter-spacing: .04em; }
 
     /* 翻面区 · 正面是自述 + 案例堆,hover 换成工作方式。卡高不变,靠交叉淡入 */
-    .fc-flip { position: relative; flex: 0 0 auto; margin-top: 14px; min-height: 136px; }
-    .fc-face, .fc-detail {
-      transition: opacity var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
-    }
+    /* 翻面区 · 固定高度,正面案例条与背面作品图原地互换 —— 卡高全程不变,不跳
+       上半部分(职位/代号/自述/技能)始终留在原位,信息不丢 */
+    .fc-flip { position: relative; flex: 0 0 auto; margin-top: 13px; height: 92px; }
+    .fc-stack-row { height: 100%; }
     .fc-detail {
-      position: absolute; left: 0; right: 0; top: 0; bottom: 0;
-      display: flex; flex-direction: column;
-      opacity: 0; transform: translateY(6px); pointer-events: none;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; gap: 8px;
+      background-color: var(--tone-wash);
+      opacity: 0; transform: translateY(5px); pointer-events: none;
+      transition: opacity var(--motion-fast) var(--ease), transform var(--motion-normal) var(--ease);
     }
-    .feed-card:hover .fc-face,
-    .feed-card:focus-within .fc-face { opacity: 0; transform: translateY(-6px); pointer-events: none; }
     .feed-card:hover .fc-detail,
     .feed-card:focus-within .fc-detail { opacity: 1; transform: none; pointer-events: auto; }
 
@@ -2851,19 +2905,21 @@
     /* 案例集 · 叠成一摞,做成通栏一条,右下角不留空 */
     .fc-stack-row {
       appearance: none; font-family: inherit; text-align: left; cursor: pointer;
-      display: flex; align-items: center; gap: 12px; width: 100%;
-      padding: 8px 10px 8px 8px;
+      display: flex; align-items: center; gap: 20px; width: 100%;
+      padding: 8px 16px 8px 20px;
       border-radius: 10px;
       background: rgba(255, 255, 255, .62);
       border: 1px solid var(--tone-line);
-      transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
+      transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), opacity var(--motion-fast) var(--ease);
     }
     .fc-stack-row:hover { background: rgba(255, 255, 255, .92); border-color: var(--tone); }
-    .fc-stack-row > i { flex: 0 0 auto; font-size: 14px; color: var(--text-disabled); }
+    /* hover 时正面必须整块淡出:堆叠图旋转后会溢出 .fc-flip,光靠背面盖不住,边角会露出来 */
+    .feed-card:hover .fc-stack-row,
+    .feed-card:focus-within .fc-stack-row { opacity: 0; pointer-events: none; }
     :root[data-theme="dark"] .fc-stack-row { background: rgba(255, 255, 255, .05); }
     .fc-stack {
       position: relative; flex: 0 0 auto;
-      width: 54px; height: 42px;
+      width: 84px; height: 64px;
     }
     .fc-stack span {
       position: absolute; inset: 0; overflow: hidden;
@@ -2873,45 +2929,52 @@
       transition: transform var(--motion-normal) var(--ease);
     }
     .fc-stack span img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .fc-stack span:nth-child(1) { transform: rotate(-6deg) translate(-3px, 2px); }
-    .fc-stack span:nth-child(2) { transform: rotate(3deg) translate(3px, 0); }
+    .fc-stack span:nth-child(1) { transform: rotate(-8deg) translate(-8px, 3px); }
+    .fc-stack span:nth-child(2) { transform: rotate(5deg) translate(8px, -2px); }
     .fc-stack span:nth-child(3) { transform: none; }
-    .feed-card:hover .fc-stack span:nth-child(1) { transform: rotate(-10deg) translate(-7px, 3px); }
-    .feed-card:hover .fc-stack span:nth-child(2) { transform: rotate(6deg) translate(6px, -1px); }
+    .feed-card:hover .fc-stack span:nth-child(1) { transform: rotate(-10deg) translate(-11px, 5px); }
+    .feed-card:hover .fc-stack span:nth-child(2) { transform: rotate(6deg) translate(10px, -3px); }
     .fc-stack-meta { min-width: 0; flex: 1 1 auto; }
     .fc-stack-meta strong {
-      display: block; font-size: 11.5px; font-weight: 600; line-height: 16px; color: var(--text-primary);
+      display: flex; align-items: baseline; gap: 7px;
+      font-size: 12px; font-weight: 600; line-height: 17px; color: var(--text-primary);
+      overflow: hidden; white-space: nowrap;
+    }
+    .fc-stack-names { display: block; margin-top: 5px; }
+    .fc-stack-names em {
+      display: flex; align-items: baseline; gap: 7px;
+      font-style: normal; font-size: 10.5px; line-height: 16px; color: var(--text-tertiary);
+    }
+    .fc-stack-names em > span {
+      flex: 0 1 auto; min-width: 0;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .fc-stack-meta em {
-      display: block; margin-top: 2px; font-style: normal; font-size: 10.5px; line-height: 15px; color: var(--text-tertiary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    /* 点线引导:把右边那截空白接上,像简历里的附件清单 */
+    .fc-stack-names em > i {
+      flex: 1 1 auto; min-width: 10px;
+      border-bottom: 1px dotted var(--tone-line);
+      transform: translateY(-3px);
+    }
+    .fc-stack-names em > b {
+      flex: 0 0 auto; font-weight: 500; font-size: 10px; color: var(--text-disabled);
     }
 
-    /* 背面 · 案例作品摊开 */
-    .fc-shots { display: flex; gap: 8px; }
+    /* 背面 · 案例作品摊开(图名正面已列,这里只给图) */
+    .fc-shots { display: flex; gap: 8px; flex: 1 1 auto; min-height: 0; }
     .fc-shot {
-      appearance: none; padding: 0; border: 0; background: none; font-family: inherit;
-      flex: 1 1 0; min-width: 0; cursor: pointer; text-align: left;
-    }
-    .fc-shot-img {
-      display: block; height: 66px; overflow: hidden;
-      border-radius: 5px; background: #fff;
+      appearance: none; padding: 0; cursor: pointer;
+      flex: 1 1 0; min-width: 0; overflow: hidden;
+      border-radius: 6px; background: #fff;
       border: 1px solid var(--tone-line);
       box-shadow: 0 3px 8px -6px rgba(23, 16, 48, .5);
       transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
-    .fc-shot-img img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .fc-shot:hover .fc-shot-img { transform: translateY(-2px); border-color: var(--tone); }
-    .fc-shot-name {
-      display: block; margin-top: 6px;
-      font-size: 10.5px; line-height: 15px; color: var(--text-tertiary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .fc-shots-empty { margin: 0; font-size: 11.5px; color: var(--text-disabled); }
+    .fc-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .fc-shot:hover { transform: translateY(-2px); border-color: var(--tone); }
+    .fc-shots-empty { margin: 0; flex: 1 1 auto; font-size: 11.5px; color: var(--text-disabled); }
 
     /* 操作 · 挂在背面底部 */
-    .fc-bar { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; }
+    .fc-bar { display: flex; gap: 6px; flex: 0 0 auto; }
     .fc-bar .button { flex: 1 1 auto; justify-content: center; padding-left: 8px; padding-right: 8px; }
 
     /* 附函便签 · A 方案:候选人把自荐条别在简历上 */
@@ -3052,26 +3115,11 @@
     /* ============================================================
        智囊团 · 占两个卡位,做成「团队履历表」:抬头通栏 + 左名册右协作
        ============================================================ */
-    /* 身份行 · 搭档是角色+状态,智囊团是成员簇,两类卡在这一行结构对齐 */
-    .fc-role {
-      display: flex; align-items: center; gap: 7px; min-width: 0; height: 24px;
-      font-size: 10.5px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden;
-    }
-    .fc-role-name {
-      flex: 0 1 auto; min-width: 0;
-      padding: 3px 9px; border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, .78); border: 1px solid var(--tone-line);
-      font-size: 10.5px; color: var(--text-secondary);
-      overflow: hidden; text-overflow: ellipsis;
-    }
-    :root[data-theme="dark"] .fc-role-name { background: rgba(255, 255, 255, .07); }
-    .fc-dot { width: 4px; height: 4px; border-radius: 50%; background: #2f9e6b; flex: 0 0 auto; }
-
     /* 智囊团和专业搭档同宽同高,靠头像簇而不是尺寸来区分 */
-    .fc-crew { display: flex; align-items: center; gap: 9px; min-width: 0; height: 24px; }
+    .fc-crew { display: flex; align-items: center; gap: 9px; min-width: 0; height: 22px; margin-bottom: 13px; }
     .fc-crew-faces { display: flex; flex: 0 0 auto; }
     .fc-crew-faces img {
-      width: 24px; height: 24px; border-radius: 50%;
+      width: 22px; height: 22px; border-radius: 50%;
       object-fit: cover; object-position: center top;
       border: 2px solid var(--tone-wash); background: #fff;
     }
@@ -8718,6 +8766,16 @@
     };
 
     const expertById = (id) => experts.find((item) => item.id === id);
+    // 手写签名用的英文昵称 —— 像在简历右上角签个名,比「AG-01」这种编号有人味
+    const SIGN_NAME = {
+      researcher: "Theo", ux: "Nora", "ux-researcher": "Iris", interaction: "Milo",
+      ui: "Vera", engineer: "Ray", analyst: "Dana", writer: "June",
+      slides: "Kai", product: "Ada", tester: "Gus",
+      smart: "Flex Crew", insight: "Insight Crew", creative: "Craft Crew",
+      delivery: "Ship Crew", office: "Desk Crew"
+    };
+    const signOf = (id) => SIGN_NAME[id] || "Agent";
+
     const loreOf = (id) => RESUME_LORE[id] || {};
     const nickOf = (item) => (loreOf(item.id).nick || item.name);
 
@@ -9086,26 +9144,26 @@
       const rank = item.rank;
       return `
         <article class="feed-card fc-resume ${feedTone(expert.id)} ${rank ? "is-applied" : ""}" data-agent="${expert.id}" data-kind="expert" tabindex="0" aria-label="查看 ${expert.name} 的简历">
-          <span class="fc-polaroid"><span class="fc-polaroid-inner"><img src="${marketAvatar(expert)}" alt=""></span></span>
-          <span class="fc-tag">${slugOf(expert.id)}</span>
-          <dl class="fc-heads">
-            <div class="fc-head-cell"><dt>NAME</dt><dd>${nickOf(expert)}</dd></div>
-            <div class="fc-head-cell"><dt>JOBS</dt><dd>${lore.jobs || 60}</dd></div>
-          </dl>
-          <div class="fc-role">
-            <span class="fc-role-name">${expert.name}</span>
-            <span class="fc-dot"></span>本周活跃 · 满意度 ${lore.rate || "4.8"}
+          <span class="fc-polaroid"><span class="fc-polaroid-inner"><img class="is-on" src="${marketAvatar(expert)}" alt=""></span></span>
+          <div class="fc-id">
+            <span class="fc-sign">${signOf(expert.id)}</span>
+            <span class="fc-post">${expert.name}</span>
           </div>
           ${rank ? feedLetter(expert.id, "expert", rank) : ""}
+          <p class="fc-pitch">${lore.pitch || expert.description}</p>
+          <div class="fc-tags">${(expert.skills || []).slice(0, 3).map((one) => `<span>${one}</span>`).join("")}</div>
           <div class="fc-flip">
-            <div class="fc-face">
-              <p class="fc-pitch">${lore.pitch || expert.description}</p>
-              <div class="fc-tags">${(expert.skills || []).slice(0, 3).map((one) => `<span>${one}</span>`).join("")}</div>
-              ${feedWorks(lore, nickOf(expert))}
-            </div>
+            ${feedWorks(lore, nickOf(expert))}
             ${feedDetail(lore, expert.id, "expert")}
           </div>
         </article>`;
+    }
+
+    // 作品类型 · 从封面图名反推,给附件清单右侧一个有信息量的落点
+    const CASE_KIND = { doc: "文档", website: "网页", table: "表格", ppt: "演示" };
+    function caseKind(cover) {
+      const key = String(cover || "").split("/").pop().split("-")[0];
+      return CASE_KIND[key] || "附件";
     }
 
     // 案例集 · 三张作品叠成一摞,只占一条,不吃版面
@@ -9122,9 +9180,9 @@
           </span>
           <span class="fc-stack-meta">
             <strong>${lore.caseTitle || "案例作品"}</strong>
-            <em>${lore.caseCount || cases.length} 件 · ${cases.map((one) => one.title).join(" / ")}</em>
+            <span class="fc-stack-names">${cases.map((one) =>
+              `<em><span>${one.title}</span><i></i><b>${caseKind(one.cover)}</b></em>`).join("")}</span>
           </span>
-          <i class="ph ph-caret-right"></i>
         </button>`;
     }
 
@@ -9135,9 +9193,8 @@
       const shots = cases.length ? `
         <div class="fc-shots">
           ${cases.map((one, index) => `
-            <button class="fc-shot" data-feed-case="${index}" aria-label="预览 ${one.title}">
-              <span class="fc-shot-img"><img src="${one.cover}" alt=""></span>
-              <span class="fc-shot-name">${one.title}</span>
+            <button class="fc-shot" data-feed-case="${index}" title="${one.title}" aria-label="预览 ${one.title}">
+              <img src="${one.cover}" alt="">
             </button>`).join("")}
         </div>` : `<p class="fc-shots-empty">暂无公开作品</p>`;
       return `
@@ -9159,27 +9216,24 @@
       // 智能组建被推上来时,成员按这次活儿的匹配结果临时换人
       const memberIds = (rank && rank.adhoc) ? rank.adhoc : (team.memberIds || []);
       const members = memberIds.map(expertById).filter(Boolean);
-      const portraits = [...new Set(members.map(marketAvatar))].slice(0, 2);
+      const portraits = [...new Set(members.map(marketAvatar))].slice(0, 4);
       return `
         <article class="feed-card fc-team is-team ${rank ? "is-applied" : ""}" data-agent="${team.id}" data-kind="team" tabindex="0" aria-label="查看 ${team.name} 的团队履历">
-          <span class="fc-polaroid ${portraits.length > 1 ? "is-duo" : ""}"><span class="fc-polaroid-inner">${portraits.map((src) => `<img src="${src}" alt="">`).join("")}</span></span>
-          <span class="fc-tag">${slugOf(team.id)}_SQUAD</span>
-          <dl class="fc-heads">
-            <div class="fc-head-cell"><dt>TEAM</dt><dd>${team.name}</dd></div>
-            <div class="fc-head-cell"><dt>CREW</dt><dd>${members.length}</dd></div>
-          </dl>
+          <span class="fc-polaroid ${portraits.length > 1 ? "is-stack" : ""}"><span class="fc-polaroid-inner">${portraits.map((src, index) =>
+            `<img class="${index ? "" : "is-on"}" src="${src}" alt="">`).join("")}</span></span>
+          <div class="fc-id">
+            <span class="fc-sign">${signOf(team.id)}</span>
+            <span class="fc-post">${team.name}</span>
+          </div>
+          ${rank ? feedLetter(team.id, "team", rank) : ""}
+          <p class="fc-pitch">${team.description}</p>
           <div class="fc-crew">
             <span class="fc-crew-faces">${members.slice(0, 4).map((member) =>
               `<img src="${marketAvatar(member)}" alt="">`).join("")}</span>
             <span class="fc-crew-names">${members.map((one) => nickOf(one)).join(" · ")}</span>
           </div>
-          ${rank ? feedLetter(team.id, "team", rank) : ""}
           <div class="fc-flip">
-            <div class="fc-face">
-              <p class="fc-pitch">${team.description}</p>
-              <div class="fc-tags">${(lore.combos || ["分工接力", "交叉校验", "统一交付"]).slice(0, 3).map((one) => `<span>${one}</span>`).join("")}</div>
-              ${feedWorks(lore, team.name)}
-            </div>
+            ${feedWorks(lore, team.name)}
             ${feedDetail(lore, team.id, "team")}
           </div>
         </article>`;
@@ -9235,6 +9289,37 @@
         const selected = button.dataset.feedKind === feedKind;
         button.classList.toggle("is-selected", selected);
         button.setAttribute("aria-selected", String(selected));
+      });
+      bindCrewShuffle();
+    }
+
+    // 智囊团拍立得 · 鼠标停在卡上时,最上面那张照片依次换成下一位成员
+    // feed 每次筛选都重建 DOM,所以渲染完重新绑一次
+    function bindCrewShuffle() {
+      qsa(".feed-card .fc-polaroid.is-stack").forEach((stack) => {
+        const shots = qsa("img", stack);
+        if (shots.length < 2) return;
+        const card = stack.closest(".feed-card");
+        let index = 0;
+        let timer = null;
+        const step = () => {
+          shots[index].classList.remove("is-on");
+          index = (index + 1) % shots.length;
+          shots[index].classList.add("is-on");
+        };
+        card.addEventListener("mouseenter", () => {
+          if (timer) return;
+          // 进场先等一拍,免得只是划过也在闪
+          timer = setInterval(step, 1500);
+        });
+        card.addEventListener("mouseleave", () => {
+          clearInterval(timer);
+          timer = null;
+          if (index === 0) return;
+          shots[index].classList.remove("is-on");
+          index = 0;
+          shots[0].classList.add("is-on");
+        });
       });
     }
 
