@@ -2735,8 +2735,8 @@
       grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
       grid-auto-flow: row dense;
       /* 立绘要从卡上沿破出去,行距和上留白都得先让出来 */
-      gap: 56px 18px;
-      padding-top: 46px;
+      gap: 38px 18px;
+      padding-top: 32px;
       align-items: stretch;
     }
 
@@ -2751,12 +2751,12 @@
       width: 100%;
       height: 100%;
       /* 下半是绝对定位的(展开才不会顶动网格),所以卡高得自己撑住 */
-      min-height: 348px;
+      min-height: 320px;
       text-align: left;
       font-family: inherit;
       /* 卡面整体是中性灰白,颜色只当点缀:立绘身后的光晕、等级字、细节里的小色块 */
-      --art-h: 140px;
-      --art-hover: 96px;
+      --art-h: 132px;
+      --art-hover: 78px;
       /* 展开是「长高」不是弹出,所以走一条更长更缓的曲线 */
       --hc-slide: 380ms;
       --hc-fade: 240ms;
@@ -2898,7 +2898,7 @@
     }
     .hc-flag i { font-size: 11px; }
     /* 投递中的卡多了一张附函,卡身要先长够 —— 否则展开时会压到下一行 */
-    .feed-card.is-applied { min-height: 512px; box-shadow: 0 0 0 2px rgba(217, 178, 60, .85), 0 14px 28px -18px rgba(80, 62, 0, .6); }
+    .feed-card.is-applied { min-height: 480px; box-shadow: 0 0 0 2px rgba(217, 178, 60, .85), 0 14px 28px -18px rgba(80, 62, 0, .6); }
     .feed-card.is-applied:hover { box-shadow: 0 0 0 2px rgba(217, 178, 60, .95), 0 30px 46px -24px rgba(80, 62, 0, .6); }
 
     /* ---- 白身 · 等级 / 名字 / 一句自述 / 展开的细节 / 数值条 ----
@@ -3022,7 +3022,7 @@
     }
 
     /* ---- 智囊团 · 占两个卡位的「阵容卡」 ---- */
-    .feed-card.fc-team { --art-h: 150px; --art-hover: 104px; min-height: 352px; }
+    .feed-card.fc-team { --art-h: 142px; --art-hover: 88px; min-height: 346px; }
     .feed-card.fc-team .hc-halo { width: 300px; height: 176px; }
     .feed-card.fc-team .hc-lower { text-align: left; }
     .feed-card.fc-team .hc-face { display: flex; gap: 20px; align-items: flex-start; }
