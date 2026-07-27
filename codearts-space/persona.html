@@ -3014,6 +3014,17 @@
     :root[data-theme="dark"] .hub-banner { background: rgba(255, 255, 255, .04); }
     .bn-track { position: absolute; inset: 0; }
 
+    /* banner 配色:浅色四套、深色四套 —— 以前写在内联 style 里,深色模式没法覆盖,
+       结果暗色下横幅还是一块亮白,标题几乎看不见 */
+    .bn-slide { --bn-1: #efe8ff; --bn-2: #f6f2ff; --bn-3: #fbfaff; --bn-ink: var(--brand-text); }
+    .bn-slide[data-bn-tone="1"] { --bn-1: #e6f4f9; --bn-2: #eff8fb; --bn-3: #fafdfe; }
+    .bn-slide[data-bn-tone="2"] { --bn-1: #f7f1e6; --bn-2: #fbf7f0; --bn-3: #fefdfb; }
+    .bn-slide[data-bn-tone="3"] { --bn-1: #eaf0fa; --bn-2: #f2f5fc; --bn-3: #fbfcfe; }
+    :root[data-theme="dark"] .bn-slide { --bn-1: #2e2748; --bn-2: #262038; --bn-3: #1f1b2c; --bn-ink: #c9b6ff; }
+    :root[data-theme="dark"] .bn-slide[data-bn-tone="1"] { --bn-1: #1e3440; --bn-2: #1a2b34; --bn-3: #162129; --bn-ink: #8fd0e4; }
+    :root[data-theme="dark"] .bn-slide[data-bn-tone="2"] { --bn-1: #3a2f20; --bn-2: #2f271a; --bn-3: #241e15; --bn-ink: #e8c48b; }
+    :root[data-theme="dark"] .bn-slide[data-bn-tone="3"] { --bn-1: #232d47; --bn-2: #1e2639; --bn-3: #1a1f2e; --bn-ink: #a8bcf0; }
+
     .bn-slide {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center; gap: 32px;
@@ -10259,7 +10270,7 @@
 
       track.innerHTML = slots.map(({ slot, entity }, index) => `
         <article class="bn-slide ${index === 0 ? "is-on" : ""}" data-bn-go="${slot.id}" data-bn-kind="${slot.kind}"
-                 style="--bn-1:${slot.tone[0]}; --bn-2:${slot.tone[1]}; --bn-3:${slot.tone[2]}; --bn-ink:var(--brand-text)">
+                 data-bn-tone="${index % 4}">
           <div class="bn-body">
             <span class="bn-kicker"><i class="ph ${slot.icon}"></i>${slot.kicker}</span>
             <h2 class="bn-title">${entity.name}<em>${entity.sign}</em></h2>
