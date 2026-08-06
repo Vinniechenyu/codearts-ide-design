@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HTML 创作专家与产品体验专家 · 双专家方案｜码道 Work</title>
+<title>HTML 创作专家与产品体验设计专家 · 双专家方案｜码道 Work</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&family=Barlow+Condensed:wght@300;400&family=Noto+Sans+SC:wght@200;300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/IKKI2000/harmonyos-fonts@master/css/harmonyos_sans_sc.css">
 <style>
@@ -671,6 +671,108 @@ body.on-dark .nav-dot.active{background:#fff}
 .report-orchestration .orch-step b{display:block;font-size:var(--fs-h2);font-weight:880;color:var(--ink)}
 .report-orchestration .orch-step p{margin-top:.4vh;font-size:var(--fs-body);line-height:1.4;color:var(--ink-2)}
 .report-orchestration .orch-step em{font-style:normal;padding:.5vh .65vw;border-radius:999px;background:color-mix(in srgb,var(--tone) 12%,#fff);font-size:var(--fs-xs);font-weight:800;color:var(--tone);white-space:nowrap}
+
+/* ===== 竞品分析实证页组件（源自设计能力竞品分析 v2）===== */
+.product-label{display:inline-flex;align-items:center;gap:.48em;min-width:0;font:inherit;color:inherit;vertical-align:middle}
+.product-logo{width:1.55em;height:1.55em;object-fit:cover;border:0;border-radius:0;background:#fff;clip-path:inset(4% round 27%);filter:drop-shadow(0 1px 1px rgba(16,20,30,.15));flex:0 0 auto}
+.head .ttl .product-label{gap:.26em}
+.head .ttl .product-logo{width:1.12em;height:1.12em;border-radius:.28em}
+.route-code .product-label{font-family:'JetBrains Mono';font-size:var(--fs-xs);letter-spacing:.08em;text-transform:none}
+.route-code .product-logo{width:2.35em;height:2.35em}
+.report-matrix td:first-child .product-logo{width:2em;height:2em}
+.duo-kicker.product-label{font-family:'JetBrains Mono';font-size:var(--fs-xs);letter-spacing:.1em}
+.duo-kicker .product-logo{width:2.5em;height:2.5em}
+.report-journey .j-label{gap:.55vw}
+.report-journey .j-label .product-logo{width:2.2em;height:2.2em}
+.brand .logo{border-radius:0;clip-path:inset(4% round 27%);filter:drop-shadow(0 1px 1px rgba(16,20,30,.14))}
+.report-five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1vw;width:100%;min-height:0}
+.report-five .route-card{--tone:var(--c-indigo);position:relative;min-width:0;min-height:48vh;padding:2.2vh 1.25vw;display:flex;flex-direction:column;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.86);border-radius:16px;overflow:hidden}
+.report-five .route-card::before{content:"";position:absolute;left:0;right:0;top:0;height:11vh;background:linear-gradient(180deg,color-mix(in srgb,var(--tone) 18%,transparent),transparent)}
+.report-five .route-code{position:relative;font-family:'JetBrains Mono';font-size:var(--fs-xs);color:var(--tone);letter-spacing:.12em;text-transform:uppercase}
+.report-five .route-name{position:relative;margin-top:7vh;font-size:var(--fs-h2);font-weight:900;line-height:1.15}
+.report-five .route-type{margin-top:.8vh;font-size:var(--fs-h3);font-weight:700;color:var(--tone)}
+.report-five .route-desc{margin-top:2vh;font-size:var(--fs-body);line-height:1.55;color:var(--ink-2)}
+.report-five .route-verdict{margin-top:auto;padding-top:1.4vh;border-top:1px solid rgba(50,60,80,.12);font-size:var(--fs-sm);font-weight:800;color:var(--ink)}
+.report-layers{display:grid;gap:1vh;width:min(1120px,100%);margin:0 auto}
+.report-layers .layer{display:grid;grid-template-columns:150px 1fr auto;gap:1.2vw;align-items:center;padding:1.4vh 1.25vw;border-radius:14px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.86);min-width:0}
+.report-layers .layer:nth-child(2),.report-layers .layer:nth-child(5){background:linear-gradient(135deg,rgba(91,91,214,.92),rgba(124,58,237,.88));color:#fff}
+.report-layers .layer-name{font-size:var(--fs-h3);font-weight:850}
+.report-layers .layer-desc{font-size:var(--fs-body);color:var(--ink-2);line-height:1.4;min-width:0}
+.report-layers .layer:nth-child(2) .layer-desc,.report-layers .layer:nth-child(5) .layer-desc{color:rgba(255,255,255,.72)}
+.report-layers .layer-form{font-family:'JetBrains Mono';font-size:var(--fs-xs);letter-spacing:.08em;color:var(--ink-3)}
+.report-layers .layer:nth-child(2) .layer-form,.report-layers .layer:nth-child(5) .layer-form{color:rgba(255,255,255,.62)}
+.report-duo .duo-card.with-evidence{padding:1.7vh 1.2vw;min-height:56vh}
+.report-duo .with-evidence .duo-title{margin-top:.45vh;font-size:var(--fs-h2)}
+.report-duo .with-evidence .duo-model{margin-top:.35vh;font-size:var(--fs-body)}
+.duo-evidence-body{display:grid;grid-template-columns:1.08fr .92fr;gap:.9vw;min-height:0;flex:1;margin-top:1.2vh}
+.duo-evidence{position:relative;min-height:0;border-radius:11px;overflow:hidden;background:#F5F6F8;border:1px solid rgba(45,55,77,.13);cursor:zoom-in;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.duo-evidence img{width:100%;height:100%;display:block;object-fit:contain;object-position:center}
+.duo-evidence::after,.qwen-evidence .shot::after{content:"点击放大";position:absolute;right:9px;bottom:8px;padding:4px 8px;border-radius:999px;background:rgba(18,20,26,.72);color:#fff;font-size:10px;font-weight:750;letter-spacing:.04em;opacity:0;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+.duo-evidence:hover,.duo-evidence:focus-visible,.qwen-evidence .shot:hover,.qwen-evidence .shot:focus-visible{transform:translateY(-2px);border-color:rgba(102,63,203,.45);box-shadow:0 12px 28px -18px rgba(69,42,136,.55);outline:none}
+.duo-evidence:hover::after,.duo-evidence:focus-visible::after,.qwen-evidence .shot:hover::after,.qwen-evidence .shot:focus-visible::after{opacity:1;transform:translateY(0)}
+.report-duo .with-evidence .duo-list{margin-top:0;gap:.65vh;align-content:start}
+.report-duo .with-evidence .duo-item{grid-template-columns:56px 1fr;gap:.5vw;padding-bottom:.62vh}
+.report-duo .with-evidence .duo-item span{font-size:var(--fs-sm);line-height:1.35}
+.report-duo .with-evidence .duo-bottom{padding-top:.8vh;font-size:var(--fs-body)}
+.report-qwen-analysis{display:grid;grid-template-columns:1.55fr .72fr;gap:1.2vw;width:100%;height:54vh}
+.report-qwen-analysis .report-chain{gap:.7vw}
+.report-qwen-analysis .report-chain::before{top:4.6vh}
+.report-qwen-analysis .phase{padding:1.35vh .72vw 1.1vh}
+.report-qwen-analysis .phase-no{width:32px;height:32px}
+.report-qwen-analysis .phase-name{margin-top:1.25vh}
+.report-qwen-analysis .phase-skills{margin-top:1vh;line-height:1.45}
+.qwen-evidence{min-width:0;display:flex;flex-direction:column;padding:.75vh .6vw .7vh;border-radius:15px;background:rgba(255,255,255,.64);border:1px solid rgba(255,255,255,.9)}
+.qwen-evidence .shot{position:relative;flex:1;min-height:0;border-radius:10px;overflow:hidden;border:1px solid rgba(40,50,70,.1);background:#F5F6F8;cursor:zoom-in;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.qwen-evidence .shot img{width:100%;height:100%;display:block;object-fit:contain;object-position:center}
+.qwen-evidence .caption{display:flex;justify-content:space-between;align-items:center;gap:.7vw;padding:.7vh .2vw 0;font-size:var(--fs-xs);font-weight:750;color:var(--ink-3)}
+.report-journey{width:100%;display:grid;grid-template-columns:125px repeat(6,minmax(0,1fr));gap:.65vw}
+.report-journey .j-head,.report-journey .j-label,.report-journey .j-cell{min-width:0;border-radius:11px;padding:1vh .75vw}
+.report-journey .j-head{background:var(--g-ink);color:#fff;font-size:var(--fs-sm);font-weight:750;text-align:center}
+.report-journey .j-label{display:flex;align-items:center;font-size:var(--fs-sm);font-weight:850;color:var(--ink)}
+.report-journey .j-cell{background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.84);font-size:var(--fs-sm);line-height:1.35;color:var(--ink-2)}
+.report-journey .j-cell b{display:block;color:var(--ink);margin-bottom:.35vh}
+.report-journey .j-cell.core{background:linear-gradient(135deg,rgba(91,76,205,.96),rgba(124,75,226,.92));border-color:transparent;color:rgba(255,255,255,.76)}
+.report-journey .j-cell.core b{color:#fff}
+.report-journey .j-cell.supported{background:linear-gradient(135deg,rgba(121,92,218,.16),rgba(164,112,225,.1));border-color:rgba(111,77,202,.24);color:#625B70}
+.report-journey .j-cell.supported b{color:#4F368F}
+.report-journey .j-cell.indirect{background:rgba(245,246,248,.72);border:1px dashed rgba(75,82,97,.2);color:#777D88}
+.journey-wrap{width:100%;display:flex;flex-direction:column;gap:1.15vh}
+.journey-legend{display:flex;align-items:center;justify-content:space-between;gap:1.2vw;padding:.75vh .85vw;border-radius:11px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.82)}
+.journey-legend .legend-items{display:flex;align-items:center;gap:1vw;flex-wrap:wrap}
+.journey-legend .legend-item{display:inline-flex;align-items:center;gap:.38vw;font-size:var(--fs-xs);font-weight:750;color:var(--ink-2)}
+.journey-legend .legend-swatch{width:18px;height:10px;border-radius:3px}
+.journey-legend .legend-swatch.core{background:linear-gradient(135deg,#5B4CCD,#7C4BE2)}
+.journey-legend .legend-swatch.supported{background:rgba(121,92,218,.15);border:1px solid rgba(111,77,202,.28)}
+.journey-legend .legend-swatch.mechanism{background:rgba(255,255,255,.72);border:1px solid rgba(75,82,97,.16)}
+.journey-legend .legend-swatch.indirect{background:#F5F6F8;border:1px dashed rgba(75,82,97,.3)}
+.journey-legend .legend-boundary{font-size:var(--fs-xs);color:var(--ink-3);text-align:right}
+.tech-pipelines{width:100%;display:grid;gap:.82vh}
+.tech-pipeline{display:grid;grid-template-columns:142px repeat(4,minmax(0,1fr));gap:.65vw;align-items:stretch}
+.tech-product{display:flex;align-items:center;gap:.55vw;padding:1vh .8vw;border-radius:12px;background:var(--g-ink);color:#fff;font-size:var(--fs-sm);font-weight:850}
+.tech-product .product-logo{width:2.05em;height:2.05em}
+.tech-node{position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0;padding:1vh .9vw;border-radius:12px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.86)}
+.tech-node:not(:last-child)::after{content:"›";position:absolute;right:-.55vw;top:50%;transform:translate(50%,-50%);z-index:2;color:var(--accent);font-size:20px;font-weight:900}
+.tech-node b{font-size:var(--fs-sm);color:var(--ink);line-height:1.2}
+.tech-node span{margin-top:.25vh;font-size:var(--fs-xs);color:var(--ink-3);line-height:1.25}
+.tech-node.verified{background:linear-gradient(135deg,rgba(121,92,218,.15),rgba(164,112,225,.08));border-color:rgba(111,77,202,.22)}
+.tech-node.limited{border-style:dashed;background:rgba(245,246,248,.7)}
+.tech-matrix{width:100%;border-collapse:separate;border-spacing:0 .6vh;font-size:var(--fs-sm)}
+.tech-matrix th{padding:.8vh .7vw;text-align:left;color:var(--ink-3);font-size:var(--fs-xs);font-weight:800}
+.tech-matrix td{padding:1vh .7vw;background:rgba(255,255,255,.58);border-top:1px solid rgba(255,255,255,.86);border-bottom:1px solid rgba(255,255,255,.86);color:var(--ink-2);line-height:1.3}
+.tech-matrix td:first-child{border-radius:11px 0 0 11px;font-weight:850;color:var(--ink)}
+.tech-matrix td:last-child{border-radius:0 11px 11px 0}
+.tech-state{display:inline-flex;align-items:center;gap:.35vw;font-weight:800;color:var(--ink)}
+.tech-state::before{content:"";width:8px;height:8px;border-radius:50%;background:#A7ADB8}
+.tech-state.strong::before{background:#6547D8}
+.tech-state.partial::before{background:#8B72D8}
+.tech-state.unclear::before{background:#A7ADB8}
+.tech-risk{color:#8B3F51;font-weight:800}
+.report-adopt .product-logo{width:1.7em;height:1.7em}
+/* ===== 并入竞品分析实证页所需组件（作用域限定，避免覆盖本 deck 已有的同名规则）===== */
+.report-qwen-analysis .report-chain{grid-template-columns:repeat(5,minmax(0,1fr))}
+.report-qwen-analysis .phase{min-height:0}
+.report-duo .with-evidence .duo-item b{min-width:0}
+
 </style>
 </head>
 <body>
@@ -694,7 +796,7 @@ body.on-dark .nav-dot.active{background:#fff}
       </div>
       <div class="cover-bottom">
         <div class="cover-tags">
-          <span>总 · 为什么要两个</span><span>分 A · HTML 创作专家</span><span>分 B · 产品体验专家</span><span>总 · 合起来怎么落地</span>
+          <span>总 · 为什么要两个</span><span>分 A · HTML 创作专家</span><span>分 B · 产品体验设计专家</span><span>总 · 合起来怎么落地</span>
         </div>
         <div class="cover-meta">CODEARTS AI IDE<br>2026 · 08 · 05</div>
       </div>
@@ -717,8 +819,8 @@ body.on-dark .nav-dot.active{background:#fff}
           <div class="directory-items"><span>市场实测与参考实践</span><span>场景、旅程与界面</span><span>能力编排与 Skill</span><span>五道质量闸门</span></div><div class="directory-note">让一份内容更值得被看、被理解、被使用</div>
         </article>
         <article class="directory-card" style="--dir:var(--c-blue)">
-          <div class="directory-no">03</div><h2 class="directory-name">产品体验专家</h2><div class="directory-en">Product Experience · 分 B</div>
-          <div class="directory-items"><span>五个根本体验问题</span><span>四层能力与专家团</span><span>四类入口与十阶段旅程</span><span>五道质量闸门</span></div><div class="directory-note">让一个产品更值得被做、被操作、被演进</div>
+          <div class="directory-no">03</div><h2 class="directory-name">产品体验设计专家</h2><div class="directory-en">Product Experience · 分 B</div>
+          <div class="directory-items"><span>五款平台竞品实证</span><span>五个根本体验问题</span><span>四层能力与四类入口</span><span>十阶段旅程与五道闸门</span></div><div class="directory-note">让一个产品更值得被做、被操作、被演进</div>
         </article>
         <article class="directory-card" style="--dir:var(--c-pink)">
           <div class="directory-no">04</div><h2 class="directory-name">合起来怎么落地</h2><div class="directory-en">Rollout &amp; Validation · 总</div>
@@ -733,7 +835,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">值得分开建设，但不该让用户在开始前凭两个名称强制二选一</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-verdict-hero">
@@ -742,7 +844,7 @@ body.on-dark .nav-dot.active{background:#fff}
           <h2>真正该拆开的是责任、方法链和验收标准，不一定是入口</h2>
           <p>后台应有<b>两套清晰的能力编排和质量闸门</b>；前台保留统一任务入口，由系统根据任务对象、复杂度和验收标准自动路由。</p>
           <p>专家中心可以展示两个专家，但必须<b>用任务语言解释差异</b>，不能只靠专业名称。</p>
-          <div class="vh-one">HTML 创作专家让一份内容<b>更值得被看、被理解和被使用</b>；产品体验专家让一个产品<b>更值得被做、被操作和被持续演进</b>。</div>
+          <div class="vh-one">HTML 创作专家让一份内容<b>更值得被看、被理解和被使用</b>；产品体验设计专家让一个产品<b>更值得被做、被操作和被持续演进</b>。</div>
         </article>
         <div class="vh-reasons">
           <div class="vh-reason">
@@ -767,7 +869,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">文件格式不是用户任务：都产出网页，但用户来做的是两件事</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="task-ab">
@@ -785,7 +887,7 @@ body.on-dark .nav-dot.active{background:#fff}
         <article class="task-card b">
           <div class="tk-tag">TASK B · 产品能力</div>
           <p class="tk-say">我有一个产品问题，帮我把产品做对并实现出来。</p>
-          <div class="tk-owner">→ 产品体验专家</div>
+          <div class="tk-owner">→ 产品体验设计专家</div>
           <div class="task-rows">
             <div class="task-row"><b>用户起点</b><span>一个产品想法、一份功能需求、一张截图或 Figma、一个待改造的现有产品、一段真实用户流程、一个代码仓</span></div>
             <div class="task-row"><b>行为矛盾</b><span>需要得到<i>真正可用的产品或功能</i>，但直接生成页面容易跳过目标用户、核心任务、流程、异常状态和实现约束，最终得到「看起来完成、实际无法验证」的结果</span></div>
@@ -803,11 +905,11 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">十个维度逐一对照，最关键的分界只有一条</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <table class="split-table">
-        <thead><tr><th style="width:11%">判断维度</th><th style="width:44.5%">HTML 创作专家</th><th style="width:44.5%">产品体验专家</th></tr></thead>
+        <thead><tr><th style="width:11%">判断维度</th><th style="width:44.5%">HTML 创作专家</th><th style="width:44.5%">产品体验设计专家</th></tr></thead>
         <tbody>
           <tr><td>任务对象</td><td class="h">一份内容、资料或数据成果</td><td class="p">一个产品、功能、页面体系或用户流程</td></tr>
           <tr><td>用户起点</td><td class="h">已有资料，希望更好地表达和交付</td><td class="p">已有想法、需求或现有产品，希望把产品做对</td></tr>
@@ -830,7 +932,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">分开做的五条价值：错误路由的代价是双向的</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-quality">
@@ -856,7 +958,7 @@ body.on-dark .nav-dot.active{background:#fff}
         </article>
         <article class="q-card">
           <div class="q-no">05</div><h3 class="q-title">扩大码道 Work 的目标市场</h3>
-          <p class="q-desc">只有产品体验专家时，码道容易被理解为设计师 / 产品经理 / 前端生成工具。加入 HTML 创作后，覆盖报告交付、数据沟通、方案比较、培训传播、轻量工具与管理汇报。</p>
+          <p class="q-desc">只有产品体验设计专家时，码道容易被理解为设计师 / 产品经理 / 前端生成工具。加入 HTML 创作后，覆盖报告交付、数据沟通、方案比较、培训传播、轻量工具与管理汇报。</p>
           <div class="q-proof">不是增加一个相似专家，而是<b>在「做产品」之外增加「交付内容」</b></div>
         </article>
       </div>
@@ -868,7 +970,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">重合的是职业身份，不重合的是当下任务</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="audience">
@@ -903,7 +1005,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">统一任务入口 + 专家中心双卡片 + 自动路由，不让用户先选专家</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="route-plan">
@@ -913,14 +1015,14 @@ body.on-dark .nav-dot.active{background:#fff}
             <h3>直接描述目标、添加资料</h3>
             <p>不需要先选专家。系统回放任务并说明推荐原因，用户可以接受或修改路由。</p>
             <div class="entry-quote">「你希望把三份调研材料做成供管理层阅读的交互式对比报告。该任务以内容表达和单成果交付为主，建议由 <b>HTML 创作专家</b> 负责。」</div>
-            <div class="entry-quote">「你希望设计一套包含登录、角色权限和审批状态的多页面产品。该任务需要定义连续流程和异常状态，建议由 <b>产品体验专家</b> 负责。」</div>
+            <div class="entry-quote">「你希望设计一套包含登录、角色权限和审批状态的多页面产品。该任务需要定义连续流程和异常状态，建议由 <b>产品体验设计专家</b> 负责。」</div>
           </div>
           <div class="entry-box">
             <em>ENTRY B · 专家中心</em>
             <h3>双卡片，但必须用任务语言</h3>
             <div class="dual-cards">
               <div class="dual-mini"><b>HTML 创作专家</b><span>把文档、表格和业务资料变成可打开、可交互、可分享的网页成果</span><i>做数据看板 / 做网页报告 / 比较两份方案 / 做互动手册</i></div>
-              <div class="dual-mini px"><b>产品体验专家</b><span>从产品目标、用户流程到可运行前端，帮你把产品做对并验证</span><i>设计新产品 / 改造现有功能 / 截图或 Figma 转前端 / 体验审计</i></div>
+              <div class="dual-mini px"><b>产品体验设计专家</b><span>从产品目标、用户流程到可运行前端，帮你把产品做对并验证</span><i>设计新产品 / 改造现有功能 / 截图或 Figma 转前端 / 体验审计</i></div>
             </div>
             <p style="margin-top:1.1vh">点击卡片后进入<b>同一个任务工作台</b>，而不是两套割裂的产品。</p>
           </div>
@@ -934,11 +1036,11 @@ body.on-dark .nav-dot.active{background:#fff}
           <div class="tree-q"><i>Q2</i><b>是否需要定义或验证核心用户与流程？交互是否改变业务状态？</b></div>
           <div class="tree-opts">
             <div class="tree-opt html"><b>否 · 单成果轻交互</b><span>→ HTML 创作专家</span></div>
-            <div class="tree-opt px"><b>是 · 多角色 / 权限 / 真实后台</b><span>→ 产品体验专家</span></div>
+            <div class="tree-opt px"><b>是 · 多角色 / 权限 / 真实后台</b><span>→ 产品体验设计专家</span></div>
           </div>
           <div class="tree-q"><i>Q3</i><b>任务中途是否升级？产品逻辑是否已确定？</b></div>
           <div class="tree-opts">
-            <div class="tree-opt"><b>持续使用 / 多角色 / 多页面 / 需设计系统</b><span>HTML 创作 → 产品体验专家</span></div>
+            <div class="tree-opt"><b>持续使用 / 多角色 / 多页面 / 需设计系统</b><span>HTML 创作 → 产品体验设计专家</span></div>
             <div class="tree-opt code"><b>逻辑已定，缺后端、接口、部署与大型工程</b><span>→ 码道 Code</span></div>
           </div>
         </div>
@@ -952,7 +1054,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">底层能力尽量共享，责任模型绝不共用，任务对象必须共享一个</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="share-grid">
@@ -980,7 +1082,7 @@ body.on-dark .nav-dot.active{background:#fff}
           <h3>不应直接共用的责任</h3>
           <div class="sh-sub">否则两个名称只是同一个网页生成器的角色包装</div>
           <table class="split-table" style="margin-top:1.3vh">
-            <thead><tr><th style="width:20%">不应混用</th><th style="width:40%">HTML 创作专家</th><th style="width:40%">产品体验专家</th></tr></thead>
+            <thead><tr><th style="width:20%">不应混用</th><th style="width:40%">HTML 创作专家</th><th style="width:40%">产品体验设计专家</th></tr></thead>
             <tbody>
               <tr><td>主任务模型</td><td class="h">内容交付任务</td><td class="p">产品体验任务</td></tr>
               <tr><td>核心上下文</td><td class="h">原资料、数据、受众、结论与来源</td><td class="p">用户、场景、流程、状态、设计系统与工程约束</td></tr>
@@ -1000,13 +1102,13 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">拆分的五条风险：每一条都有对应的产品动作，而不是靠文案解释</span></div><div class="subttl">总 · 为什么要两个专家</div></div>
-      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="section-tabs"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="risk-grid">
         <article class="risk-card">
           <div class="rk-no">RISK 01</div><h3>两个名称仍然难以区分</h3>
-          <p>「HTML」是技术格式，「产品体验」是专业领域，两者不在同一命名层级。用户可能误解成「HTML 专家只会写代码」「漂亮网页都该找产品体验专家」。</p>
+          <p>「HTML」是技术格式，「产品体验」是专业领域，两者不在同一命名层级。用户可能误解成「HTML 专家只会写代码」「漂亮网页都该找产品体验设计专家」。</p>
           <div class="rk-fix"><em>对策</em>副标题与快捷任务讲清价值；系统按任务自动推荐，不要求用户理解术语。</div>
         </article>
         <article class="risk-card">
@@ -1020,7 +1122,7 @@ body.on-dark .nav-dot.active{background:#fff}
           <div class="rk-fix"><em>对策</em>不按产物名称静态分类；用「是否定义用户与流程、是否改变业务状态、是否持续运行」判断；只有边界实质变化才转交，且保留全部上下文。</div>
         </article>
         <article class="risk-card">
-          <div class="rk-no">RISK 04</div><h3>产品体验专家过重</h3>
+          <div class="rk-no">RISK 04</div><h3>产品体验设计专家过重</h3>
           <p>如果所有产品体验任务都强制经历完整研究、UX、UI、实现与验收，简单局部优化会变慢。</p>
           <div class="rk-fix"><em>对策</em>内部继续区分单专家轻路径与专家团完整路径——拆成两个专家，不等于每个专家内部只能有一种流程。</div>
         </article>
@@ -1038,7 +1140,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">统一叫「HTML 创作专家」：讲创作成果，不讲生成代码</span></div><div class="subttl">分 A · 定位与命名</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-position">
         <article class="pos-main">
@@ -1073,7 +1175,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">四款平台各搜一次「html」：搜到的全是工具和技能，没有一位专家</span></div><div class="subttl">分 A · 现状实测</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-evidence">
         <article class="evi-card" style="--tone:var(--c-pink)">
@@ -1114,7 +1216,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">同一批 Skill 在三家复用：方法层已商品化，差异化只能来自责任层和验证层</span></div><div class="subttl">分 A · 现状实测</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-reuse">
         <table class="reuse-table">
@@ -1150,7 +1252,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">已经有人把它做成一条链路：不从「做网站」开始，而从一个办公任务开始</span></div><div class="subttl">分 A · 参考实践</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-chain">
         <article class="phase"><div class="phase-no">01</div><h3 class="phase-name">上传财报 PDF</h3><div class="phase-count">INPUT</div><p class="phase-skills">用户带着真实资料进入，而不是从一句提示词开始。</p><div class="phase-output">起点是资料</div></article>
@@ -1170,7 +1272,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">真正起作用的是四个工程动作，不是那段长提示词</span></div><div class="subttl">分 A · 参考实践</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-quality four">
         <article class="q-card">
@@ -1203,7 +1305,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">可以借的是五条产品经验，不能抄的是五处办公场景的红线</span></div><div class="subttl">分 A · 参考实践</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-duo">
         <article class="duo-card dark">
@@ -1237,7 +1339,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">首期不宣传「什么网页都能做」，只收四类可验收的高价值任务</span></div><div class="subttl">分 A · 场景</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <table class="report-matrix">
         <thead><tr><th>优先级</th><th>场景</th><th>输入</th><th>典型产物</th><th>验收重点</th></tr></thead>
@@ -1260,7 +1362,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">用三个 Demo 证明价值：每个都能被追问「数据从哪来」</span></div><div class="subttl">分 A · 场景</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-tri">
         <article class="tri-card" style="--tone:var(--c-indigo)">
@@ -1293,7 +1395,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">旅程有两处不能省：生成前先回放任务，交付后能继续复用</span></div><div class="subttl">分 A · 旅程</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-flow">
         <div class="flow-row">
@@ -1320,7 +1422,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">首页不要求用户先写完整提示词，只帮他补齐四件事</span></div><div class="subttl">分 A · 旅程</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-duo">
         <article class="duo-card">
@@ -1353,7 +1455,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">预览是主结果，代码是按需下钻；改稿要能「指着成果改」</span></div><div class="subttl">分 A · 界面</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-wire">
         <div class="wire">
@@ -1401,7 +1503,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">用户只面对一位专家，后台是七层能力</span></div><div class="subttl">分 A · 能力编排</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-architecture">
         <article class="arch-intro">
@@ -1429,7 +1531,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">首期九个 Skill 内部具备，但不必展示给用户</span></div><div class="subttl">分 A · Skill 蓝图</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="skill-blueprint">
         <div class="skill-map">
@@ -1504,7 +1606,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">「输出了一段代码」不算完成：五类检查全过才算生成完成</span></div><div class="subttl">分 A · 质量与安全</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-quality">
         <article class="q-card">
@@ -1542,7 +1644,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">完成态给证据清单，安全给默认值——两者都不问用户</span></div><div class="subttl">分 A · 质量与安全</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-duo">
         <article class="duo-card dark">
@@ -1578,7 +1680,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">首期 MVP：十一项必须有，八项明确不做</span></div><div class="subttl">分 A · 质量与安全</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验专家</span><span>04 合起来落地</span></div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
     <div class="body-area vc">
       <div class="report-duo">
         <article class="duo-card">
@@ -1616,11 +1718,236 @@ body.on-dark .nav-dot.active{background:#fff}
     <div class="report-foot"><span>MVP SCOPE</span><span>19 / 21</span></div>
   </section>
 
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl">设计能力的差异不在模型，而在用什么形态承载</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="report-five">
+        <article class="route-card" style="--tone:var(--c-indigo)"><div class="route-code">01 · <span class="product-label"><img class="product-logo" src="assets/cmp-codex-logo.jpeg" alt="">Codex</span></div><h2 class="route-name">插件工作流型</h2><div class="route-type">插件 + 10 Skill</div><p class="route-desc">把目标确认、视觉探索、代码实现、设计 QA 与分享压缩为一条短链。</p><div class="route-verdict">优化交付闭环</div></article>
+        <article class="route-card" style="--tone:var(--c-pink)"><div class="route-code">02 · <span class="product-label"><img class="product-logo" src="assets/cmp-claude-logo.png" alt="">Claude</span></div><h2 class="route-name">单 Skill 增强型</h2><div class="route-type">单一高强度 Skill</div><p class="route-desc">以明确的视觉立场约束前端生成，重点避免模板化和默认 AI 审美。</p><div class="route-verdict">优化视觉表现</div></article>
+        <article class="route-card" style="--tone:var(--c-teal)"><div class="route-code">03 · <span class="product-label"><img class="product-logo" src="assets/cmp-trae-work-logo.jpeg" alt="">TraeWork</span></div><h2 class="route-name">专属工作台型</h2><div class="route-type">Design + 插件 + Skills</div><p class="route-desc">既提供连续设计模式，也通过界面设计插件与相关 Skills 补充专项能力。</p><div class="route-verdict">优化生产环境</div></article>
+        <article class="route-card" style="--tone:var(--c-green)"><div class="route-code">04 · <span class="product-label"><img class="product-logo" src="assets/cmp-workbuddy-logo.jpeg" alt="">WorkBuddy</span></div><h2 class="route-name">专家团型</h2><div class="route-type">专家 + 专家团</div><p class="route-desc">用职业角色建立任务预期，再通过团队分工承接复杂、多专业任务。</p><div class="route-verdict">优化任务委托</div></article>
+        <article class="route-card" style="--tone:var(--c-purple)"><div class="route-code">05 · <span class="product-label"><img class="product-logo" src="assets/cmp-qwen-office-logo.jpeg" alt="">千问办公</span></div><h2 class="route-name">链式方法库型</h2><div class="route-type">套件 + 28 Skill</div><p class="route-desc">把探索、定义、设计、验证与交付拆成可复用、可串联的方法链。</p><div class="route-verdict">优化方法覆盖</div></article>
+      </div>
+      <div class="tech-note"><b>这一章为什么先看竞品：</b>第 02 章用「四款平台搜 <code>html</code>」证明了<b>内容交付侧没有责任主体</b>；产品体验侧的情况不同——五款平台都在建设计能力，但各用一种形态承载。先看清它们优化的是什么、代价在哪，再谈码道的产品体验设计专家该怎么做。</div>
+      <div class="tech-note"><b>比较维度与样本层级：</b>五个名称统一按「用什么形态承载设计能力」划分，卡片底部一行是各自真正在优化的目标。⚠️ 五个样本不在同一产品层级——Claude 的 <code>frontend-design</code> 是<b>一个 Skill</b>，其余四款是插件、套件或平台。本页比较的是能力构建方式，不是产品规模。</div>
+    </div>
+    <div class="report-foot"><span>FIVE ARCHETYPES</span><span>03 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl">设计专家不是一个 Prompt，而是六层能力同时成立</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="report-layers">
+        <div class="layer"><div class="layer-name">用户入口层</div><div class="layer-desc">让用户知道从哪里开始，不必先学习系统能力目录</div><div class="layer-form">MODE / EXPERT / COMMAND</div></div>
+        <div class="layer"><div class="layer-name">专业身份层</div><div class="layer-desc">建立“谁负责”和“结果应达到什么标准”的能力预期</div><div class="layer-form">ROLE / TEAM</div></div>
+        <div class="layer"><div class="layer-name">方法层</div><div class="layer-desc">规定输入、步骤、判断边界与输出模板</div><div class="layer-form">SKILL / RULE / TEMPLATE</div></div>
+        <div class="layer"><div class="layer-name">编排与状态层</div><div class="layer-desc">选择方法、连接阶段、保存上下文并支持恢复</div><div class="layer-form">ROUTER / STATE / CONTEXT</div></div>
+        <div class="layer"><div class="layer-name">工具与执行层</div><div class="layer-desc">访问真实设计稿、浏览器、代码仓、图像与部署环境</div><div class="layer-form">MCP / API / TOOL</div></div>
+        <div class="layer"><div class="layer-name">验证与交付层</div><div class="layer-desc">用可运行代码、截图比较、测试和验收记录证明结果</div><div class="layer-form">QA / TEST / EVIDENCE</div></div>
+      </div>
+    </div>
+    <div class="report-foot"><span>SIX-LAYER MODEL</span><span>04 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl">没有一家三项全能：覆盖广度、开始成本与交付可信度互相牵制</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <table class="report-matrix">
+        <thead><tr><th>产品</th><th>用户入口</th><th>能力载体</th><th>突出优势</th><th>主要代价</th><th>最佳场景</th></tr></thead>
+        <tbody>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-codex-logo.jpeg" alt="">Codex</span></td><td>自然语言 / 插件</td><td><span class="chip">10 Skill</span></td><td class="strong">实现与 QA 闭环</td><td>方法颗粒度少于千问</td><td>设计到代码交付</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-claude-logo.png" alt="">Claude</span></td><td>代码任务</td><td><span class="chip">单 Skill</span></td><td class="strong">视觉风格集中</td><td>产品逻辑链较短</td><td>高表现力前端</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-trae-work-logo.jpeg" alt="">TraeWork</span></td><td>Design / 插件市场</td><td><span class="chip">模式 + 扩展</span></td><td class="strong">工作台与专项能力并存</td><td>入口与能力选择成本</td><td>持续迭代设计</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-workbuddy-logo.jpeg" alt="">WorkBuddy</span></td><td>专家 / 专家团</td><td><span class="chip">角色与团队</span></td><td class="strong">普通用户易委托</td><td>过程与验收不透明</td><td>复杂跨专业任务</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-qwen-office-logo.jpeg" alt="">千问办公</span></td><td>套件 / 快捷命令</td><td><span class="chip">28 Skill</span></td><td class="strong">方法覆盖最完整</td><td>链路与维护复杂</td><td>专业流程标准化</td></tr>
+        </tbody>
+      </table>
+      <div class="verdict"><span class="vk">核心判断</span><span class="vv">不应寻找单一“最强竞品”，而应分别吸收它们在<b>入口、方法、工作台、团队协作和验证闭环</b>上的长板。</span></div>
+    </div>
+    <div class="report-foot"><span>COMPARATIVE VIEW</span><span>05 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl"><span class="product-label"><img class="product-logo" src="assets/cmp-codex-logo.jpeg" alt="">Codex</span> 赢在闭环短，<span class="product-label"><img class="product-logo" src="assets/cmp-claude-logo.png" alt="">Claude</span> 赢在审美硬，都不靠 Skill 数量</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="report-duo">
+        <article class="duo-card with-evidence">
+          <div class="duo-kicker product-label"><img class="product-logo" src="assets/cmp-codex-logo.jpeg" alt="">Codex · Product Design</div><h2 class="duo-title">把交付链缩短</h2><div class="duo-model">插件内 10 个聚焦 Skill</div>
+          <div class="duo-evidence-body">
+            <div class="duo-evidence"><img src="assets/cmp-codex-product-design-ui.png" alt="Codex Product Design 插件真实界面"></div>
+            <div class="duo-list">
+              <div class="duo-item"><b>入口</b><span>目标确认、研究、审计、视觉探索</span></div>
+              <div class="duo-item"><b>执行</b><span>截图 / URL 到响应式前端实现</span></div>
+              <div class="duo-item"><b>验证</b><span>视觉来源对比、Design QA、分享</span></div>
+              <div class="duo-item"><b>代价</b><span>完整产品研究与定义方法较少</span></div>
+            </div>
+          </div>
+          <div class="duo-bottom">适合：目标已明确，要快速拿到可运行原型</div>
+        </article>
+        <article class="duo-card dark with-evidence">
+          <div class="duo-kicker product-label"><img class="product-logo" src="assets/cmp-claude-logo.png" alt="">Claude · Frontend Design</div><h2 class="duo-title">把视觉立场变强</h2><div class="duo-model">单一高强度审美 Skill</div>
+          <div class="duo-evidence-body">
+            <div class="duo-evidence"><img src="assets/cmp-claude-frontend-design-skill.png" alt="Claude frontend-design Skill 官方仓库真实页面"></div>
+            <div class="duo-list">
+              <div class="duo-item"><b>入口</b><span>直接描述页面或前端任务</span></div>
+              <div class="duo-item"><b>执行</b><span>强调版式、字体、色彩、动效和差异化</span></div>
+              <div class="duo-item"><b>约束</b><span>回避无差别渐变与模板式组件</span></div>
+              <div class="duo-item"><b>代价</b><span>不覆盖完整产品发现与验证链</span></div>
+            </div>
+          </div>
+          <div class="duo-bottom">适合：单页与前端，要一眼看出不是 AI 默认审美</div>
+        </article>
+      </div>
+    </div>
+    <div class="report-foot"><span>CLOSED LOOP VS AESTHETIC FOCUS</span><span>06 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl"><span class="product-label"><img class="product-logo" src="assets/cmp-trae-work-logo.jpeg" alt="">TraeWork</span> 把过程摆出来，<span class="product-label"><img class="product-logo" src="assets/cmp-workbuddy-logo.jpeg" alt="">WorkBuddy</span> 把过程收起来</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="report-duo">
+        <article class="duo-card dark with-evidence">
+          <div class="duo-kicker product-label"><img class="product-logo" src="assets/cmp-trae-work-logo.jpeg" alt="">TraeWork</div><h2 class="duo-title">工作台与扩展协同</h2><div class="duo-model">Design 模式 + 界面设计插件 + Skills</div>
+          <div class="duo-evidence-body">
+            <div class="duo-evidence"><img src="assets/cmp-traework-design-market.png" alt="TraeWork 界面设计插件与 Skills 真实界面"></div>
+            <div class="duo-list">
+              <div class="duo-item"><b>连续性</b><span>生成草稿、批改、设计系统与转代码</span></div>
+              <div class="duo-item"><b>可见性</b><span>过程与预览集中在专属界面</span></div>
+              <div class="duo-item"><b>专项能力</b><span>界面插件与 Skills 补充组件和规范</span></div>
+              <div class="duo-item"><b>风险</b><span>模式、插件与 Skill 衔接成本较高</span></div>
+            </div>
+          </div>
+          <div class="duo-bottom">用户学习的是“怎么在这里工作”</div>
+        </article>
+        <article class="duo-card with-evidence">
+          <div class="duo-kicker product-label"><img class="product-logo" src="assets/cmp-workbuddy-logo.jpeg" alt="">WORKBUDDY</div><h2 class="duo-title">自然语言委托专业团队</h2><div class="duo-model">专家市场 + 专家团 + MCP</div>
+          <div class="duo-evidence-body">
+            <div class="duo-evidence"><img src="assets/cmp-workbuddy-experts.png" alt="WorkBuddy 产品设计专家市场真实界面"></div>
+            <div class="duo-list">
+              <div class="duo-item"><b>认知</b><span>职业角色比 Skill 名更易理解</span></div>
+              <div class="duo-item"><b>协作</b><span>专家团包装多角色分工</span></div>
+              <div class="duo-item"><b>扩展</b><span>可接 MCP 和自定义 Skill</span></div>
+              <div class="duo-item"><b>风险</b><span>角色标签可能掩盖执行与验收机制</span></div>
+            </div>
+          </div>
+          <div class="duo-bottom">用户学习的是“该把任务交给谁”</div>
+        </article>
+      </div>
+    </div>
+    <div class="report-foot"><span>WORKBENCH VS ROLE MODEL</span><span>07 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><img class="logo" src="assets/cmp-qwen-office-logo.jpeg" alt="千问办公"><span class="ttl">千问最强的不是 28 个 Skill，而是产物能在 Skill 之间继续消费</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="report-qwen-analysis">
+        <div class="report-chain">
+          <article class="phase"><div class="phase-no">01</div><h2 class="phase-name">探索</h2><div class="phase-count">6 Skills</div><div class="phase-skills">frame · scope · audit · probe · bench · signal</div><div class="phase-output">问题与研究证据</div></article>
+          <article class="phase"><div class="phase-no">02</div><h2 class="phase-name">定义</h2><div class="phase-count">5 Skills</div><div class="phase-skills">brief · stories · sitemap · journey · board</div><div class="phase-output">方向与视觉基线</div></article>
+          <article class="phase"><div class="phase-no">03</div><h2 class="phase-name">设计</h2><div class="phase-count">9 Skills</div><div class="phase-skills">flow-web · flow-mobile · edge · chart · avatar · poster · pitch · motion × 2</div><div class="phase-output">界面与动效产物</div></article>
+          <article class="phase"><div class="phase-no">04</div><h2 class="phase-name">验证</h2><div class="phase-count">4 Skills</div><div class="phase-skills">check · access · test · metric</div><div class="phase-output">走查与测试判断</div></article>
+          <article class="phase"><div class="phase-no">05</div><h2 class="phase-name">交付</h2><div class="phase-count">4 Skills</div><div class="phase-skills">qa · prd · extract · retro</div><div class="phase-output">工程交付与复盘</div></article>
+        </div>
+        <article class="qwen-evidence">
+          <div class="shot"><img src="assets/cmp-qwen-product-design-suite.png" alt="千问办公产品设计套件真实界面"></div>
+          <div class="caption"><span class="product-label"><img class="product-logo" src="assets/cmp-qwen-office-logo.jpeg" alt="">千问办公</span><span>套件页 · 28 个链式 Skill</span></div>
+        </article>
+      </div>
+      <div class="verdict"><span class="vk">机制</span><span class="vv">每个 Skill 显式声明 <b>reads / writes / schema / context</b>，下一个 Skill 才知道该读什么、该交出什么——链条因此能自动接续，而不靠用户手工拼装。</span></div>
+    </div>
+    <div class="report-foot"><span>QWEN PRODUCT DESIGN SUITE</span><span>08 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl">千问的代价：19,204 行方法文档，换来四处协议漂移</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="report-risk">
+        <article class="risk-summary"><div class="risk-score">28</div><h2 class="risk-title">Skill 方法覆盖最深</h2><p class="risk-copy">本地套件共 19,204 行 Skill 文档，甚至覆盖研究、无障碍、可用性、动效、PRD 和复盘。</p><div class="duo-bottom">链路越长，协议一致性本身就是产品能力</div></article>
+        <div class="risk-list">
+          <div class="risk-row"><b>上下文目录</b><span><code>.spark/context/</code> 与 <code>spark-output/context/</code> 两套约定并存</span><em>PROTOCOL DRIFT</em></div>
+          <div class="risk-row"><b>Skill 数量</b><span>Manifest / README 写 28，但套件文案 26 处写 27、仅 5 处写 28</span><em>COUNT DRIFT</em></div>
+          <div class="risk-row"><b>版本状态</b><span>套件版本 0.5.10，Skill Graph 仍标记 0.5.8-draft</span><em>VERSION DRIFT</em></div>
+          <div class="risk-row"><b>验证声明</b><span>WCAG、可用性测试和 QA 只有接入真实对象与证据才算完成</span><em>EVIDENCE GAP</em></div>
+        </div>
+      </div>
+    </div>
+    <div class="report-foot"><span>METHOD DEPTH ≠ RUNTIME RELIABILITY</span><span>09 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl">没有一家覆盖完整旅程，最普遍的缺口是研究与定义</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="journey-wrap">
+        <div class="journey-legend">
+          <div class="legend-items">
+            <span class="legend-item"><i class="legend-swatch core"></i>核心产品化能力</span>
+            <span class="legend-item"><i class="legend-swatch supported"></i>材料明确支持</span>
+            <span class="legend-item"><i class="legend-swatch indirect"></i>间接承接 / 依赖外部</span>
+          </div>
+          <div class="legend-boundary">颜色表示能力形态，不表示质量高低；真实效果仍需同题任务验证。</div>
+        </div>
+        <div class="report-journey">
+          <div></div><div class="j-head">进入任务</div><div class="j-head">研究与定义</div><div class="j-head">结构与视觉</div><div class="j-head">原型与实现</div><div class="j-head">工程交付</div><div class="j-head">验证与复盘</div>
+          <div class="j-label"><img class="product-logo" src="assets/cmp-codex-logo.jpeg" alt="">Codex</div><div class="j-cell supported"><b>Product Design</b>Get Context</div><div class="j-cell supported"><b>Research / Audit</b>明确支持</div><div class="j-cell supported"><b>Ideate</b>视觉方向</div><div class="j-cell core"><b>Image / URL to Code</b>响应式实现</div><div class="j-cell core"><b>Share</b>可运行原型</div><div class="j-cell core"><b>Design QA</b>视觉对照</div>
+          <div class="j-label"><img class="product-logo" src="assets/cmp-claude-logo.png" alt="">Claude</div><div class="j-cell indirect"><b>Claude Code</b>通用任务入口</div><div class="j-cell indirect"><b>Subject Grounding</b>不是用户研究</div><div class="j-cell core"><b>Visual Direction</b>风格与 Token</div><div class="j-cell core"><b>Frontend Build</b>生成并实现</div><div class="j-cell indirect"><b>Repo Workflow</b>非设计专属</div><div class="j-cell indirect"><b>General Tests</b>无内置视觉 QA</div>
+          <div class="j-label"><img class="product-logo" src="assets/cmp-trae-work-logo.jpeg" alt="">TraeWork</div><div class="j-cell core"><b>Design 模式</b>插件 / Skills</div><div class="j-cell indirect"><b>Skills 补充</b>取决于安装</div><div class="j-cell core"><b>设计系统</b>界面与规范</div><div class="j-cell core"><b>连续编辑</b>批量修改</div><div class="j-cell core"><b>Export</b>代码导出</div><div class="j-cell supported"><b>Preview</b>预览检查</div>
+          <div class="j-label"><img class="product-logo" src="assets/cmp-workbuddy-logo.jpeg" alt="">WorkBuddy</div><div class="j-cell core"><b>专家 / 专家团</b>角色入口</div><div class="j-cell supported"><b>研究类专家</b>角色覆盖</div><div class="j-cell supported"><b>产品体验设计专家</b>角色覆盖</div><div class="j-cell supported"><b>设计转代码专家</b>按专家承接</div><div class="j-cell indirect"><b>MCP / 工具</b>依赖配置</div><div class="j-cell indirect"><b>结果汇总</b>无统一 QA 门禁证据</div>
+          <div class="j-label"><img class="product-logo" src="assets/cmp-qwen-office-logo.jpeg" alt="">千问办公</div><div class="j-cell supported"><b>产品设计套件</b>快捷命令</div><div class="j-cell core"><b>探索 + 定义</b>11 Skills</div><div class="j-cell core"><b>Board + Flow</b>结构与视觉</div><div class="j-cell core"><b>设计阶段</b>9 Skills</div><div class="j-cell supported"><b>PRD / Extract</b>交付 Skills</div><div class="j-cell core"><b>Check / Test / Retro</b>验证复盘</div>
+        </div>
+      </div>
+    </div>
+    <div class="report-foot"><span>USER JOURNEY COVERAGE</span><span>10 / 21</span></div>
+  </section>
+
+  <section class="slide s-gray">
+    <div class="head">
+      <div class="head-l"><div class="brand"><span class="ttl">成熟度的分水岭是四个运行机制，不是 Skill 数量</span></div><div class="subttl">分 B · 竞品实证</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div></div>
+    <div class="body-area vc">
+      <div class="journey-legend">
+        <div class="legend-items">
+          <span class="tech-state strong">机制明确</span>
+          <span class="tech-state partial">部分支持 / 依赖外部</span>
+          <span class="tech-state unclear">公开机制不足</span>
+        </div>
+        <div class="legend-boundary">判断“可运行与可验证程度”，不为审美或产出质量打分。<br>“机制明确”来自插件结构、官方功能或本地套件；“公开机制不足”表示我们未取得证据，不能由能力名称反推运行时一定完成。</div>
+      </div>
+      <table class="tech-matrix">
+        <thead><tr><th>产品</th><th>能力路由</th><th>上下文持久化</th><th>真实工具执行</th><th>验证门禁</th><th>主要技术风险</th></tr></thead>
+        <tbody>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-codex-logo.jpeg" alt="">Codex</span></td><td><span class="tech-state strong">插件 Router</span></td><td><span class="tech-state partial">用户上下文 + 项目</span></td><td><span class="tech-state strong">浏览器 / Figma / Repo</span></td><td><span class="tech-state strong">截图 QA + 分享</span></td><td class="tech-risk">工具不可用会使闭环降级</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-claude-logo.png" alt="">Claude</span></td><td><span class="tech-state partial">Skill 描述匹配</span></td><td><span class="tech-state partial">会话 / 代码仓</span></td><td><span class="tech-state strong">工程 Agent</span></td><td><span class="tech-state unclear">通用测试 / 人工判断</span></td><td class="tech-risk">缺少设计阶段状态与专属 QA</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-trae-work-logo.jpeg" alt="">TraeWork</span></td><td><span class="tech-state strong">模式 + Agent 拆解</span></td><td><span class="tech-state partial">项目 + Global Memory</span></td><td><span class="tech-state strong">插件 / Skills / 工具</span></td><td><span class="tech-state partial">预览与评论迭代</span></td><td class="tech-risk">模式、插件与 Skill 边界分散</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-workbuddy-logo.jpeg" alt="">WorkBuddy</span></td><td><span class="tech-state strong">专家 / 专家团</span></td><td><span class="tech-state unclear">公开细节有限</span></td><td><span class="tech-state partial">MCP + 自定义 Skill</span></td><td><span class="tech-state unclear">外显证据有限</span></td><td class="tech-risk">多专家依赖与冲突可能成为黑盒</td></tr>
+          <tr><td><span class="product-label"><img class="product-logo" src="assets/cmp-qwen-office-logo.jpeg" alt="">千问办公</span></td><td><span class="tech-state strong">Skill Graph / 推荐链</span></td><td><span class="tech-state strong">JSON + Marker</span></td><td><span class="tech-state partial">Connector 增强</span></td><td><span class="tech-state partial">Check / Test / QA</span></td><td class="tech-risk">文本协议漂移，缺强运行时校验</td></tr>
+        </tbody>
+      </table>
+      <div class="verdict"><span class="vk">四道关</span><span class="vv"><b>路由是否确定 · 上下文是否可恢复 · 工具是否真实执行 · 完成声明是否被证据门禁控制</b>——Codex 最接近，只缺上下文一道；Claude 与 WorkBuddy 各缺三道。没有一家四道全通。</span></div>
+    </div>
+    <div class="report-foot"><span>RUNTIME RELIABILITY</span><span>11 / 21</span></div>
+  </section>
+
   <!-- 03-1 五个根本体验问题 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">产品体验专家要解决的不是「能力不够」，而是五个体验问题</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">产品体验设计专家要解决的不是「能力不够」，而是五个体验问题</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-quality">
@@ -1650,7 +1977,7 @@ body.on-dark .nav-dot.active{background:#fff}
           <div class="q-proof">后果：<b>验收只能靠人肉复查</b></div>
         </article>
       </div>
-      <div class="verdict"><span class="vk">因此</span><span class="vv">码道 Work 不应把设计能力做成<b>需要用户自行组合专家、Skill 和插件的能力市场</b>，而应做成一条由产品体验专家负责、<b>按任务复杂度自动组织专业能力的设计交付旅程</b>：表达目标 → 回放任务 → 推荐路径 → 建立设计契约 → 完成 UX → 确认视觉方向 → 生成并运行前端 → 通过质量闸门 → 交付并沉淀复用。</span></div>
+      <div class="verdict"><span class="vk">因此</span><span class="vv">码道 Work 不应把设计能力做成<b>需要用户自行组合专家、Skill 和插件的能力市场</b>，而应做成一条由产品体验设计专家负责、<b>按任务复杂度自动组织专业能力的设计交付旅程</b>：表达目标 → 回放任务 → 推荐路径 → 建立设计契约 → 完成 UX → 确认视觉方向 → 生成并运行前端 → 通过质量闸门 → 交付并沉淀复用。</span></div>
     </div>
     <div class="report-foot"><span>FIVE ROOT PROBLEMS</span><span>26 / 40</span></div>
   </section>
@@ -1658,8 +1985,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-2 五条体验设计策略 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">五条体验设计策略：每一条都直接对应一个根本问题</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">五条体验设计策略：每一条都直接对应一个根本问题</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-architecture">
@@ -1684,8 +2011,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-3 四层能力 + 单专家/专家团 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">四层能力结构：专家团是按复杂度自动组建的，不是让用户去搭</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">四层能力结构：专家团是按复杂度自动组建的，不是让用户去搭</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-architecture">
@@ -1695,8 +2022,8 @@ body.on-dark .nav-dot.active{background:#fff}
           <div class="arch-rule">系统必须说明推荐原因：「当前任务同时包含核心流程设计、视觉系统建立和可运行前端交付，建议由专家团完成，并在产品逻辑与视觉方向两个节点邀请你确认。」</div>
         </article>
         <div class="arch-stack">
-          <div class="arch-layer own"><b><i>L1</i>责任层</b><span>产品体验专家 —— 理解目标、解释判断、组织执行、汇总交付</span><em>默认暴露</em></div>
-          <div class="arch-layer"><b><i>L2</i>协作层</b><span>产品体验专家团 —— 对复杂任务分工、交接与交叉验证</span><em>按需展示</em></div>
+          <div class="arch-layer own"><b><i>L1</i>责任层</b><span>产品体验设计专家 —— 理解目标、解释判断、组织执行、汇总交付</span><em>默认暴露</em></div>
+          <div class="arch-layer"><b><i>L2</i>协作层</b><span>产品体验设计专家团 —— 对复杂任务分工、交接与交叉验证</span><em>按需展示</em></div>
           <div class="arch-layer"><b><i>L3</i>方法层</b><span>Skills —— 需求澄清、审计、流程设计、视觉探索、设计转代码、QA</span><em>渐进披露</em></div>
           <div class="arch-layer"><b><i>L4</i>工具层</b><span>插件与连接器 —— 浏览器、Figma、代码仓、图片生成、组件库、部署</span><em>仅授权或异常时展示</em></div>
           <div class="arch-layer" style="background:linear-gradient(135deg,rgba(47,111,237,.13),rgba(255,255,255,.62));border-color:rgba(47,111,237,.22)"><b><i>轻</i>何时用单专家</b><span>目标范围明确 · 一两个页面 · 只做诊断/流程/视觉其中一项 · 已有设计系统 · 不涉真实代码</span><em>「优化这个登录页的信息层级」</em></div>
@@ -1710,8 +2037,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-4 专家团角色 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">前台永远只有一位设计负责人在说话，其余角色按阶段进入</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">前台永远只有一位设计负责人在说话，其余角色按阶段进入</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <table class="role-table">
@@ -1733,8 +2060,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-5 四类任务入口 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">四类任务入口：同一个输入框，四条默认路径</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">四类任务入口：同一个输入框，四条默认路径</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-entry" style="grid-template-columns:repeat(4,minmax(0,1fr))">
@@ -1795,8 +2122,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-6 四类任务差异化旅程 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">同一位专家，四条旅程该走的深浅不同</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">同一位专家，四条旅程该走的深浅不同</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <table class="report-matrix">
@@ -1811,7 +2138,7 @@ body.on-dark .nav-dot.active{background:#fff}
           <tr><td>默认交付</td><td>设计契约、原型、代码、验收</td><td>代码、预览、对比截图</td><td>修改代码、影响说明、回归结果</td><td>审计报告、优先级和改进方向</td></tr>
         </tbody>
       </table>
-      <div class="tech-note"><b>读法：</b>四列的差别不在「做不做设计」，而在<b>哪一段必须做实、哪一段可以跳过</b>。把四条路径压成同一条完整流程，正是第 10 页 RISK 04「产品体验专家过重」的成因——<b>拆成两个专家，不等于每个专家内部只能有一种固定流程</b>。</div>
+      <div class="tech-note"><b>读法：</b>四列的差别不在「做不做设计」，而在<b>哪一段必须做实、哪一段可以跳过</b>。把四条路径压成同一条完整流程，正是第 10 页 RISK 04「产品体验设计专家过重」的成因——<b>拆成两个专家，不等于每个专家内部只能有一种固定流程</b>。</div>
     </div>
     <div class="report-foot"><span>FOUR DIFFERENTIATED JOURNEYS</span><span>31 / 40</span></div>
   </section>
@@ -1819,8 +2146,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-7 十阶段旅程 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">十个阶段，三个必须停下来让用户确认的节点</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">十个阶段，三个必须停下来让用户确认的节点</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="stage-grid">
@@ -1853,8 +2180,8 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-8 五道闸门 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">五道闸门 + 四种状态：「未验证」不得被声称为「通过」</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">五道闸门 + 四种状态：「未验证」不得被声称为「通过」</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-quality">
@@ -1892,15 +2219,15 @@ body.on-dark .nav-dot.active{background:#fff}
   <!-- 03-9 MVP 与首个闭环 -->
   <section class="slide s-gray">
     <div class="head">
-      <div class="head-l"><div class="brand"><span class="ttl">首期十二项必须实现，一条闭环先跑通再谈扩展</span></div><div class="subttl">分 B · 产品体验专家</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验专家</span><span>04 合起来落地</span></div>
+      <div class="head-l"><div class="brand"><span class="ttl">首期十二项必须实现，一条闭环先跑通再谈扩展</span></div><div class="subttl">分 B · 产品体验设计专家</div></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-duo">
         <article class="duo-card">
           <div class="duo-kicker">Must Have · 12</div><h2 class="duo-title">必须实现</h2><div class="duo-model">缺任何一项，这条链路都无法自证</div>
           <div class="duo-list">
-            <div class="duo-item num"><b>01</b><span>一个统一的「产品体验专家」入口</span></div>
+            <div class="duo-item num"><b>01</b><span>一个统一的「产品体验设计专家」入口</span></div>
             <div class="duo-item num"><b>02</b><span>自然语言、截图、URL、Figma 和代码仓输入</span></div>
             <div class="duo-item num"><b>03</b><span>四类任务意图识别</span></div>
             <div class="duo-item num"><b>04</b><span>任务回放与<i>推荐原因</i></span></div>
@@ -1944,13 +2271,13 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">两条链路并排看：没有一行是共用的，这就是拆分的证据</span></div><div class="subttl">总 · 合起来怎么落地</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span class="active">04 合起来落地</span></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="dual-track">
         <div class="dt-head"></div>
         <div class="dt-head h">HTML 创作专家</div>
-        <div class="dt-head p">产品体验专家</div>
+        <div class="dt-head p">产品体验设计专家</div>
 
         <div class="dt-label">任务回放字段</div>
         <div class="dt-cell h">受众 · 核心问题 · 资料范围 · 页面类型 · 关键模块 · 是否需外部数据 · 分享范围 · 验收标准</div>
@@ -1989,7 +2316,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">能力拆开、入口汇合、上下文连续</span></div><div class="subttl">总 · 合起来怎么落地</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span class="active">04 合起来落地</span></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-orchestration" style="height:auto">
@@ -2012,7 +2339,7 @@ body.on-dark .nav-dot.active{background:#fff}
           </div>
           <div class="orch-step" style="--tone:var(--c-teal)">
             <div class="orch-step-no">B</div>
-            <div><b>产品体验专家</b><p>目标 → UX → UI → 前端 → 联合验收</p></div>
+            <div><b>产品体验设计专家</b><p>目标 → UX → UI → 前端 → 联合验收</p></div>
             <em>可运行产品前端</em>
           </div>
           <div class="orch-step" style="--tone:var(--c-neutral)">
@@ -2035,7 +2362,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">三阶段上线：先验路由，再露卡片，最后打通转交</span></div><div class="subttl">总 · 合起来怎么落地</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span class="active">04 合起来落地</span></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="phase-grid">
@@ -2061,7 +2388,7 @@ body.on-dark .nav-dot.active{background:#fff}
           <div class="ph-exit">退出标准：<em>转交后用户零重复解释，上下文保留率可度量</em></div>
         </article>
       </div>
-      <div class="tech-note"><b>首期都不做「大而全」：</b>HTML 创作专家先聚焦<b>资料可视化报告、数据看板与经营简报、方案对比与审阅工具、互动手册与演示</b>四类；产品体验专家先聚焦<b>一条完整闭环</b>（需求与品牌参考 → 回放 → 确认核心流程 → 确认视觉方向 → 真实项目生成前端 → 联合验收）。<b>先证明两条链路各自成立，再扩大场景。</b></div>
+      <div class="tech-note"><b>首期都不做「大而全」：</b>HTML 创作专家先聚焦<b>资料可视化报告、数据看板与经营简报、方案对比与审阅工具、互动手册与演示</b>四类；产品体验设计专家先聚焦<b>一条完整闭环</b>（需求与品牌参考 → 回放 → 确认核心流程 → 确认视觉方向 → 真实项目生成前端 → 联合验收）。<b>先证明两条链路各自成立，再扩大场景。</b></div>
     </div>
     <div class="report-foot"><span>THREE-PHASE ROLLOUT</span><span>37 / 40</span></div>
   </section>
@@ -2070,7 +2397,7 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">不先验证用户喜不喜欢名称，先验证两套任务模型是否产生更好的结果</span></div><div class="subttl">总 · 合起来怎么落地</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span class="active">04 合起来落地</span></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="report-duo">
@@ -2106,11 +2433,11 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">两套指标，六个维度；目标值必须由真实任务基线确定</span></div><div class="subttl">总 · 合起来怎么落地</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span class="active">04 合起来落地</span></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <table class="split-table">
-        <thead><tr><th style="width:13%">指标类型</th><th style="width:43.5%">HTML 创作专家</th><th style="width:43.5%">产品体验专家</th></tr></thead>
+        <thead><tr><th style="width:13%">指标类型</th><th style="width:43.5%">HTML 创作专家</th><th style="width:43.5%">产品体验设计专家</th></tr></thead>
         <tbody>
           <tr><td>北极星信号</td><td class="h">被实际打开、分享或复用的可验证网页成果数</td><td class="p">被验收并继续投入使用或开发的可验证产品成果数</td></tr>
           <tr><td>启动</td><td class="h">上传资料后的有效任务启动率</td><td class="p">任务回放确认率</td></tr>
@@ -2129,14 +2456,14 @@ body.on-dark .nav-dot.active{background:#fff}
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">建议做两个专家，但拆分依据必须是这五条</span></div><div class="subttl">总 · 最终决策建议</div></div>
-      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验专家</span><span class="active">04 合起来落地</span></div>
+      <div class="section-tabs"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
     </div>
     <div class="body-area vc">
       <div class="say-grid">
         <article class="say-card dark">
           <em>30-SECOND VERSION</em>
-          <div class="say-30" style="color:rgba(255,255,255,.7)">HTML 创作专家和产品体验专家虽然都可能生成网页，但解决的不是同一个问题。前者从<b style="color:#fff">文档、表格和数据</b>出发，目标是把内容变成可信、直观、可分享的网页成果；后者从<b style="color:#fff">产品想法、功能需求或现有体验</b>出发，目标是把用户流程、视觉系统和可运行前端组织成一个可验证的产品。两者的职业人群部分重合，但<b style="color:#fff">用户任务、专业判断和验收标准不同</b>。因此建议能力和责任分开建设，用户入口保持统一，由系统自动路由，并在任务升级时携带完整上下文转交。</div>
-          <div class="say-1">同样交付网页，HTML 创作专家对<b>「内容是否讲清楚」</b>负责，产品体验专家对<b>「产品是否做正确」</b>负责。</div>
+          <div class="say-30" style="color:rgba(255,255,255,.7)">HTML 创作专家和产品体验设计专家虽然都可能生成网页，但解决的不是同一个问题。前者从<b style="color:#fff">文档、表格和数据</b>出发，目标是把内容变成可信、直观、可分享的网页成果；后者从<b style="color:#fff">产品想法、功能需求或现有体验</b>出发，目标是把用户流程、视觉系统和可运行前端组织成一个可验证的产品。两者的职业人群部分重合，但<b style="color:#fff">用户任务、专业判断和验收标准不同</b>。因此建议能力和责任分开建设，用户入口保持统一，由系统自动路由，并在任务升级时携带完整上下文转交。</div>
+          <div class="say-1">同样交付网页，HTML 创作专家对<b>「内容是否讲清楚」</b>负责，产品体验设计专家对<b>「产品是否做正确」</b>负责。</div>
         </article>
         <article class="say-card">
           <em>DECISION CRITERIA</em>
@@ -2147,7 +2474,7 @@ body.on-dark .nav-dot.active{background:#fff}
             <article class="final-card" style="min-height:11vh"><div class="fc-no">04</div><b>不同质量闸门</b><span>内容数据运行体验安全 vs 对齐逻辑视觉实现验收</span></article>
             <article class="final-card hl" style="min-height:11vh;grid-column:span 2"><div class="fc-no">05</div><b>不同成功指标</b><span>被打开分享复用 vs 被验收并继续投入</span></article>
           </div>
-          <div class="say-user"><b>不能只因为：</b>都有市场案例、都能生成 HTML、希望专家市场看起来更丰富、想用不同角色形象包装同一能力。<br><b>目标人群按「任务」而不是「职位」定义：</b>HTML 创作专家服务「需要把现有内容变成网页成果」的任务；产品体验专家服务「需要定义或改造数字产品体验」的任务。</div>
+          <div class="say-user"><b>不能只因为：</b>都有市场案例、都能生成 HTML、希望专家市场看起来更丰富、想用不同角色形象包装同一能力。<br><b>目标人群按「任务」而不是「职位」定义：</b>HTML 创作专家服务「需要把现有内容变成网页成果」的任务；产品体验设计专家服务「需要定义或改造数字产品体验」的任务。</div>
         </article>
       </div>
       <div class="tech-note"><b>分析依据与边界：</b>① <b>一手实测</b>——2026-08-05 在 Claude Directory、TraeWork 插件市场、WorkBuddy 专家/技能市场、千问办公技能市场分别搜索 <code>html</code>（第 11—12 页，可点击放大核对）。② <b>公开案例</b>——火山引擎开发者社区的 AI 财报分析与 HTML 可视化工作流、扣子空间相关案例。③ <b>内部文档二次拆解</b>——《码道Work-HTML生成专家产品方案-参考火山引擎实践》《码道Work-UIUX设计专家-用户使用旅程与能力编排方案》《五款AI工作平台-设计能力构建竞品分析》，未新增未经验证的用户研究数据或业务指标。<b>结论只走到证据能支撑的地方：形态缺口与产品路径可证，生成质量、效率提升与路由认可度待同题实测。</b></div>
@@ -2286,7 +2613,7 @@ function closeLightbox(){
   document.body.classList.remove('lightbox-open');
   const t=lightboxTrigger;lightboxTrigger=null;if(t)t.focus();
 }
-document.querySelectorAll('.evi-shot').forEach(el=>{
+document.querySelectorAll('.evi-shot,.duo-evidence,.qwen-evidence .shot').forEach(el=>{
   const img=el.querySelector('img');
   el.tabIndex=0;el.setAttribute('role','button');
   el.setAttribute('aria-label','放大查看：'+((img&&img.alt)||'实测截图'));
