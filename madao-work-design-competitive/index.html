@@ -773,6 +773,46 @@ body.on-dark .nav-dot.active{background:#fff}
 .report-qwen-analysis .phase{min-height:0}
 .report-duo .with-evidence .duo-item b{min-width:0}
 
+
+/* ===== 章节封面：黑底光晕（每章一个色相，与两轨色编码一致）===== */
+:root{--glow-h:245;--glow-h2:288;--glow-sat:95%;--glow-light:40%;--glow-spread:35;--glow-color-int:.68;--glow-white-int:.58}
+.s-glow{background:#06060a;color:#fff;padding:7vh 6vw}
+.s-glow .glow{position:absolute;left:0;right:0;bottom:0;height:calc(var(--glow-spread)*1vh);z-index:0;pointer-events:none}
+.s-glow .glow::before,.s-glow .glow::after{content:"";position:absolute;inset:0;mix-blend-mode:screen}
+.s-glow .glow::before{background:radial-gradient(ellipse 78% 96% at 22% 112%,hsla(var(--glow-h),var(--glow-sat),calc(var(--glow-light) + 12%),var(--glow-color-int)) 0%,hsla(var(--glow-h),var(--glow-sat),var(--glow-light),0) 92%)}
+.s-glow .glow::after{background:radial-gradient(ellipse 78% 96% at 78% 112%,hsla(var(--glow-h2),var(--glow-sat),calc(var(--glow-light) + 12%),calc(var(--glow-color-int)*.9)) 0%,hsla(var(--glow-h2),var(--glow-sat),var(--glow-light),0) 90%)}
+.s-glow .glow-white{position:absolute;left:0;right:0;bottom:0;height:calc(var(--glow-spread)*1vh);z-index:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(to top,hsla(var(--glow-h),22%,90%,var(--glow-white-int)) 0%,hsla(var(--glow-h),30%,80%,0) 84%)}
+.s-glow .chrome{position:absolute;top:5.4vh;left:6vw;z-index:3;font-family:'JetBrains Mono';font-size:var(--fs-xs);letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.s-glow .inner{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:1fr;align-content:center}
+.cover-block{max-width:64vw}
+.ch-no{font-family:'Inter';font-weight:200;font-size:min(11vw,17vh);line-height:.9;letter-spacing:-.04em;opacity:.45;background:linear-gradient(120deg,hsl(var(--glow-h),var(--glow-sat),82%),hsl(var(--glow-h2),var(--glow-sat),70%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1vh}
+.ch-cover-title{font-weight:700;font-size:min(6vw,10vh);line-height:1.05;letter-spacing:-.01em;margin-bottom:2.2vh;background:linear-gradient(100deg,hsl(var(--glow-h),var(--glow-sat),85%),hsl(var(--glow-h2),var(--glow-sat),74%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.ch-cover-sub{font-weight:300;font-size:max(15px,1.25vw);line-height:1.7;color:rgba(255,255,255,.62);max-width:48ch}
+.ch-points{display:flex;flex-wrap:wrap;gap:.5vw;margin-top:3.2vh}
+.ch-points span{padding:.7vh .95vw;border-radius:999px;border:1px solid hsla(var(--glow-h),var(--glow-sat),70%,.3);background:hsla(var(--glow-h),var(--glow-sat),60%,.09);font-size:var(--fs-sm);font-weight:700;color:hsl(var(--glow-h),var(--glow-sat),84%)}
+.report-foot.light{left:6vw;right:6vw;color:rgba(255,255,255,.4);z-index:3}
+/* 章节封面上的 Tab：反白版 */
+.section-tabs.on-glow{position:absolute;top:5vh;right:6vw;z-index:4;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.section-tabs.on-glow span{color:rgba(255,255,255,.5)}
+.section-tabs.on-glow span.active{background:#fff;color:#12131a;box-shadow:none}
+/* Tab 可点：手型 + 悬停反馈 */
+.section-tabs span{cursor:pointer;transition:color .18s,background .18s}
+.section-tabs span:not(.active):hover{color:var(--ink);background:rgba(127,137,157,.14)}
+.section-tabs.on-glow span:not(.active):hover{color:#fff;background:rgba(255,255,255,.14)}
+body.overview .s-glow .slide-inner{padding:7vh 6vw}
+
+
+/* 千问代价页（方法深 ≠ 运行可靠）所需组件 */
+.report-risk{display:grid;grid-template-columns:1fr 1.55fr;gap:1.4vw;width:100%;min-height:0}
+.report-risk .risk-summary{padding:2.5vh 1.7vw;border-radius:17px;background:var(--g-ink);color:#fff;display:flex;flex-direction:column}
+.report-risk .risk-score{font-family:'Inter';font-size:clamp(64px,7vw,112px);font-weight:250;line-height:.9;background:linear-gradient(120deg,#a9a7ff,#69d7ec);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.report-risk .risk-title{margin-top:2vh;font-size:var(--fs-h2);font-weight:850}
+.report-risk .risk-copy{margin-top:1.3vh;font-size:var(--fs-body);line-height:1.55;color:rgba(255,255,255,.65)}
+.report-risk .risk-list{display:grid;gap:1vh}
+.report-risk .risk-row{display:grid;grid-template-columns:150px 1fr auto;align-items:center;gap:1vw;padding:1.3vh 1.2vw;border-radius:13px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.84)}
+.report-risk .risk-row b{font-size:var(--fs-h3)}
+.report-risk .risk-row span{font-size:var(--fs-body);color:var(--ink-2);line-height:1.35}
+.report-risk .risk-row em{font-style:normal;font-family:'JetBrains Mono';font-size:var(--fs-xs);color:var(--c-red);font-weight:700}
 </style>
 </head>
 <body>
@@ -829,6 +869,22 @@ body.on-dark .nav-dot.active{background:#fff}
       </div>
     </div>
     <div class="report-foot"><span>TWO EXPERTS, ONE WORKBENCH</span><span>02 / 40</span></div>
+  </section>
+
+  <!-- 章节封面 01 -->
+  <section class="slide s-glow chapter-cover" style="--glow-h:245;--glow-h2:288">
+    <div class="glow"></div><div class="glow-white"></div>
+    <div class="chrome">码道 WORK · 双专家方案</div>
+    <div class="section-tabs on-glow"><span class="active">01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
+    <div class="inner">
+      <div class="cover-block">
+        <div class="ch-no">01</div>
+        <h2 class="ch-cover-title">为什么要两个专家</h2>
+        <p class="ch-cover-sub">都产出网页，但用户来做的是两件事。真正该拆开的是<b style="color:#fff;font-weight:600">责任、方法链和验收标准</b>，不一定是入口。</p>
+        <div class="ch-points"><span>不是同一个问题</span><span>十维本质差异</span><span>目标人群与路由</span><span>共享边界与五条风险</span></div>
+      </div>
+    </div>
+    <div class="report-foot light"><span>CHAPTER 01 · WHY TWO</span><span>00 / 00</span></div>
   </section>
 
   <!-- 01-1 核心结论 -->
@@ -1134,6 +1190,22 @@ body.on-dark .nav-dot.active{background:#fff}
       </div>
     </div>
     <div class="report-foot"><span>FIVE RISKS, FIVE ANSWERS</span><span>10 / 40</span></div>
+  </section>
+
+  <!-- 章节封面 02 -->
+  <section class="slide s-glow chapter-cover" style="--glow-h:272;--glow-h2:300">
+    <div class="glow"></div><div class="glow-white"></div>
+    <div class="chrome">码道 WORK · 双专家方案</div>
+    <div class="section-tabs on-glow"><span>01 为什么两个</span><span class="active">02 HTML 创作专家</span><span>03 产品体验设计专家</span><span>04 合起来落地</span></div>
+    <div class="inner">
+      <div class="cover-block">
+        <div class="ch-no">02</div>
+        <h2 class="ch-cover-title">HTML 创作专家</h2>
+        <p class="ch-cover-sub">让一份内容<b style="color:#fff;font-weight:600">更值得被看、被理解和被使用</b>——从已有资料出发，以一份可验证的网页成果收口。</p>
+        <div class="ch-points"><span>市场实测与参考实践</span><span>场景、旅程与界面</span><span>能力编排与 Skill</span><span>五道质量闸门</span></div>
+      </div>
+    </div>
+    <div class="report-foot light"><span>CHAPTER 02 · CONTENT CREATION</span><span>00 / 00</span></div>
   </section>
 
   <!-- 05 定位 / 命名 / JTBD / 用户 -->
@@ -1718,6 +1790,22 @@ body.on-dark .nav-dot.active{background:#fff}
     <div class="report-foot"><span>MVP SCOPE</span><span>19 / 21</span></div>
   </section>
 
+  <!-- 章节封面 03 -->
+  <section class="slide s-glow chapter-cover" style="--glow-h:214;--glow-h2:246">
+    <div class="glow"></div><div class="glow-white"></div>
+    <div class="chrome">码道 WORK · 双专家方案</div>
+    <div class="section-tabs on-glow"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span class="active">03 产品体验设计专家</span><span>04 合起来落地</span></div>
+    <div class="inner">
+      <div class="cover-block">
+        <div class="ch-no">03</div>
+        <h2 class="ch-cover-title">产品体验设计专家</h2>
+        <p class="ch-cover-sub">让一个产品<b style="color:#fff;font-weight:600">更值得被做、被操作和被持续演进</b>——先看五款平台各用什么形态承载设计能力。</p>
+        <div class="ch-points"><span>五款平台竞品实证</span><span>五个根本体验问题</span><span>四层能力与四类入口</span><span>十阶段旅程与五道闸门</span></div>
+      </div>
+    </div>
+    <div class="report-foot light"><span>CHAPTER 03 · PRODUCT EXPERIENCE</span><span>00 / 00</span></div>
+  </section>
+
   <section class="slide s-gray">
     <div class="head">
       <div class="head-l"><div class="brand"><span class="ttl">设计能力的差异不在模型，而在用什么形态承载</span></div><div class="subttl">分 B · 竞品实证</div></div>
@@ -2267,6 +2355,22 @@ body.on-dark .nav-dot.active{background:#fff}
     <div class="report-foot"><span>MVP &amp; FIRST LOOP</span><span>34 / 40</span></div>
   </section>
 
+  <!-- 章节封面 04 -->
+  <section class="slide s-glow chapter-cover" style="--glow-h:322;--glow-h2:280">
+    <div class="glow"></div><div class="glow-white"></div>
+    <div class="chrome">码道 WORK · 双专家方案</div>
+    <div class="section-tabs on-glow"><span>01 为什么两个</span><span>02 HTML 创作专家</span><span>03 产品体验设计专家</span><span class="active">04 合起来落地</span></div>
+    <div class="inner">
+      <div class="cover-block">
+        <div class="ch-no">04</div>
+        <h2 class="ch-cover-title">合起来怎么落地</h2>
+        <p class="ch-cover-sub">能力拆开、入口汇合、上下文连续。<b style="color:#fff;font-weight:600">两条链路并置</b>就是拆分成立与否的判据。</p>
+        <div class="ch-points"><span>两条链路并置</span><span>产品结构与三阶段上线</span><span>验证计划与双指标</span><span>最终决策建议</span></div>
+      </div>
+    </div>
+    <div class="report-foot light"><span>CHAPTER 04 · ROLLOUT & VALIDATION</span><span>00 / 00</span></div>
+  </section>
+
   <!-- 04-1 两条链路并置 -->
   <section class="slide s-gray">
     <div class="head">
@@ -2678,6 +2782,19 @@ document.addEventListener('mousemove',e=>{
   navDots.classList.toggle('show',e.clientX>window.innerWidth-120);
 });
 document.addEventListener('mouseleave',()=>{controls.classList.remove('show');navDots.classList.remove('show');});
+
+/* 右上角章节 Tab：点击跳到对应章节封面 */
+const chapterCovers=slides.map((s,i)=>s.classList.contains('chapter-cover')?i:-1).filter(i=>i>=0);
+document.querySelectorAll('.section-tabs').forEach(bar=>{
+  [...bar.children].forEach((tab,k)=>{
+    if(chapterCovers[k]===undefined)return;
+    tab.setAttribute('role','button');
+    tab.setAttribute('tabindex','0');
+    tab.title='跳到第 '+String(k+1).padStart(2,'0')+' 章封面';
+    tab.addEventListener('click',e=>{e.stopPropagation();go(chapterCovers[k]);});
+    tab.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(chapterCovers[k]);}});
+  });
+});
 
 window.scrollTo(0,0);
 updateCurrent(0);
