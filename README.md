@@ -37,7 +37,7 @@ CodeArts IDE / 码道代码智能体的体验设计材料集，统一托管。�
 
 | 材料 | 产品 | 链接 |
 |---|---|---|
-| 码道 Work 小程序设计 Demo | AgentSpace | [`madao-work-miniprogram/#home+connect`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-miniprogram/#home+connect) |
+| 码道 Work 小程序设计 Demo | AgentSpace | [`madao-work-miniprogram/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-miniprogram/) |
 | 码道 Work · 交互原型 | AgentSpace | [`codearts-space/`](https://vinniechenyu.github.io/codearts-ide-design/codearts-space/pet.html) |
 | CodeArts ADE 工作台交互原型 | ADE | [`codearts-ade-prototype/`](https://vinniechenyu.github.io/codearts-ide-design/codearts-ade-prototype/) |
 | Agent Space · IDE 内的智能体协同 | AgentSpace | [`agent-space-prototype/`](https://vinniechenyu.github.io/codearts-ide-design/agent-space-prototype/) |
