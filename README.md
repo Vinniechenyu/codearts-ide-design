@@ -8,39 +8,40 @@ CodeArts IDE / 码道代码智能体的体验设计材料集，统一托管。�
 
 ---
 
-## 材料（14 份）
+## 材料（15 份）
 
 ### 业界洞察 + 竞品分析
 
 | 材料 | 产品 | 链接 |
 |---|---|---|
-| 码道 Work · HTML 创作专家与产品体验设计专家 · 双专家方案（54 页） | AgentSpace | [`madao-work-design-competitive/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-design-competitive/) |
+| AI 办公智能体 · 业界洞察与竞品分析 | Work | [`ai-office-agent-insight/`](https://vinniechenyu.github.io/codearts-ide-design/ai-office-agent-insight/) |
+| 码道 Work · HTML 创作专家与产品体验设计专家 · 双专家方案（54 页） | Work | [`madao-work-design-competitive/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-design-competitive/) |
 | 拆透 ADE，重构 AI 时代的开发工作流 | ADE | [`codearts-ade-vision/`](https://vinniechenyu.github.io/codearts-ide-design/codearts-ade-vision/) |
-| 当 IDE 遇见 Agent，体验如何被重新定义（5 款横评） | AgentSpace | [`agentspace-insight/`](https://vinniechenyu.github.io/codearts-ide-design/agentspace-insight/) |
-| Agent Team 模式的 UX 解剖（3 款横评） | AgentSpace | [`agent-team-analysis/`](https://vinniechenyu.github.io/codearts-ide-design/agent-team-analysis/) |
+| 当 IDE 遇见 Agent，体验如何被重新定义（5 款横评） | Space | [`agentspace-insight/`](https://vinniechenyu.github.io/codearts-ide-design/agentspace-insight/) |
+| Agent Team 模式的 UX 解剖（3 款横评） | Space | [`agent-team-analysis/`](https://vinniechenyu.github.io/codearts-ide-design/agent-team-analysis/) |
 | AI CLI 设计分析与探索报告 | CLI | [`cli-analysis-report/`](https://vinniechenyu.github.io/codearts-ide-design/cli-analysis-report/) |
 
 ### 专项分析
 
 | 材料 | 产品 | 链接 |
 |---|---|---|
-| 码道 Work · 产品定位与功能 PRD | AgentSpace | [`madao-work-prd/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-prd/) |
+| 码道 Work · 产品定位与功能 PRD | Work | [`madao-work-prd/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-prd/) |
 | 码道 · 生成响应体验优化专项 | IDE | [`madao-response-deck/`](https://vinniechenyu.github.io/codearts-ide-design/madao-response-deck/) |
 
 ### 方法论 · 体验范式
 
 | 材料 | 产品 | 链接 |
 |---|---|---|
-| 设计范式：任务驱动型 Agent 工作台 | AgentSpace | [`agent-workbench-paradigm/`](https://vinniechenyu.github.io/codearts-ide-design/agent-workbench-paradigm/) |
+| 设计范式：任务驱动型 Agent 工作台 | Space | [`agent-workbench-paradigm/`](https://vinniechenyu.github.io/codearts-ide-design/agent-workbench-paradigm/) |
 
 ### 交互原型
 
 | 材料 | 产品 | 链接 |
 |---|---|---|
-| 码道 Work 小程序设计 Demo | AgentSpace | [`madao-work-miniprogram/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-miniprogram/) |
-| 码道 Work · 交互原型 | AgentSpace | [`codearts-space/`](https://vinniechenyu.github.io/codearts-ide-design/codearts-space/pet.html) |
+| 码道 Work 小程序设计 Demo | Work | [`madao-work-miniprogram/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-miniprogram/) |
+| 码道 Work · 交互原型 | Work | [`codearts-space/`](https://vinniechenyu.github.io/codearts-ide-design/codearts-space/pet.html) |
 | CodeArts ADE 工作台交互原型 | ADE | [`codearts-ade-prototype/`](https://vinniechenyu.github.io/codearts-ide-design/codearts-ade-prototype/) |
-| Agent Space · IDE 内的智能体协同 | AgentSpace | [`agent-space-prototype/`](https://vinniechenyu.github.io/codearts-ide-design/agent-space-prototype/) |
+| Agent Space · IDE 内的智能体协同 | Space | [`agent-space-prototype/`](https://vinniechenyu.github.io/codearts-ide-design/agent-space-prototype/) |
 | AI 时代的开发者工具 · CLI 设计方案 | CLI | [`cli-design-proposal/`](https://vinniechenyu.github.io/codearts-ide-design/cli-design-proposal/) |
 
 ### 组件 · 规范
@@ -54,7 +55,7 @@ CodeArts IDE / 码道代码智能体的体验设计材料集，统一托管。�
 ## 目录维度
 
 **按类型：** 专项分析 · 业界洞察+竞品分析 · 方法论·体验范式 · 交互原型 · 组件·规范
-**按产品形态：** CodeArts IDE · CodeArts ADE · AgentSpace · CLI · 通用·跨产品
+**按产品形态：** IDE · ADE · Space · Work · CLI · 通用·跨产品
 
 **状态标记：** `live` 可体验 · `proto` 可交互 · `concept` 概念探索 · `doc` 可阅读
 
