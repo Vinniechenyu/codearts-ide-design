@@ -4676,7 +4676,7 @@
     .project-card.is-archived { opacity: 0.66; }
     .project-card-head { display: flex; align-items: flex-start; gap: var(--sp-3); }
     .project-card-goal { margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 19px; }
-    .project-detail-head .project-goal-line { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .project-detail-head .project-goal-line { overflow-wrap: break-word; }
     .project-progress { display: flex; flex-direction: column; gap: 6px; }
     .project-progress-top { display: flex; align-items: baseline; justify-content: space-between; color: var(--text-tertiary); font-size: 11px; }
     .project-progress-top strong { color: var(--text-primary); font-size: 13px; font-weight: 600; }
@@ -4685,7 +4685,7 @@
     .pj-fill.is-green { background: var(--green-600); }
     .pj-fill.is-amber { background: var(--amber-600); }
     .project-card-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding-top: var(--sp-3); border-top: 1px solid var(--border-subtle); }
-    .member-stack { display: inline-flex; align-items: center; }
+    .member-stack { display: inline-flex; align-items: center; flex: none; }
     .member-stack .member-chip {
       display: inline-flex; align-items: center; justify-content: center;
       width: 24px; height: 24px; margin-left: -6px;
@@ -4701,7 +4701,7 @@
       color: var(--waiting-text); background: var(--waiting-soft); border: 1px solid var(--waiting-border);
       border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
     }
-    .project-card-note { color: var(--text-tertiary); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .project-card-note { min-width: 0; flex: 1; text-align: right; color: var(--text-tertiary); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* 项目详情头 */
     /* 项目详情：头部面包屑，替代单独的返回按钮 */
@@ -6473,11 +6473,27 @@
     .toast.is-visible {
       transform: translateY(0);
       opacity: 1;
+      pointer-events: auto;
     }
 
     .toast i {
       font-size: 16px;
     }
+
+    .toast-action {
+      flex: none;
+      margin-left: 2px;
+      padding: 3px 10px;
+      color: var(--on-fill);
+      background: var(--brand);
+      border: 0;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .toast-action:hover { background: var(--brand-solid); }
 
     .mono {
       font-family: var(--mono);
@@ -7913,6 +7929,823 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
 /* 8 物种卡片布局需要更宽的面板（原规则 760px 在后面，必须写在样式表末尾才压得过）*/
 .pet-skin .sk-panel{width:min(720px,92vw)}
 
+
+    /* =====================================================================
+       改动（上线前评审）+ 站点（发布 / 还原 / 移交）
+       —— 定位：把 DevOps 的评审/环境/发布/回滚机制翻译成业务语言
+       —— 原则：一级层不出现分支 / PR / 流水线 / diff，细节一律进「看细节」
+       ===================================================================== */
+
+    /* 侧边导航角标 */
+    .nav-item-badge {
+      margin-left: auto;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--waiting-soft);
+      border: 1px solid var(--waiting-border);
+      color: var(--waiting-text);
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .sidebar-nav-item.is-active .nav-item-badge {
+      background: var(--surface-primary);
+    }
+
+    /* ---------- 通用：风险与状态 pill ---------- */
+    .rv-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      font-size: 11.5px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .rv-pill i { font-size: 12px; }
+    .rv-pill.is-high   { background: var(--waiting-soft);   border-color: var(--waiting-border);   color: var(--waiting-text); }
+    .rv-pill.is-low    { background: var(--completed-soft); border-color: var(--completed-border); color: var(--completed-text); }
+    .rv-pill.is-draft  { background: var(--surface-subtle); border-color: var(--border-default);   color: var(--text-tertiary); }
+    .rv-pill.is-preview{ background: var(--info-soft);      border-color: var(--info-border);      color: var(--info-text); }
+    .rv-pill.is-live   { background: var(--completed-soft); border-color: var(--completed-border); color: var(--completed-text); }
+    .rv-pill.is-handoff{ background: var(--brand-soft);     border-color: var(--brand-border);     color: var(--brand-text); }
+
+    /* ---------- 改动 · 收件箱式双栏 ----------
+       与「站点」刻意做成两种结构：
+         站点 = 资产清单，巡视心智 → 全宽表格
+         改动 = 待处理队列，清空心智 → 左队列 + 右常驻详情
+       ------------------------------------------------------------------ */
+    .resource-center-view.is-wide { width: 100%; max-width: 1320px; }
+
+    .rv-inbox {
+      display: grid;
+      grid-template-columns: 296px minmax(0, 1fr);
+      gap: var(--sp-5, 20px);
+      align-items: start;
+    }
+    @media (max-width: 1100px) { .rv-inbox { grid-template-columns: minmax(0, 1fr); } }
+
+    /* 左：队列 */
+    .rv-queue {
+      position: sticky;
+      top: 0;
+      max-height: calc(100vh - 178px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 4px 4px 1px;
+    }
+    .rv-queue::-webkit-scrollbar { width: 6px; }
+    .rv-queue::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .rv-queue-head {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-2);
+      padding: 0 2px var(--sp-3);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--sp-3);
+    }
+    .rv-queue-head strong { font-size: 13px; }
+    .rv-queue-head span { margin-left: auto; color: var(--text-disabled); font-size: 11.5px; }
+
+    .rv-group-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: var(--sp-4) 2px var(--sp-2);
+      color: var(--text-tertiary);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+    .rv-group-label:first-of-type { padding-top: 0; }
+    .rv-group-label i { font-size: 13px; }
+    .rv-group-label.is-warn { color: var(--waiting-text); }
+    .rv-group-label.is-ok { color: var(--completed-text); }
+    .rv-group-label .rv-group-n {
+      margin-left: auto;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-subtle);
+      border-radius: var(--radius-full);
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+    .rv-group-label.is-warn .rv-group-n { background: var(--waiting-soft); color: var(--waiting-text); }
+    .rv-group-label.is-ok .rv-group-n { background: var(--completed-soft); color: var(--completed-text); }
+
+    /* 卡片式队列项 */
+    .rv-q-item {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding: 12px 13px;
+      margin-bottom: var(--sp-2);
+      text-align: left;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color var(--motion-fast) var(--ease),
+                  box-shadow var(--motion-fast) var(--ease),
+                  background var(--motion-fast) var(--ease);
+    }
+    .rv-q-item:hover { border-color: var(--border-hover); box-shadow: var(--elevation-2); }
+
+    /* 紧急度用一个小圆点表达，不用整条粗边 */
+    .rv-q-item::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: -1px;
+      width: 3px;
+      height: 18px;
+      border-radius: 0 3px 3px 0;
+      background: transparent;
+    }
+    .rv-q-item.needs-you::before { background: var(--amber-600); }
+    .rv-q-item.is-clean::before { background: var(--green-600); }
+
+    .rv-q-item.is-on {
+      background: var(--brand-soft);
+      border-color: var(--brand-border);
+      box-shadow: var(--elevation-2);
+    }
+    .rv-q-item.is-on::before { background: var(--brand); }
+
+    .rv-q-item.is-auto {
+      background: var(--surface-secondary);
+      border-style: dashed;
+    }
+    .rv-q-item.is-auto .rv-q-title { color: var(--text-tertiary); font-weight: 500; }
+
+    .rv-q-title {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rv-q-change {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      line-height: 17px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rv-q-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-disabled);
+      font-size: 11px;
+    }
+    .rv-q-meta .rv-q-ver {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: var(--surface-subtle);
+      color: var(--text-tertiary);
+    }
+    .rv-q-item.is-on .rv-q-ver { background: var(--surface-primary); }
+
+    .rv-q-empty { padding: var(--sp-6) var(--sp-3); color: var(--text-disabled); font-size: 12px; text-align: center; }
+
+    /* 右：详情面板 */
+    .rv-pane { min-width: 0; }
+    .rv-pane-empty {
+      display: grid;
+      place-items: center;
+      gap: var(--sp-2);
+      min-height: 320px;
+      color: var(--text-disabled);
+      font-size: 13px;
+    }
+    .rv-pane-empty i { font-size: 32px; }
+
+    /* ---------- 改动 · 详情（上线前评审卡） ---------- */
+    .rv-detail-head { margin-bottom: var(--sp-4); }
+    .rv-detail-head h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      line-height: 30px;
+      letter-spacing: -0.02em;
+    }
+    .rv-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-3);
+      color: var(--text-tertiary);
+      font-size: 12px;
+    }
+    .rv-detail-meta span { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* 摘要 / 细节 双 Tab —— 借鉴 Codex「摘要 / 代码」，但默认停在人话层 */
+    .rv-tabs {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      margin-bottom: var(--sp-4);
+      background: var(--surface-subtle);
+      border-radius: var(--radius-md);
+    }
+    .rv-tab {
+      padding: 5px 12px;
+      border: 0;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      font-size: 12.5px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .rv-tab.is-on {
+      background: var(--surface-primary);
+      color: var(--text-primary);
+      font-weight: 600;
+      box-shadow: var(--elevation-1);
+    }
+
+    .rv-panel {
+      padding: var(--sp-5, 20px);
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--sp-4);
+    }
+    .rv-panel-label {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-3);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      letter-spacing: 0.02em;
+    }
+    .rv-panel-label .rv-count { margin-left: auto; font-weight: 500; }
+
+    .rv-what-list { margin: 0; padding-left: 18px; }
+    .rv-what-list li {
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-size: 13.5px;
+      line-height: 21px;
+    }
+    .rv-what-list li:last-child { margin-bottom: 0; }
+
+    /* 自检清单 */
+    .rv-checks { display: flex; flex-direction: column; gap: 10px; }
+    .rv-check {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-2);
+      font-size: 13px;
+      line-height: 20px;
+    }
+    .rv-check i { flex: none; margin-top: 2px; font-size: 15px; }
+    .rv-check.is-ok i { color: var(--completed-text); }
+    .rv-check.is-ok  { color: var(--text-secondary); }
+    .rv-check.is-warn {
+      padding: 10px 12px;
+      margin: -2px 0;
+      background: var(--waiting-soft);
+      border: 1px solid var(--waiting-border);
+      border-radius: var(--radius-md);
+      color: var(--waiting-text);
+    }
+    .rv-check.is-warn i { color: var(--waiting-text); }
+    .rv-check-ask { display: block; margin-top: 3px; font-weight: 600; }
+
+    .rv-preview-row { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+
+    /* 决策条 —— 吸在右栏底部，常驻可见；三个动作，「先放着」是必要的第三选项 */
+    #reviewDetailPanel { padding-bottom: var(--sp-2); }
+
+    .rv-decision {
+      position: sticky;
+      bottom: 0;
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-top: var(--sp-3);
+      padding: var(--sp-3) var(--sp-4);
+      /* 不透明：sticky 时不能透出下面的内容 */
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, .06), var(--elevation-2);
+    }
+    .rv-decision[hidden] { display: none; }
+    .rv-decision .rv-decision-hint {
+      flex: 1;
+      padding: 0 var(--sp-2);
+      color: var(--text-tertiary);
+      font-size: 11.5px;
+      line-height: 16px;
+    }
+    .rv-decision .rv-decision-hint strong { color: var(--waiting-text); }
+
+    /* 内容能完整滚过吸底条 */
+    .rv-pane { padding-bottom: 4px; }
+
+    /* 看细节层：这里才允许出现工程语言 */
+    .rv-tech-note {
+      display: flex;
+      gap: var(--sp-2);
+      padding: 10px 12px;
+      margin-bottom: var(--sp-3);
+      background: var(--info-soft);
+      border: 1px solid var(--info-border);
+      border-radius: var(--radius-md);
+      color: var(--info-text);
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .rv-tech-note i { flex: none; font-size: 14px; margin-top: 1px; }
+    .rv-file {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+    }
+    .rv-file:last-child { border-bottom: 0; }
+    .rv-file-name { font-family: var(--mono); color: var(--text-secondary); }
+    .rv-file-delta { margin-left: auto; font-family: var(--mono); font-size: 11.5px; }
+    .rv-add { color: var(--completed-text); }
+    .rv-del { color: var(--failed-text); }
+
+    /* 圈选打回 */
+    .rv-reject { margin-top: var(--sp-3); }
+    .rv-reject-reasons { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+    .rv-reject textarea {
+      width: 100%;
+      min-height: 72px;
+      padding: 10px 12px;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 20px;
+      resize: vertical;
+    }
+    .rv-reject textarea:focus { outline: none; border-color: var(--focus-border); }
+
+    /* ---------- 右侧抽屉：看代码 / 看版本 ---------- */
+    .side-drawer-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      display: none;
+      background: var(--alpha-500);
+    }
+    .side-drawer-mask.is-open { display: block; }
+
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 96;
+      display: flex;
+      flex-direction: column;
+      width: min(680px, 92vw);
+      height: 100vh;
+      background: var(--surface-primary);
+      border-left: 1px solid var(--border-default);
+      box-shadow: var(--elevation-3);
+      transform: translateX(100%);
+      transition: transform var(--motion-normal) var(--ease);
+    }
+    .side-drawer.is-open { transform: translateX(0); }
+    .side-drawer.is-wide { width: min(560px, 92vw); }
+
+    .sd-head {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: var(--sp-4) var(--sp-5, 20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sd-head h2 { margin: 0; font-size: 15px; letter-spacing: -0.01em; }
+    .sd-head .sd-sub { color: var(--text-disabled); font-size: 11.5px; }
+    .sd-head .sd-close { margin-left: auto; }
+
+    .sd-body { flex: 1; overflow: auto; }
+
+    .sd-foot {
+      padding: 10px var(--sp-5, 20px);
+      border-top: 1px solid var(--border-subtle);
+      background: var(--surface-secondary);
+      color: var(--text-tertiary);
+      font-size: 11.5px;
+      line-height: 17px;
+    }
+
+    /* 文件切换条 */
+    .cd-files {
+      display: flex;
+      gap: 2px;
+      padding: var(--sp-2) var(--sp-3);
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--surface-secondary);
+    }
+    .cd-file-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex: none;
+      padding: 5px 10px;
+      border: 0;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cd-file-tab:hover { background: var(--surface-hover); }
+    .cd-file-tab.is-on { background: var(--surface-primary); color: var(--text-primary); box-shadow: var(--elevation-1); }
+    .cd-file-tab .cd-flag {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--amber-600);
+    }
+
+    .cd-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: 9px var(--sp-4);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+    }
+    .cd-meta .cd-path { font-family: var(--mono); color: var(--text-secondary); }
+    .cd-meta .cd-delta { margin-left: auto; font-family: var(--mono); }
+
+    /* diff 行 */
+    .cd-code { padding: var(--sp-2) 0; font-family: var(--mono); font-size: 12px; line-height: 20px; }
+    .cd-line { display: flex; align-items: flex-start; padding: 0 var(--sp-3); white-space: pre; }
+    .cd-line-n {
+      flex: none;
+      width: 34px;
+      text-align: right;
+      padding-right: 12px;
+      color: var(--text-disabled);
+      font-size: 11px;
+      user-select: none;
+    }
+    .cd-line-sign { flex: none; width: 14px; color: var(--text-disabled); }
+    .cd-line-s { min-width: 0; overflow-x: auto; }
+    .cd-line.is-add { background: var(--completed-soft); }
+    .cd-line.is-add .cd-line-sign, .cd-line.is-add .cd-line-s { color: var(--completed-text); }
+    .cd-line.is-del { background: var(--failed-soft); }
+    .cd-line.is-del .cd-line-sign, .cd-line.is-del .cd-line-s { color: var(--failed-text); }
+    .cd-flag-note {
+      display: flex;
+      gap: var(--sp-2);
+      margin: var(--sp-3) var(--sp-3) 0;
+      padding: 9px 11px;
+      background: var(--waiting-soft);
+      border: 1px solid var(--waiting-border);
+      border-radius: var(--radius-md);
+      color: var(--waiting-text);
+      font-family: var(--sans);
+      font-size: 12px;
+      line-height: 18px;
+      white-space: normal;
+    }
+    .cd-flag-note i { flex: none; font-size: 14px; margin-top: 1px; }
+
+    /* 版本时间线 */
+    .vt-list { padding: var(--sp-3) var(--sp-5, 20px) var(--sp-5, 20px); }
+    .vt-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: var(--sp-3);
+      padding: var(--sp-3) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .vt-item:last-child { border-bottom: 0; }
+    .vt-v {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .vt-when { display: block; margin-top: 2px; color: var(--text-disabled); font-size: 10.5px; }
+    .vt-main { min-width: 0; }
+    .vt-top { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: 4px; flex-wrap: wrap; }
+    .vt-what { margin: 0 0 8px; color: var(--text-secondary); font-size: 12.5px; line-height: 19px; }
+    .vt-who { color: var(--text-disabled); font-size: 11px; }
+    .vt-ops { display: flex; flex-wrap: wrap; gap: 6px; }
+    .vt-item.is-current { background: var(--brand-soft); border-radius: var(--radius-md); padding-left: var(--sp-3); padding-right: var(--sp-3); }
+    .rv-pill.is-rolled { background: var(--failed-soft); border-color: var(--failed-border); color: var(--failed-text); }
+    .rv-pill.is-hist { background: var(--surface-subtle); border-color: var(--border-default); color: var(--text-disabled); }
+
+    /* 详情里的版本区间条 */
+    .rv-verline {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: 10px var(--sp-4);
+      margin-bottom: var(--sp-4);
+      background: var(--surface-subtle);
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .rv-verline b { font-family: var(--mono); color: var(--text-primary); }
+    .rv-verline .rv-verline-ops { margin-left: auto; display: flex; gap: 6px; }
+
+    /* ---------- 站点封面图：迷你网站预览 ----------
+       用户靠「长什么样」认自己的站，不是靠名字。
+       CSS 画的顶栏 + 首屏 + 内容区，比抽象图标直观。
+       ------------------------------------------------------------------ */
+    .site-thumb {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-default);
+      background: var(--surface-primary);
+      overflow: hidden;
+      box-shadow: var(--elevation-1);
+    }
+    .sh-thumb.site-thumb { width: 72px; height: 52px; }
+
+    /* 顶栏：三个窗口点，一眼认出这是个网页 */
+    .st-bar {
+      flex: none;
+      height: 9px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 4px;
+      background: var(--st-ink, #6f3cd8);
+    }
+    .st-dot { width: 2.5px; height: 2.5px; border-radius: 50%; background: rgba(255, 255, 255, .75); }
+
+    /* 首屏 */
+    .st-hero {
+      flex: none;
+      height: 19px;
+      background: linear-gradient(135deg, var(--st-1, #efe9fd), var(--st-2, #e0edff));
+      display: grid;
+      place-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .st-hero::after {
+      content: "";
+      width: 26px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--st-ink, #6f3cd8);
+      opacity: .5;
+    }
+
+    /* 内容区：列表型 */
+    .st-lines {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      padding: 0 6px;
+    }
+    .st-line { height: 2.5px; border-radius: 1.5px; background: var(--st-ink, #6f3cd8); opacity: .24; }
+    .st-line.is-short { width: 58%; }
+
+    /* 内容区：网格型（案例墙那种） */
+    .st-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 1fr;
+      gap: 2.5px;
+      padding: 4px 5px;
+    }
+    .st-cell { border-radius: 1.5px; background: var(--st-ink, #6f3cd8); opacity: .2; }
+
+    /* 草稿态：还没发布的站，封面压灰 */
+    .site-thumb.is-muted { filter: grayscale(.6); opacity: .7; }
+
+    /* ---------- 站点 · 表格式列表 ----------
+       展示形式借鉴 Codex 站点：缩略图 + 可见范围独立成列 + 主操作常驻 + 溢出菜单
+       补上 Codex 没有的三列信息：版本状态 / 在用情况 / 待确认提醒
+       ------------------------------------------------------------------ */
+    .sh-table { border-top: 1px solid var(--border-subtle); }
+
+    .sh-thead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 148px 172px 176px;
+      gap: var(--sp-3);
+      padding: 10px var(--sp-3);
+      color: var(--text-disabled);
+      font-size: 11.5px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 1080px) { .sh-thead { display: none; } }
+
+    .sh-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 148px 172px 176px;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: var(--sp-3);
+      border-bottom: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: background var(--motion-fast) var(--ease);
+    }
+    .sh-row:hover { background: var(--surface-hover); }
+    @media (max-width: 1080px) {
+      .sh-row { grid-template-columns: minmax(0, 1fr); align-items: flex-start; }
+    }
+
+    /* 第 1 列：缩略图 + 名称 + 状态 + 地址 */
+    .sh-main { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+
+
+
+    .sh-copy { min-width: 0; }
+    .sh-name-line { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: 3px; }
+    .sh-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sh-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-disabled);
+      font-size: 11.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sh-url {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sh-url:hover { color: var(--brand-solid); text-decoration: underline; }
+    .sh-sub-dot { opacity: .5; }
+
+    /* 第 2 列：谁能看到 */
+    .sh-scope { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+    .sh-scope i { font-size: 14px; color: var(--icon-secondary); }
+    .sh-scope.is-private i { color: var(--text-disabled); }
+    .sh-scope.is-public i { color: var(--completed-text); }
+
+    /* 第 3 列：在用情况 */
+    .sh-live { display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; color: var(--text-tertiary); }
+    .sh-live strong { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+    .sh-live .sh-alert { color: var(--waiting-text); font-weight: 600; }
+    .sh-live .sh-err { color: var(--failed-text); font-weight: 600; }
+
+    /* 第 4 列：操作 */
+    .sh-ops { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+    .sh-more-wrap { position: relative; }
+    .sh-more-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      z-index: 40;
+      min-width: 208px;
+      padding: 6px;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      box-shadow: var(--elevation-2);
+    }
+    .sh-more-menu[hidden] { display: none; }
+    .sh-more-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      width: 100%;
+      padding: 7px 9px;
+      border: 0;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 12.5px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sh-more-item:hover { background: var(--surface-hover); }
+    .sh-more-item i { font-size: 15px; color: var(--icon-default); }
+    .sh-more-item.is-danger { color: var(--destructive); }
+    .sh-more-item.is-danger i { color: var(--destructive); }
+    .sh-more-sep { height: 1px; margin: 5px 4px; background: var(--border-subtle); }
+    .sh-more-label { padding: 6px 9px 3px; color: var(--text-disabled); font-size: 11px; }
+
+    /* 三态：行内紧凑指示 */
+    .sh-stage-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      color: var(--text-disabled);
+    }
+    .sh-stage-mini b { font-weight: 600; }
+    .sh-stage-mini .is-now { color: var(--text-primary); }
+
+    /* 移交交接包 */
+    .sh-handoff-list { display: flex; flex-direction: column; gap: 8px; margin: var(--sp-3) 0; }
+    .sh-handoff-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .sh-handoff-item i { color: var(--completed-text); font-size: 15px; }
+
+    /* 通用小抽屉（发布 / 移交 / 还原确认） */
+    .rv-sheet-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-6);
+      background: var(--alpha-700);
+      z-index: 90;
+    }
+    .rv-sheet-mask.is-open { display: flex; }
+    .rv-sheet {
+      width: min(520px, 100%);
+      max-height: 80vh;
+      overflow: auto;
+      padding: var(--sp-6);
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--elevation-3);
+    }
+    .rv-sheet h2 { margin: 0 0 6px; font-size: 18px; letter-spacing: -0.01em; }
+    .rv-sheet p.rv-sheet-sub { margin: 0 0 var(--sp-4); color: var(--text-secondary); font-size: 13px; line-height: 20px; }
+    .rv-sheet-foot { display: flex; justify-content: flex-end; gap: var(--sp-2); margin-top: var(--sp-5, 20px); }
+
+    .rv-scope { display: flex; flex-direction: column; gap: var(--sp-2); }
+    .rv-scope-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      padding: var(--sp-3);
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+    }
+    .rv-scope-item:hover { border-color: var(--border-hover); }
+    .rv-scope-item.is-on { border-color: var(--brand); background: var(--brand-soft); }
+    .rv-scope-item i { font-size: 18px; color: var(--icon-default); margin-top: 1px; }
+    .rv-scope-item.is-on i { color: var(--brand-solid); }
+    .rv-scope-copy strong { display: block; font-size: 13px; color: var(--text-primary); }
+    .rv-scope-copy span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--text-tertiary); line-height: 17px; }
+
   </style>
 </head>
 <body>
@@ -7953,10 +8786,6 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
             <i class="ph ph-plus-square"></i>
             <span>新建任务</span>
           </button>
-          <button class="sidebar-nav-item" data-sidebar-action="project">
-            <i class="ph ph-folder"></i>
-            <span>项目</span>
-          </button>
           <button class="sidebar-nav-item" data-sidebar-action="scheduled">
             <i class="ph ph-alarm"></i>
             <span>自动化</span>
@@ -7965,6 +8794,19 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
             <i class="ph ph-identification-card"></i>
             <span>工作搭档</span>
             <span class="nav-item-hint">技能 · 连接器</span>
+          </button>
+          <button class="sidebar-nav-item" data-sidebar-action="project">
+            <i class="ph ph-folder"></i>
+            <span>项目</span>
+          </button>
+          <button class="sidebar-nav-item" data-sidebar-action="shipped">
+            <i class="ph ph-rocket-launch"></i>
+            <span>站点</span>
+          </button>
+          <button class="sidebar-nav-item" data-sidebar-action="review">
+            <i class="ph ph-tray"></i>
+            <span>改动</span>
+            <span class="nav-item-badge" id="reviewNavBadge">3</span>
           </button>
         </nav>
         <div class="task-list" id="taskList">
@@ -8387,6 +9229,141 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
 
           </section>
 
+          <!-- =================================================================
+               改动 · 上线前评审
+               借鉴 Codex「拉取请求」的列表+详情骨架与「摘要/代码」双 Tab，
+               但一级层全部换成业务语言；工程细节收进「看细节」。
+               ================================================================= -->
+          <section class="resource-center-view is-wide" id="reviewCenterView" hidden>
+            <div class="resource-center-head">
+              <div>
+                <h1>改动</h1>
+                <p>搭档改了站点里的什么，在上线前先过你一眼。处理完一条，自动跳到下一条。</p>
+              </div>
+            </div>
+
+            <div class="rv-inbox">
+              <!-- 左：待处理队列（分组，不是筛选器；这是收件箱不是资产清单） -->
+              <aside class="rv-queue" id="reviewQueue" aria-label="待处理的改动"></aside>
+
+              <!-- 右：常驻详情 -->
+              <div class="rv-pane">
+                <div id="reviewDetailPanel" hidden>
+                  <div class="rv-detail-head">
+                    <h1 id="reviewDetailTitle">改动标题</h1>
+                    <div class="rv-detail-meta" id="reviewDetailMeta"></div>
+                  </div>
+
+                  <!-- 版本区间：这次改动会把站点从哪一版推到哪一版 -->
+                  <div class="rv-verline" id="reviewVerLine"></div>
+
+                  <div class="rv-tabs" role="tablist" aria-label="查看层级">
+                    <button class="rv-tab is-on" data-review-tab="what" role="tab">改了什么</button>
+                    <button class="rv-tab" data-review-tab="detail" role="tab">看细节</button>
+                  </div>
+
+                  <div id="reviewTabWhat">
+                    <div class="rv-panel">
+                      <div class="rv-panel-label"><i class="ph ph-list-bullets"></i>改了什么</div>
+                      <ul class="rv-what-list" id="reviewWhatList"></ul>
+                    </div>
+
+                    <div class="rv-panel">
+                      <div class="rv-panel-label">
+                        <i class="ph ph-checks"></i>自检结论
+                        <span class="rv-count" id="reviewCheckCount"></span>
+                      </div>
+                      <div class="rv-checks" id="reviewChecks"></div>
+                    </div>
+
+                  </div>
+
+                  <div id="reviewTabDetail" hidden>
+                    <div class="rv-tech-note">
+                      <i class="ph ph-info"></i>
+                      <span>这一层是站点的源码与构建记录，给需要深究的人和后面接手的开发看。日常确认不必进来——上一层已经够你做判断。<b>点文件可以打开代码。</b></span>
+                    </div>
+                    <div class="rv-panel">
+                      <div class="rv-panel-label"><i class="ph ph-file-code"></i>本次改动的源码文件<span class="rv-count">点开看代码</span></div>
+                      <div id="reviewFileList"></div>
+                    </div>
+                    <div class="rv-panel">
+                      <div class="rv-panel-label"><i class="ph ph-terminal-window"></i>构建与自检记录</div>
+                      <div id="reviewRunLog"></div>
+                    </div>
+                  </div>
+
+                  <div class="rv-reject" id="reviewRejectBox" hidden>
+                    <div class="rv-panel">
+                      <div class="rv-panel-label"><i class="ph ph-arrow-u-up-left"></i>只改这一块，其它保留</div>
+                      <div class="rv-reject-reasons" id="reviewRejectReasons"></div>
+                      <textarea id="reviewRejectNote" placeholder="说明希望怎么改，例如：这个案例先撤下来，等授权续上再放回去。"></textarea>
+                      <div class="rv-sheet-foot">
+                        <button class="button button-tertiary" id="reviewRejectCancel">取消</button>
+                        <button class="button button-primary" id="reviewRejectSubmit">发回去改</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- 吸底决策条：常驻右栏底部，不随内容穿插 -->
+                <div class="rv-decision" id="reviewDecisionBar">
+                  <button class="button button-secondary" id="reviewPreviewBtn"><i class="ph ph-eye"></i>看预览版</button>
+                  <span class="rv-decision-hint" id="reviewDecisionHint"></span>
+                  <button class="button button-tertiary" id="reviewLaterBtn">先放着</button>
+                  <button class="button button-secondary" id="reviewRejectBtn"><i class="ph ph-arrow-u-up-left"></i>圈选打回</button>
+                  <button class="button button-primary" id="reviewAcceptBtn"><i class="ph ph-paper-plane-tilt"></i>采纳并发布</button>
+                </div>
+
+                <div class="rv-pane-empty" id="reviewEmpty" hidden>
+                  <i class="ph ph-seal-check"></i>
+                  <strong>都处理完了</strong>
+                  <span>搭档改完站点后，需要你拍板的改动会出现在左边。</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- =================================================================
+               站点 · 发布与还原
+               借鉴 Codex「站点」的一级入口位置，但补上它没有的治理：
+               三态 / 可见范围 / 一键还原 / 使用观测 / 移交专业开发
+               ================================================================= -->
+          <section class="resource-center-view" id="shippedCenterView" hidden>
+            <div class="resource-center-head">
+              <div>
+                <h1>站点</h1>
+                <p>你建的站现在跑在哪一版、谁能看到、出问题怎么退回去。</p>
+              </div>
+            </div>
+            <div class="resource-kpis" id="shippedKpis"></div>
+            <div class="resource-toolbar">
+              <div class="resource-filter-group" id="shippedFilterGroup">
+                <button class="filter-chip is-selected" data-shipped-tab="app">站点</button>
+                <button class="filter-chip" data-shipped-tab="doc">配套文档</button>
+              </div>
+              <label class="resource-search">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="search" id="shippedSearchInput" placeholder="搜索站点">
+              </label>
+            </div>
+            <div class="sh-table">
+              <div class="sh-thead">
+                <span>站点</span>
+                <span>谁能看到</span>
+                <span>在用情况</span>
+                <span></span>
+              </div>
+              <div id="shippedGrid"></div>
+            </div>
+            <div class="feed-empty" id="shippedEmpty" hidden>
+              <i class="ph ph-rocket-launch"></i>
+              <strong>还没有这一类站点</strong>
+              <span>做完并确认发布后，站点会出现在这里。</span>
+            </div>
+          </section>
+
           <section class="run-view" id="runView">
             <div class="run-top">
               <div class="run-heading">
@@ -8781,6 +9758,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
   <div class="toast" id="toast" role="status" aria-live="polite">
     <i class="ph ph-check-circle"></i>
     <span id="toastText">已更新</span>
+    <button class="toast-action" id="toastAction" hidden>撤销</button>
   </div>
 
   <div class="case-preview" id="casePreview" aria-hidden="true">
@@ -8798,6 +9776,105 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       </figcaption>
     </figure>
   </div>
+
+    <!-- 看代码抽屉 -->
+    <div class="side-drawer-mask" data-drawer-close="codeDrawer"></div>
+    <aside class="side-drawer" id="codeDrawer" role="dialog" aria-modal="true" aria-labelledby="codeDrawerTitle">
+      <div class="sd-head">
+        <div>
+          <h2 id="codeDrawerTitle">看代码</h2>
+          <span class="sd-sub" id="codeDrawerSub">客户案例展示站 · v6 → v7</span>
+        </div>
+        <button class="icon-button sd-close" data-drawer-close="codeDrawer" aria-label="关闭"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="cd-files" id="codeDrawerFiles"></div>
+      <div class="cd-meta">
+        <span class="cd-path" id="codeDrawerPath">app/page.tsx</span>
+        <span>只显示改动的部分</span>
+        <span class="cd-delta" id="codeDrawerDelta"></span>
+      </div>
+      <div class="sd-body">
+        <div class="cd-code" id="codeDrawerCode"></div>
+      </div>
+      <div class="sd-foot">
+        这一层是给开发看的。你要判断的事已经写在「改了什么」里——真需要人接手时，这些代码会随交接包一起带走。
+      </div>
+    </aside>
+
+    <!-- 版本记录抽屉 -->
+    <div class="side-drawer-mask" data-drawer-close="versionDrawer"></div>
+    <aside class="side-drawer is-wide" id="versionDrawer" role="dialog" aria-modal="true" aria-labelledby="versionDrawerTitle">
+      <div class="sd-head">
+        <div>
+          <h2 id="versionDrawerTitle">版本记录</h2>
+          <span class="sd-sub" id="versionDrawerSub">每一版都留着，随时可以回到任意一版</span>
+        </div>
+        <button class="icon-button sd-close" data-drawer-close="versionDrawer" aria-label="关闭"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="sd-body">
+        <div class="vt-list" id="versionTimeline"></div>
+      </div>
+      <div class="sd-foot">
+        回滚不会删掉任何版本——它只是把「正式版」指到另一版上，之后随时可以再切回来。所有切换都记进操作记录。
+      </div>
+    </aside>
+
+    <!-- 发布范围 -->
+    <div class="rv-sheet-mask" id="publishMask" role="dialog" aria-modal="true" aria-labelledby="publishTitle">
+      <div class="rv-sheet">
+        <h2 id="publishTitle">发布「<span id="publishTargetName">站点</span>」</h2>
+        <p class="rv-sheet-sub">选择谁能看到这一版。发布之后随时可以一键还原到上一个版本。</p>
+        <div class="rv-scope" id="publishScope">
+          <button class="rv-scope-item is-on" data-publish-scope="preview">
+            <i class="ph ph-users-three"></i>
+            <span class="rv-scope-copy"><strong>先发预览版</strong><span>只有你和受邀的人能打开，用临时地址，确认没问题再放大</span></span>
+          </button>
+          <button class="rv-scope-item" data-publish-scope="team">
+            <i class="ph ph-buildings"></i>
+            <span class="rv-scope-copy"><strong>发给本部门</strong><span>部门同事登录后可访问，用正式地址</span></span>
+          </button>
+          <button class="rv-scope-item" data-publish-scope="link">
+            <i class="ph ph-link"></i>
+            <span class="rv-scope-copy"><strong>对外发布</strong><span>绑定正式域名，公司外也能访问；发布前会再跑一次合规检查</span></span>
+          </button>
+        </div>
+        <div class="rv-sheet-foot">
+          <button class="button button-tertiary" data-sheet-close="publishMask">取消</button>
+          <button class="button button-primary" id="publishConfirmBtn"><i class="ph ph-paper-plane-tilt"></i>确认发布</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 移交专业开发 -->
+    <div class="rv-sheet-mask" id="handoffMask" role="dialog" aria-modal="true" aria-labelledby="handoffTitle">
+      <div class="rv-sheet">
+        <h2 id="handoffTitle">请专业开发接管</h2>
+        <p class="rv-sheet-sub">下面这些会一起带过去，开发者不用再问你一遍。你仍然在这里看进度和验收。</p>
+        <div class="sh-handoff-list">
+          <div class="sh-handoff-item"><i class="ph ph-check-circle"></i>原始目标与受众（你最开始说的那句话）</div>
+          <div class="sh-handoff-item"><i class="ph ph-check-circle"></i>站点源码与内容文件（可直接 clone 下来跑）</div>
+          <div class="sh-handoff-item"><i class="ph ph-check-circle"></i>这一路的决策记录（11 条，含你打回过的 3 次）</div>
+          <div class="sh-handoff-item"><i class="ph ph-check-circle"></i>预览环境与构建配置（域名、证书、部署脚本）</div>
+          <div class="sh-handoff-item"><i class="ph ph-check-circle"></i>验收标准（开发完照这个验，不用重新对齐）</div>
+        </div>
+        <div class="rv-sheet-foot">
+          <button class="button button-tertiary" data-sheet-close="handoffMask">再想想</button>
+          <button class="button button-primary" id="handoffConfirmBtn"><i class="ph ph-arrow-bend-up-right"></i>创建开发任务</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 一键还原 -->
+    <div class="rv-sheet-mask" id="revertMask" role="dialog" aria-modal="true" aria-labelledby="revertTitle">
+      <div class="rv-sheet">
+        <h2 id="revertTitle">还原到上一个版本</h2>
+        <p class="rv-sheet-sub" id="revertSub">正在使用的人会立刻看到上一个版本。这次操作会记进操作记录，随时可以再切回来。</p>
+        <div class="rv-sheet-foot">
+          <button class="button button-tertiary" data-sheet-close="revertMask">取消</button>
+          <button class="button button-primary" id="revertConfirmBtn"><i class="ph ph-arrow-counter-clockwise"></i>确认还原</button>
+        </div>
+      </div>
+    </div>
 
   <script>
     const modeContent = {
@@ -11353,11 +12430,36 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       }
     }
 
+    /* 项目级 UI 状态记忆：切项目时记住各自最后停留的视图/筛选/折叠状态 */
+    const PROJECT_UI_KEYS = ["projectTab", "taskFilter", "planView", "railCollapsed", "railFeedAll", "pcPartner"];
+    function saveProjectUi(id) {
+      if (!id) return;
+      state.projectUi = state.projectUi || {};
+      const snap = {};
+      PROJECT_UI_KEYS.forEach((key) => { snap[key] = key === "railCollapsed" ? { ...(state[key] || {}) } : state[key]; });
+      state.projectUi[id] = snap;
+    }
+    function restoreProjectUi(id) {
+      const saved = state.projectUi && state.projectUi[id];
+      if (saved) {
+        PROJECT_UI_KEYS.forEach((key) => { if (key in saved) state[key] = saved[key]; });
+        state.railCollapsed = state.railCollapsed || {};
+      } else {
+        state.projectTab = "overview";
+        state.taskFilter = "全部";
+        state.planView = "list";
+        state.railCollapsed = {};
+        state.railFeedAll = false;
+        state.pcPartner = null;
+      }
+    }
+
     function openProjectDetail(id) {
       const project = projectById(id);
       if (!project) return;
+      if (state.activeProjectId && state.activeProjectId !== id) saveProjectUi(state.activeProjectId);
       state.activeProjectId = id;
-      state.projectTab = "overview";
+      restoreProjectUi(id);
       el("projectListPanel").hidden = true;
       el("projectDetailPanel").hidden = false;
       setProjectCrumb(project);
@@ -11366,6 +12468,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
     }
 
     function backToProjectList() {
+      if (state.activeProjectId) saveProjectUi(state.activeProjectId);
       state.activeProjectId = null;
       el("projectDetailPanel").hidden = true;
       el("projectListPanel").hidden = false;
@@ -11420,6 +12523,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       }
       el("pcPartnerLabel").textContent = state.pcPartner || "选择搭档";
       el("pcProjectLabel").textContent = p.name;
+      el("pcSendButton").disabled = !(el("projectTaskPrompt").value || "").trim();
       el("pcPartnerMenu").innerHTML = partners.map((m) => `
         <button class="pc-menu-item ${m.name === state.pcPartner ? "is-selected" : ""}" data-pc-partner="${escapeText(m.name)}">
           <span class="member-avatar is-ai">${m.avatar ? `<img src="${m.avatar}" alt="">` : "AI"}</span>
@@ -11506,9 +12610,6 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           renderProjectRail(p);
         });
       });
-      qsa("[data-rail-goto]", rail).forEach((button) => {
-        button.addEventListener("click", () => { state.projectTab = button.dataset.railGoto; renderProjectDetail(); });
-      });
       qsa("[data-rail-add]", rail).forEach((button) => {
         button.addEventListener("click", () => showToast("可邀请人类成员，或从搭档中心添加搭档成员"));
       });
@@ -11529,6 +12630,15 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           showToast(`已选中 ${button.dataset.railMention}，写下任务目标即可派发`);
         });
       });
+    }
+
+    /* 右侧信息栏：把焦点切到「成员」卡（邀请成员入口复用）。成员/动态已常驻右侧栏，不再有独立 tab。 */
+    function focusProjectMembers() {
+      const p = projectById(state.activeProjectId);
+      if (!p) return;
+      el("projectWorkbench").classList.remove("is-rail-hidden");
+      state.railCollapsed = { ...(state.railCollapsed || {}), members: false };
+      renderProjectRail(p);
     }
 
     /* 概览 */
@@ -11774,10 +12884,17 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           if (button.dataset.planAction === "convertAll") {
             const items = plan.filter((one) => !one.done && !one.taskId);
             if (!items.length) return;
-            items.forEach(convert);
+            const createdIds = [];
+            items.forEach((item) => { createdIds.push(convert(item).id); });
             p.feed.unshift({ actor: "human", who: "Nie wen", action: "批量转为任务", target: `${items.length} 条计划`, time: "刚刚", note: `执行者 ${partner} · 全部进入待派发`, kind: "human" });
             renderProjectDetail();
-            showToast(`${items.length} 条计划已转为任务`);
+            showToast(`${items.length} 条计划已转为任务`, {
+              action: { label: "撤销", fn: () => {
+                p.tasks = p.tasks.filter((t) => !createdIds.includes(t.id));
+                items.forEach((item) => { item.taskId = null; });
+                renderProjectDetail();
+              } }
+            });
             return;
           }
           const now = Date.now();
@@ -11798,10 +12915,14 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       });
       qsa("[data-plan-delete]", el("projectTabPanel")).forEach((button) => {
         button.addEventListener("click", () => {
-          const at = plan.findIndex((one) => one.id === button.dataset.planDelete);
+          const id = button.dataset.planDelete;
+          const at = plan.findIndex((one) => one.id === id);
+          if (at < 0) return;
           const [item] = plan.splice(at, 1);
           renderProjectDetail();
-          showToast(`已删除：${item.title.slice(0, 14)}`);
+          showToast(`已删除：${item.title.slice(0, 14)}`, {
+            action: { label: "撤销", fn: () => { plan.splice(Math.min(at, plan.length), 0, item); renderProjectDetail(); } }
+          });
         });
       });
       qsa("[data-plan-open-task]", el("projectTabPanel")).forEach((button) => {
@@ -11902,7 +13023,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
                 <h3><i class="ph ph-plugs-connected"></i>连接器</h3>
                 <p>外部来源作为知识与事件源接入本项目</p>
               </div>
-              ${(p.connectors || []).map((c) => `
+              ${(p.context.connectors || []).map((c) => `
                 <div class="ctx-row">
                   <i class="ph ${c.icon}"></i>
                   <span class="ctx-row-main">
@@ -12065,8 +13186,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
             return;
           }
           if (action === "invite") {
-            state.projectTab = "members";
-            renderProjectDetail();
+            focusProjectMembers();
             showToast("可邀请人类成员，或从搭档中心添加搭档成员");
             return;
           }
@@ -12079,23 +13199,6 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           renderProjectDetail();
           showToast("已忽略该建议");
         });
-      });
-      qsa("[data-milestone-toggle]", root).forEach((button) => {
-        button.addEventListener("click", () => {
-          const section = button.closest(".milestone");
-          const open = section.classList.toggle("is-open");
-          button.setAttribute("aria-expanded", String(open));
-        });
-      });
-      qsa("[data-plan-task]", root).forEach((button) => {
-        button.addEventListener("click", () => {
-          const task = taskById(p, button.dataset.planTask);
-          if (task && task.col === "review") openAcceptance(p.id, task.id);
-          else showToast(`「${task.title}」· 执行者 ${task.owner.name} · ${task.criteria ? `${task.criteria.length} 条验收标准` : "验收标准待补充"}`);
-        });
-      });
-      qsa("[data-plan-action]", root).forEach((button) => {
-        button.addEventListener("click", () => showToast("项目经理搭档正在重排里程碑，草案生成后需你确认才生效"));
       });
       qsa("[data-task-filter]", root).forEach((button) => {
         button.addEventListener("click", () => { state.taskFilter = button.dataset.taskFilter; renderProjectDetail(); });
@@ -12119,9 +13222,12 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       });
       qsa("[data-memory-delete]", root).forEach((button) => {
         button.addEventListener("click", () => {
-          const [memory] = p.context.memories.splice(Number(button.dataset.memoryDelete), 1);
+          const idx = Number(button.dataset.memoryDelete);
+          const [memory] = p.context.memories.splice(idx, 1);
           renderProjectDetail();
-          showToast(`已删除记忆：${memory.text.slice(0, 16)}…`);
+          showToast(`已删除记忆：${memory.text.slice(0, 16)}…`, {
+            action: { label: "撤销", fn: () => { p.context.memories.splice(Math.min(idx, p.context.memories.length), 0, memory); renderProjectDetail(); } }
+          });
         });
       });
       qsa("[data-context-action]", root).forEach((button) => {
@@ -12145,12 +13251,6 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           }
           showToast(map[button.dataset.contextAction] || "已处理");
         });
-      });
-      qsa("[data-version-view]", root).forEach((chip) => {
-        chip.addEventListener("click", () => showToast(`打开 ${chip.textContent} 版本：可与其它版本对比，也可回滚`));
-      });
-      qsa("[data-asset-upgrade]", root).forEach((button) => {
-        button.addEventListener("click", () => showToast("已提交升级申请：项目记忆默认项目内隔离，升级为组织资产需管理员确认并留痕"));
       });
     }
 
@@ -12300,20 +13400,22 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       const project = projectById(acc.projectId);
       const task = taskById(project, acc.taskId);
       const scope = acc.targets.length ? `第 ${acc.targets.map((i) => i + 1).join("、")} 条` : "整体";
+      const noteValue = ((el("rejectNote") && el("rejectNote").value) || "").trim();
+      const noteSuffix = noteValue ? ` · 批注：${noteValue}` : "";
       task.versions[task.versions.length - 1].state = "已打回";
-      task.versions[task.versions.length - 1].note = `打回原因：${acc.reason} · 局部打回 ${scope}标准`;
+      task.versions[task.versions.length - 1].note = `打回原因：${acc.reason} · 局部打回 ${scope}标准${noteSuffix}`;
       task.version += 1;
-      task.versions.push({ v: `v${task.version}`, state: "返工中", note: `搭档仅重做被圈选部分，其余已通过内容保留` });
+      task.versions.push({ v: `v${task.version}`, state: "返工中", note: `搭档仅重做被圈选部分，其余已通过内容保留${noteSuffix}` });
       const rejAsset = project.assets.deliverables.find((a) => task.deliverable.name.includes(a.name) || a.name.includes(task.deliverable.name.replace(/ v\d+$/, "")));
       if (rejAsset) {
         rejAsset.versions.push(`v${task.version}`);
         rejAsset.current = rejAsset.versions.length - 1;
         rejAsset.versionMeta = rejAsset.versionMeta || [];
-        rejAsset.versionMeta[rejAsset.current] = { time: "刚刚", by: task.owner.name, note: `返工中：${acc.reason}` };
+        rejAsset.versionMeta[rejAsset.current] = { time: "刚刚", by: task.owner.name, note: `返工中：${acc.reason}${noteSuffix}` };
       }
       task.col = "running";
       task.meta = `返工中 · 仅重做${scope}标准 · v${task.version}`;
-      project.feed.unshift({ actor: "human", who: "Nie wen", action: "打回了", target: `${task.title} v${task.version - 1}`, time: "刚刚", note: `原因：${acc.reason} · 局部打回 ${scope}标准，搭档只改这一块`, kind: "reject" });
+      project.feed.unshift({ actor: "human", who: "Nie wen", action: "打回了", target: `${task.title} v${task.version - 1}`, time: "刚刚", note: `原因：${acc.reason} · 局部打回 ${scope}标准，搭档只改这一块${noteSuffix}`, kind: "reject" });
       project.updatedNote = `刚刚 · 你局部打回了${task.title}`;
       closeAcceptance();
       renderProjectDetail();
@@ -12450,7 +13552,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         </div>`;
 
       if (np.step === 1) {
-        el("newProjectSubtitle").textContent = "定好名称、目标与指令，再挑搭档和知识——这些正是项目里右侧信息栏的内容";
+        el("newProjectSubtitle").textContent = "定好名称、目标与指令，再挑搭档和知识——指令与知识在「知识」视图，成员与动态在右侧信息栏";
         const pickerRow = (kind, items, selectedNames) => np.picker !== kind ? "" : `
           <div class="np-picker">
             ${items.filter((item) => !selectedNames.includes(typeof item === "string" ? item : item.name))
@@ -12670,7 +13772,6 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           goal: np.goal,
           updatedNote: "刚刚 · 项目已创建，指令与知识已就绪",
           instruction: np.instruction,
-          connectors: np.connectors.map((c) => ({ name: c.name, icon: c.icon, meta: c.meta })),
           members: [
             { name: "Nie wen", type: "human", role: "负责人", initials: "NW", meta: "定目标与验收标准 · 全部权限" },
             { name: "项目经理搭档", type: "ai", role: "AI · 项目经理", avatar: "assets/codearts-agent/ux-avatar.png", meta: "拆解计划、汇总进度、提醒阻塞" },
@@ -12685,7 +13786,8 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           }))),
           context: {
             files: np.knowledge.map((k) => ({ name: k.name, icon: k.icon, meta: "创建时加入 · 自动注入每次执行" })),
-            memories: [{ text: `项目目标：${np.goal}`, source: "manual", pinned: true, meta: "创建时写入 · 注入每次执行" }]
+            memories: [{ text: `项目目标：${np.goal}`, source: "manual", pinned: true, meta: "创建时写入 · 注入每次执行" }],
+            connectors: np.connectors.map((c) => ({ name: c.name, icon: c.icon, meta: c.meta }))
           },
           assets: { deliverables: [], reusables: [] },
           feed: [{ actor: "human", who: "Nie wen", action: "创建了项目", target: np.name || np.goal.slice(0, 20), time: "刚刚", note: `已设置项目指令，加入 ${np.partners.length} 位搭档、${np.connectors.length} 个连接器、${np.knowledge.length} 项知识；搭档拆出 ${np.draft.length} 个里程碑、${taskCount} 个任务`, kind: "human" }],
@@ -12775,7 +13877,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
 
     function hideResourceCenters() {
       if (el("partnerTabbar")) el("partnerTabbar").hidden = true;
-      ["scheduledCenterView", "capabilityCenterView", "projectCenterView", "inspirationCenterView"].forEach((id) => {
+      ["scheduledCenterView", "capabilityCenterView", "projectCenterView", "inspirationCenterView", "reviewCenterView", "shippedCenterView"].forEach((id) => {
         if (el(id)) el(id).hidden = true;
       });
       el("workspace").classList.remove("is-resource-center");
@@ -12790,7 +13892,9 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         scheduled: ["scheduledCenterView", "自动化"],
         capability: ["capabilityCenterView", "工作搭档 · 技能"],
         inspiration: ["inspirationCenterView", "工作搭档 · 灵感"],
-        project: ["projectCenterView", "项目"]
+        project: ["projectCenterView", "项目"],
+        review: ["reviewCenterView", "改动"],
+        shipped: ["shippedCenterView", "站点"]
       };
       const target = viewMap[action];
       if (!target) return;
@@ -12819,7 +13923,1031 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         const active = state.activeProjectId ? projectById(state.activeProjectId) : null;
         setProjectCrumb(active);
       }
+      if (action === "review") renderReviewCenter();
+      if (action === "shipped") renderShipped();
     }
+
+    /* =====================================================================
+       改动（上线前评审）+ 站点（发布 / 还原 / 移交）
+       —— 把 CodeArts DevOps 的 PR 评审、环境隔离、发布、回滚翻译成业务语言
+       —— 一级层禁止出现：分支 / PR / 流水线 / commit / diff
+       ===================================================================== */
+
+    const REVIEW_ITEMS = [
+      {
+        id: "rv-cases",
+        name: "客户案例展示站",
+        kind: "站点", change: "新增 3 个案例页 + 首页改版",
+        site: { ink: "#6f3cd8", c1: "#efe9fd", c2: "#e0edff", layout: "grid" },
+        project: "市场部品牌站群",
+        partner: "建站搭档",
+        time: "12 分钟前",
+        risk: "high",
+        status: "待确认",
+        target: "sh-cases",
+        summary: "加了 3 个客户案例页，首页换成案例墙布局，手机上也重新排过。",
+        what: [
+          "新增「某银行 / 某车企 / 某零售」3 个案例页，每页含背景、做法、结果三段",
+          "首页从图文列表改成案例墙，点进去直接到对应案例页",
+          "手机、平板、电脑三种尺寸都重排过，案例墙在手机上变成单列"
+        ],
+        checks: [
+          { ok: true, text: "三种屏幕尺寸下排版正常，没有横向滚动" },
+          { ok: true, text: "3 个新页面的链接都能打开，首页跳转正确" },
+          { ok: true, text: "打开速度 1.4 秒，比改版前快 0.3 秒" },
+          { ok: false, text: "某车企的 logo 使用授权 8 月底到期",
+            ask: "需要你判断：是先撤下这个案例，还是你去续授权？站点已经是对外可见的。" }
+        ],
+        fromVersion: "v6", toVersion: "v7",
+        files: [
+          { name: "app/cases/[slug]/page.tsx", add: 168, del: 4, diff: [
+            { t: "ctx", n: 12, s: "export default async function CasePage({ params }) {" },
+            { t: "del", n: 13, s: "  const doc = await getCase(params.slug);" },
+            { t: "add", n: 13, s: "  const doc = await getCase(params.slug);" },
+            { t: "add", n: 14, s: "  if (!doc) return notFound();" },
+            { t: "add", n: 15, s: "" },
+            { t: "add", n: 16, s: "  const { background, approach, outcome } = doc.sections;" },
+            { t: "ctx", n: 17, s: "" },
+            { t: "ctx", n: 18, s: "  return (" },
+            { t: "add", n: 19, s: "    <article className=\"case-detail\">" },
+            { t: "add", n: 20, s: "      <CaseHero title={doc.title} client={doc.client} />" },
+            { t: "add", n: 21, s: "      <Section title=\"项目背景\">{background}</Section>" },
+            { t: "add", n: 22, s: "      <Section title=\"我们的做法\">{approach}</Section>" },
+            { t: "add", n: 23, s: "      <Section title=\"最终结果\">{outcome}</Section>" },
+            { t: "add", n: 24, s: "    </article>" },
+            { t: "ctx", n: 25, s: "  );" },
+            { t: "ctx", n: 26, s: "}" }
+          ]},
+          { name: "app/page.tsx", add: 94, del: 61, diff: [
+            { t: "ctx", n: 28, s: "export default function Home() {" },
+            { t: "del", n: 29, s: "  return <CaseList items={cases} layout=\"rows\" />;" },
+            { t: "del", n: 30, s: "  // 旧版：图文列表，每行一个案例" },
+            { t: "add", n: 29, s: "  return (" },
+            { t: "add", n: 30, s: "    <CaseWall" },
+            { t: "add", n: 31, s: "      items={cases}" },
+            { t: "add", n: 32, s: "      columns={{ base: 1, md: 2, lg: 3 }}" },
+            { t: "add", n: 33, s: "      onSelect={(c) => router.push(`/cases/${c.slug}`)}" },
+            { t: "add", n: 34, s: "    />" },
+            { t: "add", n: 35, s: "  );" },
+            { t: "ctx", n: 36, s: "}" }
+          ]},
+          { name: "components/CaseWall.tsx", add: 132, del: 0, diff: [
+            { t: "add", n: 1, s: "import { useMemo } from \"react\";" },
+            { t: "add", n: 2, s: "" },
+            { t: "add", n: 3, s: "export function CaseWall({ items, columns, onSelect }) {" },
+            { t: "add", n: 4, s: "  const cols = useMemo(() => resolveCols(columns), [columns]);" },
+            { t: "add", n: 5, s: "" },
+            { t: "add", n: 6, s: "  return (" },
+            { t: "add", n: 7, s: "    <div className=\"case-wall\" style={{ \"--cols\": cols }}>" },
+            { t: "add", n: 8, s: "      {items.map((c) => (" },
+            { t: "add", n: 9, s: "        <button key={c.slug} onClick={() => onSelect(c)}>" },
+            { t: "add", n: 10, s: "          <img src={c.cover} alt=\"\" loading=\"lazy\" />" },
+            { t: "add", n: 11, s: "          <span>{c.client}</span>" },
+            { t: "add", n: 12, s: "        </button>" },
+            { t: "add", n: 13, s: "      ))}" },
+            { t: "add", n: 14, s: "    </div>" },
+            { t: "add", n: 15, s: "  );" },
+            { t: "add", n: 16, s: "}" }
+          ]},
+          { name: "content/cases/auto-oem.mdx", add: 246, del: 0, flag: "授权即将到期", diff: [
+            { t: "add", n: 1, s: "---" },
+            { t: "add", n: 2, s: "client: 某车企" },
+            { t: "add", n: 3, s: "cover: /assets/cases/auto-oem/logo.svg" },
+            { t: "add", n: 4, s: "license: 2026-08-31   # ← 授权到期日" },
+            { t: "add", n: 5, s: "---" },
+            { t: "add", n: 6, s: "" },
+            { t: "add", n: 7, s: "## 项目背景" },
+            { t: "add", n: 8, s: "该车企在全国有 1,200 家经销商…" }
+          ]}
+        ],
+        log: [
+          "构建通过：42 个页面静态生成，无报错",
+          "三档视口截图对比：375 / 768 / 1440，均无溢出",
+          "全站链接扫描：58 条内链全部可达，0 个死链",
+          "资产合规扫描：命中 1 处授权即将到期（cases/auto-oem/logo.svg）"
+        ]
+      },
+      {
+        id: "rv-kb",
+        name: "部门知识库站点",
+        kind: "站点", change: "导航结构调整",
+        site: { ink: "#1a56c4", c1: "#eef4ff", c2: "#e6eefc", layout: "lines" },
+        project: "研发效能知识沉淀",
+        partner: "建站搭档",
+        time: "1 小时前",
+        risk: "high",
+        status: "待确认",
+        target: "sh-kb",
+        summary: "把 5 个一级栏目合并成 3 个，搜索挪到了顶部。",
+        what: [
+          "一级导航从 5 个栏目合并成 3 个：上手、规范、排障",
+          "搜索框从侧栏挪到顶部，任何页面都能直接搜",
+          "给每篇文档自动加了「最后更新时间」和「谁维护」"
+        ],
+        checks: [
+          { ok: true, text: "全部 138 篇文档都能正常打开" },
+          { ok: true, text: "搜索在所有页面可用，中文分词正常" },
+          { ok: false, text: "栏目合并会让 12 个旧链接失效",
+            ask: "需要你判断：这 12 个链接在几个群里被转发过。是做自动跳转到新地址，还是保留旧页面做提示？" }
+        ],
+        fromVersion: "v4", toVersion: "v5",
+        files: [
+          { name: "config/nav.ts", add: 28, del: 46, flag: "12 个旧链接受影响", diff: [
+            { t: "ctx", n: 1, s: "export const nav = [" },
+            { t: "del", n: 2, s: "  { key: \"start\",   label: \"快速上手\" }," },
+            { t: "del", n: 3, s: "  { key: \"install\", label: \"安装部署\" }," },
+            { t: "del", n: 4, s: "  { key: \"spec\",    label: \"编码规范\" }," },
+            { t: "del", n: 5, s: "  { key: \"review\",  label: \"评审规范\" }," },
+            { t: "del", n: 6, s: "  { key: \"trouble\", label: \"故障排查\" }," },
+            { t: "add", n: 2, s: "  { key: \"start\",   label: \"上手\",  merges: [\"install\"] }," },
+            { t: "add", n: 3, s: "  { key: \"spec\",    label: \"规范\",  merges: [\"review\"] }," },
+            { t: "add", n: 4, s: "  { key: \"trouble\", label: \"排障\" }," },
+            { t: "ctx", n: 5, s: "];" },
+            { t: "ctx", n: 6, s: "" },
+            { t: "del", n: 7, s: "// TODO: 合并栏目后需要处理历史路径" },
+            { t: "add", n: 7, s: "// 历史路径未做跳转 —— 见自检第 3 项" }
+          ]},
+          { name: "components/SearchBar.tsx", add: 74, del: 12, diff: [
+            { t: "del", n: 8, s: "  <aside className=\"sidebar\">" },
+            { t: "del", n: 9, s: "    <SearchBar scope=\"section\" />" },
+            { t: "del", n: 10, s: "  </aside>" },
+            { t: "add", n: 8, s: "  <header className=\"site-header\">" },
+            { t: "add", n: 9, s: "    <SearchBar scope=\"global\" placeholder=\"搜全部 138 篇文档\" />" },
+            { t: "add", n: 10, s: "  </header>" }
+          ]},
+          { name: "lib/doc-meta.ts", add: 51, del: 0, diff: [
+            { t: "add", n: 1, s: "export function docMeta(doc) {" },
+            { t: "add", n: 2, s: "  return { updatedAt: doc.git.lastCommit, owner: doc.frontmatter.owner };" },
+            { t: "add", n: 3, s: "}" }
+          ]}
+        ],
+        log: [
+          "构建通过：138 篇文档全部生成",
+          "全站链接扫描：命中 12 条将失效的历史路径",
+          "搜索索引重建：138 篇，耗时 3.2 秒"
+        ]
+      },
+      {
+        id: "rv-launch",
+        name: "新品发布活动页",
+        kind: "站点", change: "准备第一次上线",
+        site: { ink: "#a66300", c1: "#fff7e6", c2: "#ffeccc", layout: "hero" },
+        project: "Q3 新品上市推广",
+        partner: "建站搭档",
+        time: "3 小时前",
+        risk: "high",
+        status: "待确认",
+        target: "sh-launch",
+        summary: "页面做完了，报名表单也通了，等你决定发给谁。",
+        what: [
+          "按品牌规范做完整页：首屏、卖点、报名表单、倒计时",
+          "报名数据存到你指定的那张表里，已试提交过 1 条并核对无误",
+          "配了自定义域名，证书已签发"
+        ],
+        checks: [
+          { ok: true, text: "三种屏幕尺寸下排版正常" },
+          { ok: true, text: "报名表单可提交，数据已进指定表格" },
+          { ok: true, text: "对外合规扫描：无未公开的产品参数" },
+          { ok: true, text: "打开速度 1.1 秒，符合对外页面要求" },
+          { ok: true, text: "域名与证书就绪，可直接对外访问" }
+        ],
+        fromVersion: "—", toVersion: "v1",
+        files: [
+          { name: "app/launch/page.tsx", add: 342, del: 0, diff: [
+            { t: "add", n: 1, s: "export default function LaunchPage() {" },
+            { t: "add", n: 2, s: "  return (" },
+            { t: "add", n: 3, s: "    <main>" },
+            { t: "add", n: 4, s: "      <Hero countdownTo=\"2026-09-01T10:00:00+08:00\" />" },
+            { t: "add", n: 5, s: "      <Highlights items={features} />" },
+            { t: "add", n: 6, s: "      <SignupForm target=\"sheet://q3-launch-signup\" />" },
+            { t: "add", n: 7, s: "    </main>" },
+            { t: "add", n: 8, s: "  );" },
+            { t: "add", n: 9, s: "}" }
+          ]},
+          { name: "app/launch/SignupForm.tsx", add: 128, del: 0, diff: [
+            { t: "add", n: 12, s: "  async function onSubmit(data) {" },
+            { t: "add", n: 13, s: "    const res = await fetch(\"/api/signup\", { method: \"POST\", body: JSON.stringify(data) });" },
+            { t: "add", n: 14, s: "    if (!res.ok) return setError(\"提交失败，请稍后再试\");" },
+            { t: "add", n: 15, s: "    setDone(true);" },
+            { t: "add", n: 16, s: "  }" }
+          ]},
+          { name: "app/api/signup/route.ts", add: 64, del: 0, diff: [
+            { t: "add", n: 1, s: "export async function POST(req) {" },
+            { t: "add", n: 2, s: "  const body = await req.json();" },
+            { t: "add", n: 3, s: "  await sheets.append(SHEET_ID, [body.name, body.phone, body.company]);" },
+            { t: "add", n: 4, s: "  return Response.json({ ok: true });" },
+            { t: "add", n: 5, s: "}" }
+          ]},
+          { name: "styles/launch.css", add: 96, del: 0, diff: [
+            { t: "add", n: 1, s: ".hero { min-height: 68vh; display: grid; place-items: center; }" },
+            { t: "add", n: 2, s: "@media (max-width: 768px) { .hero { min-height: 52vh; } }" }
+          ]}
+        ],
+        log: [
+          "构建通过，产物 218KB（gzip 后 74KB）",
+          "端到端试跑报名流程 1 次，数据落表成功",
+          "Lighthouse：性能 96 / 可访问性 100 / SEO 100"
+        ]
+      },
+      {
+        id: "rv-join",
+        name: "招聘落地页",
+        kind: "站点", change: "配色微调",
+        site: { ink: "#17864a", c1: "#eaf7ee", c2: "#e0f0e8", layout: "lines" },
+        project: "市场部品牌站群",
+        partner: "建站搭档",
+        time: "昨天",
+        risk: "low",
+        status: "已自动通过",
+        target: null,
+        summary: "只动了颜色，没碰内容和表单，按低风险规则已自动通过。",
+        what: [
+          "主色调统一到品牌绿，与其它几个站保持一致",
+          "按钮对比度提高，深色模式下不再发灰"
+        ],
+        checks: [
+          { ok: true, text: "只改了样式，没有触碰内容与表单逻辑" },
+          { ok: true, text: "深浅两种模式对比度都达标" },
+          { ok: true, text: "低风险改动，按你设置的规则自动通过（可随时改回逐条确认）" }
+        ],
+        fromVersion: "v2", toVersion: "v3",
+        files: [{ name: "styles/theme.css", add: 18, del: 6, diff: [
+          { t: "ctx", n: 4, s: ":root {" },
+          { t: "del", n: 5, s: "  --brand: #2f7a52;" },
+          { t: "del", n: 6, s: "  --brand-on: #e8f3ec;" },
+          { t: "add", n: 5, s: "  --brand: #17864a;        /* 统一到品牌绿 */" },
+          { t: "add", n: 6, s: "  --brand-on: #ffffff;     /* 对比度 4.5:1 → 7.1:1 */" },
+          { t: "ctx", n: 7, s: "}" }
+        ]}],
+        log: ["样式改动，未触发内容与数据校验流程"]
+      }
+    ];
+
+    const SHIPPED_ITEMS = [
+      {
+
+        history: [
+          { v: "v7", state: "待发布", time: "12 分钟前", who: "建站搭档", what: "新增 3 个案例页 + 首页改版", reviewId: "rv-cases" },
+          { v: "v6", state: "正式版", time: "3 小时前", who: "建站搭档", what: "修复移动端导航遮挡首屏" },
+          { v: "v5", state: "已回滚", time: "2 天前", who: "建站搭档", what: "首页换成视频背景（加载过慢，已回滚）" },
+          { v: "v4", state: "历史", time: "5 天前", who: "你", what: "手工调整了 3 处文案" },
+          { v: "v3", state: "历史", time: "1 周前", who: "建站搭档", what: "接入案例内容管理" }
+        ],
+        id: "sh-cases", kind: "app", name: "客户案例展示站", project: "市场部品牌站群",
+        site: { ink: "#6f3cd8", c1: "#efe9fd", c2: "#e0edff", layout: "grid" },
+        stage: "live", version: "v6", pendingVersion: "v7", updated: "3 小时前",
+        url: "cases.yourcorp.work.huaweicloud.com",
+        scopeKind: "link", scope: "组织内所有人", users: 214, opens: 1820, errors: 0,
+        note: "1 个改动等你确认", reviewId: "rv-cases"
+      },
+      {
+
+        history: [
+          { v: "v5", state: "待发布", time: "1 小时前", who: "建站搭档", what: "导航结构调整：5 个栏目合并成 3 个", reviewId: "rv-kb" },
+          { v: "v4", state: "正式版", time: "1 天前", who: "建站搭档", what: "新增 12 篇排障文档" },
+          { v: "v3", state: "历史", time: "4 天前", who: "建站搭档", what: "全站搜索接入" },
+          { v: "v2", state: "历史", time: "2 周前", who: "你", what: "补充上手指引" }
+        ],
+        id: "sh-kb", kind: "app", name: "部门知识库站点", project: "研发效能知识沉淀",
+        site: { ink: "#1a56c4", c1: "#eef4ff", c2: "#e6eefc", layout: "lines" },
+        stage: "live", version: "v4", pendingVersion: "v5", updated: "1 小时前",
+        url: "kb.yourcorp.work.huaweicloud.com",
+        scopeKind: "team", scope: "研发部 86 人", users: 86, opens: 642, errors: 0,
+        note: "1 个改动等你确认", reviewId: "rv-kb"
+      },
+      {
+
+        history: [
+          { v: "v2", state: "预览版", time: "3 小时前", who: "建站搭档", what: "补齐倒计时与移动端排版", reviewId: "rv-launch" },
+          { v: "v1", state: "历史", time: "昨天", who: "建站搭档", what: "首版页面与报名表单" }
+        ],
+        id: "sh-launch", kind: "app", name: "新品发布活动页", project: "Q3 新品上市推广",
+        site: { ink: "#a66300", c1: "#fff7e6", c2: "#ffeccc", layout: "hero" },
+        stage: "preview", version: "v2", pendingVersion: null, updated: "3 小时前",
+        url: "q3-launch.preview.work.huaweicloud.com",
+        scopeKind: "invited", scope: "受邀的 4 人", users: 4, opens: 27, errors: 0
+      },
+      {
+
+        history: [
+          { v: "v3", state: "正式版", time: "2 天前", who: "建站搭档", what: "配色统一到品牌绿（低风险自动通过）" },
+          { v: "v2", state: "历史", time: "1 周前", who: "建站搭档", what: "岗位列表改为自动同步" },
+          { v: "v1", state: "历史", time: "3 周前", who: "你", what: "首版落地页" }
+        ],
+        id: "sh-join", kind: "app", name: "招聘落地页", project: "市场部品牌站群",
+        site: { ink: "#17864a", c1: "#eaf7ee", c2: "#e0f0e8", layout: "lines" },
+        stage: "live", version: "v3", pendingVersion: null, updated: "2 天前",
+        url: "join.yourcorp.work.huaweicloud.com",
+        scopeKind: "link", scope: "组织内所有人", users: 96, opens: 430, errors: 2,
+        handoff: true, handoffNote: "已交专业开发（要接入内部招聘系统）"
+      },
+      {
+
+        history: [
+          { v: "v1", state: "草稿版", time: "昨天", who: "建站搭档", what: "首版表单页，还没发布过" }
+        ],
+        id: "sh-feedback", kind: "app", name: "客户反馈收集页", project: "市场部品牌站群",
+        site: { ink: "#6e6e6e", c1: "#f5f5f5", c2: "#ebebeb", layout: "hero" },
+        stage: "draft", version: "v1", pendingVersion: null, updated: "昨天",
+        url: null,
+        scopeKind: "private", scope: "仅自己可见", users: 1, opens: 3, errors: 0
+      },
+      {
+
+        history: [
+          { v: "v4", state: "已交付", time: "5 天前", who: "建站搭档", what: "补充站群导航收敛方案" },
+          { v: "v3", state: "历史", time: "1 周前", who: "你", what: "调整了栏目优先级" }
+        ],
+        id: "sh-ia", kind: "doc", name: "品牌站群信息架构方案", project: "市场部品牌站群",
+        site: { ink: "#5b2fb4", c1: "#f6f2fe", c2: "#efe9fd", layout: "lines" },
+        stage: "done", version: "v4", updated: "5 天前", url: null,
+        scopeKind: "invited", scope: "已交付给 6 人", users: 6, opens: 41, errors: 0
+      },
+      {
+
+        history: [
+          { v: "v2", state: "已交付", time: "1 周前", who: "建站搭档", what: "补充对外文案合规清单" },
+          { v: "v1", state: "历史", time: "3 周前", who: "建站搭档", what: "首版规范" }
+        ],
+        id: "sh-guide", kind: "doc", name: "站点内容与文案规范", project: "市场部品牌站群",
+        site: { ink: "#1a56c4", c1: "#eef4ff", c2: "#e6eefc", layout: "lines" },
+        stage: "done", version: "v2", updated: "1 周前", url: null,
+        scopeKind: "invited", scope: "已交付给 4 人", users: 4, opens: 18, errors: 0
+      }
+    ];
+
+    const reviewState = { filter: "待确认", activeId: null, tab: "what", rejectReason: null, publishTarget: null, revertTarget: null, publishScope: "preview" };
+    const shippedState = { tab: "app" };
+
+    /* 画一个迷你网站：顶栏 + 首屏 + 内容，比抽象图标直观 */
+    function siteThumb(site, cls, muted) {
+      const body = site.layout === "grid"
+        ? '<span class="st-grid">' + '<span class="st-cell"></span>'.repeat(6) + '</span>'
+        : site.layout === "hero"
+          ? '<span class="st-lines"><span class="st-line"></span><span class="st-line is-short"></span></span>'
+          : '<span class="st-lines"><span class="st-line"></span><span class="st-line"></span><span class="st-line is-short"></span></span>';
+      return '<span class="' + cls + ' site-thumb' + (muted ? ' is-muted' : '') + '" aria-hidden="true" ' +
+        'style="--st-ink:' + site.ink + ';--st-1:' + site.c1 + ';--st-2:' + site.c2 + '">' +
+        '<span class="st-bar"><span class="st-dot"></span><span class="st-dot"></span><span class="st-dot"></span></span>' +
+        '<span class="st-hero"></span>' + body + '</span>';
+    }
+
+    function pendingReviewCount() {
+      return REVIEW_ITEMS.filter((r) => r.status === "待确认").length;
+    }
+
+    function syncReviewBadge() {
+      const badge = el("reviewNavBadge");
+      if (!badge) return;
+      const n = pendingReviewCount();
+      badge.textContent = n;
+      badge.hidden = n === 0;
+    }
+
+    function riskPill(risk) {
+      return risk === "high"
+        ? '<span class="rv-pill is-high"><i class="ph ph-warning-circle"></i>需要你拍板</span>'
+        : '<span class="rv-pill is-low"><i class="ph ph-check-circle"></i>低风险 · 已自动通过</span>';
+    }
+
+    /* ---------- 改动：队列 + 常驻详情 ---------- */
+
+    const RV_GROUPS = [
+      { key: "needs",  label: "等你判断",   icon: "ph-warning",      cls: "is-warn" },
+      { key: "clean",  label: "可以直接发", icon: "ph-check-circle", cls: "is-ok" },
+      { key: "auto",   label: "已自动通过", icon: "ph-fast-forward", cls: "" }
+    ];
+
+    function reviewGroupOf(item) {
+      if (item.status === "已自动通过") return "auto";
+      if (item.status !== "待确认") return null;
+      return item.checks.some((c) => !c.ok) ? "needs" : "clean";
+    }
+
+    function openReviewList() {
+      const items = REVIEW_ITEMS.filter((r) => reviewGroupOf(r));
+      return items;
+    }
+
+    function renderReviewCenter() {
+      syncReviewBadge();
+      const items = openReviewList();
+      const q = el("reviewQueue");
+
+      const pendingN = items.filter((i) => reviewGroupOf(i) !== "auto").length;
+      let html =
+        '<div class="rv-queue-head"><strong>待处理</strong>' +
+        '<span>' + (pendingN ? '还剩 ' + pendingN + ' 条' : '已清空') + '</span></div>';
+
+      RV_GROUPS.forEach((g) => {
+        const group = items.filter((i) => reviewGroupOf(i) === g.key);
+        if (!group.length) return;
+        html += '<div class="rv-group-label ' + g.cls + '"><i class="ph ' + g.icon + '"></i>' + g.label +
+                '<span class="rv-group-n">' + group.length + '</span></div>';
+        html += group.map((item) => (
+          '<button class="rv-q-item' +
+            (g.key === "needs" ? " needs-you" : "") +
+            (g.key === "clean" ? " is-clean" : "") +
+            (g.key === "auto" ? " is-auto" : "") +
+            (item.id === reviewState.activeId ? " is-on" : "") +
+            '" data-review-open="' + item.id + '">' +
+            '<span class="rv-q-title">' + item.name + '</span>' +
+            '<span class="rv-q-change">' + item.change + '</span>' +
+            '<span class="rv-q-meta">' +
+              '<span class="rv-q-ver">' + item.fromVersion + ' → ' + item.toVersion + '</span>' +
+              '<span>' + item.time + '</span>' +
+            '</span>' +
+          '</button>'
+        )).join("");
+      });
+
+      if (!items.length) html += '<div class="rv-q-empty">没有等你过目的改动</div>';
+      q.innerHTML = html;
+
+      qsa("[data-review-open]").forEach((btn) => {
+        btn.addEventListener("click", () => openReviewDetail(btn.dataset.reviewOpen));
+      });
+
+      /* 常驻详情：没选就自动选第一条待处理的 */
+      const still = items.find((i) => i.id === reviewState.activeId);
+      if (still) openReviewDetail(still.id, true);
+      else if (items.length) openReviewDetail(items[0].id, true);
+      else {
+        el("reviewDetailPanel").hidden = true;
+        el("reviewEmpty").hidden = false;
+      }
+    }
+
+    /* 处理完一条 → 自动跳到下一条，队列心智的关键 */
+    function advanceReview() {
+      const items = openReviewList();
+      const next = items.find((i) => reviewGroupOf(i) !== "auto") || items[0];
+      reviewState.activeId = next ? next.id : null;
+      renderReviewCenter();
+    }
+
+    function openReviewDetail(id, keepQueue) {
+      const item = REVIEW_ITEMS.find((r) => r.id === id);
+      if (!item) return;
+      const changed = reviewState.activeId !== id;
+      reviewState.activeId = id;
+      if (changed) { reviewState.tab = "what"; reviewState.rejectReason = null; }
+
+      el("reviewEmpty").hidden = true;
+      el("reviewDetailPanel").hidden = false;
+      el("reviewDetailTitle").textContent = item.name + "：" + item.change;
+
+      el("reviewDetailMeta").innerHTML =
+        '<span><i class="ph ph-browser"></i>' + item.kind + '</span>' +
+        '<span><i class="ph ph-folder"></i>' + item.project + '</span>' +
+        '<span><i class="ph ph-robot"></i>' + item.partner + '</span>' +
+        '<span><i class="ph ph-clock"></i>' + item.time + '</span>';
+
+      /* 版本区间条 */
+      const site = SHIPPED_ITEMS.find((x) => x.id === item.target);
+      el("reviewVerLine").innerHTML =
+        '<i class="ph ph-git-branch"></i>' +
+        '<span>发布后这个站会从 <b>' + item.fromVersion + '</b> 走到 <b>' + item.toVersion + '</b>' +
+        (site ? '，当前正式版是 <b>' + site.version + '</b>' : '') + '</span>' +
+        '<span class="rv-verline-ops">' +
+          (site ? '<button class="button button-tertiary button-compact" data-open-versions="' + site.id + '"><i class="ph ph-git-diff"></i>对比上一版</button>' : '') +
+          '<button class="button button-tertiary button-compact" data-open-code="0"><i class="ph ph-code"></i>看代码</button>' +
+        '</span>';
+
+      el("reviewWhatList").innerHTML = item.what.map((w) => '<li>' + w + '</li>').join("");
+
+      const warn = item.checks.filter((c) => !c.ok);
+      el("reviewCheckCount").textContent = (item.checks.length - warn.length) + '/' + item.checks.length + ' 项通过';
+      el("reviewChecks").innerHTML = item.checks.map((c) => (
+        c.ok
+          ? '<div class="rv-check is-ok"><i class="ph ph-check-circle"></i><span>' + c.text + '</span></div>'
+          : '<div class="rv-check is-warn"><i class="ph ph-warning"></i><span>' + c.text +
+            '<span class="rv-check-ask">' + c.ask + '</span></span></div>'
+      )).join("");
+
+      /* 文件列表：可点开代码 */
+      el("reviewFileList").innerHTML = item.files.map((f, i) => (
+        '<button class="rv-file" data-open-code="' + i + '" style="width:100%;background:none;border-width:0 0 1px 0;cursor:pointer;font-family:inherit;text-align:left">' +
+          '<i class="ph ph-file"></i><span class="rv-file-name">' + f.name + '</span>' +
+          (f.flag ? '<span class="rv-pill is-high" style="margin-left:8px"><i class="ph ph-warning"></i>' + f.flag + '</span>' : '') +
+          '<span class="rv-file-delta"><span class="rv-add">+' + f.add + '</span> <span class="rv-del">-' + f.del + '</span>' +
+          ' <i class="ph ph-arrow-square-out" style="margin-left:6px"></i></span>' +
+        '</button>'
+      )).join("");
+
+      el("reviewRunLog").innerHTML = item.log.map((l) => (
+        '<div class="rv-file"><i class="ph ph-caret-right"></i><span class="rv-file-name">' + l + '</span></div>'
+      )).join("");
+
+      const auto = item.status === "已自动通过";
+      el("reviewDecisionBar").hidden = auto;
+      el("reviewDecisionHint").innerHTML = auto
+        ? '低风险改动，已按你的规则自动通过'
+        : warn.length
+          ? '<strong>' + warn.length + ' 项待你判断</strong> · 处理完再发布更稳妥'
+          : '自检全部通过 · 可以直接发布';
+
+      qsa("[data-open-code]").forEach((b) => b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openCodeDrawer(item.id, parseInt(b.dataset.openCode, 10) || 0);
+      }));
+      qsa("[data-open-versions]").forEach((b) => b.addEventListener("click", () => openVersionDrawer(b.dataset.openVersions)));
+
+      setReviewTab(reviewState.tab || "what");
+      el("reviewRejectBox").hidden = true;
+
+      if (!keepQueue) {
+        qsa(".rv-q-item").forEach((n) => n.classList.toggle("is-on", n.dataset.reviewOpen === id));
+      }
+    }
+
+    function backToReviewList() { /* 收件箱式 IA 下不再有「返回列表」，详情常驻 */ }
+
+    function setReviewTab(tab) {
+      reviewState.tab = tab;
+      qsa("[data-review-tab]").forEach((b) => b.classList.toggle("is-on", b.dataset.reviewTab === tab));
+      el("reviewTabWhat").hidden = tab !== "what";
+      el("reviewTabDetail").hidden = tab !== "detail";
+    }
+
+    /* ---------- 看代码抽屉 ---------- */
+
+    function openDrawer(id) {
+      el(id).classList.add("is-open");
+      qsa('[data-drawer-close="' + id + '"]').forEach((n) => {
+        if (n.classList.contains("side-drawer-mask")) n.classList.add("is-open");
+      });
+    }
+    function closeDrawer(id) {
+      el(id)?.classList.remove("is-open");
+      qsa('[data-drawer-close="' + id + '"]').forEach((n) => n.classList.remove("is-open"));
+    }
+
+    function renderCodeFile(item, idx) {
+      const f = item.files[idx];
+      el("codeDrawerPath").textContent = f.name;
+      el("codeDrawerDelta").innerHTML = '<span class="rv-add">+' + f.add + '</span> <span class="rv-del">-' + f.del + '</span>';
+      qsa(".cd-file-tab").forEach((t) => t.classList.toggle("is-on", t.dataset.codeFile === String(idx)));
+
+      const lines = (f.diff || []).map((d) => (
+        '<div class="cd-line' + (d.t === "add" ? " is-add" : d.t === "del" ? " is-del" : "") + '">' +
+          '<span class="cd-line-n">' + (d.n || "") + '</span>' +
+          '<span class="cd-line-sign">' + (d.t === "add" ? "+" : d.t === "del" ? "-" : " ") + '</span>' +
+          '<span class="cd-line-s">' + (d.s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</span>' +
+        '</div>'
+      )).join("");
+
+      el("codeDrawerCode").innerHTML =
+        (f.flag ? '<div class="cd-flag-note"><i class="ph ph-warning"></i><span>这个文件就是自检拦下来的地方：<strong>' + f.flag + '</strong></span></div>' : '') +
+        lines;
+      el("sd-body-scroll") && (el("sd-body-scroll").scrollTop = 0);
+    }
+
+    /* 同名文件（多个 page.tsx）要能分清，按需多带一级目录 */
+    function shortPath(name, all) {
+      const base = name.split("/").pop();
+      const dup = all.filter((x) => x.name.split("/").pop() === base).length > 1;
+      if (!dup) return base;
+      const parts = name.split("/");
+      return parts.slice(-2).join("/");
+    }
+
+    function openCodeDrawer(reviewId, idx) {
+      const item = REVIEW_ITEMS.find((r) => r.id === reviewId);
+      if (!item) return;
+      el("codeDrawerTitle").textContent = item.name;
+      el("codeDrawerSub").textContent = item.change + " · " + item.fromVersion + " → " + item.toVersion;
+      el("codeDrawerFiles").innerHTML = item.files.map((f, i) => (
+        '<button class="cd-file-tab' + (i === idx ? " is-on" : "") + '" data-code-file="' + i + '">' +
+          (f.flag ? '<span class="cd-flag"></span>' : '') +
+          shortPath(f.name, item.files) +
+        '</button>'
+      )).join("");
+      qsa("[data-code-file]").forEach((t) => t.addEventListener("click", () => renderCodeFile(item, parseInt(t.dataset.codeFile, 10))));
+      renderCodeFile(item, idx);
+      openDrawer("codeDrawer");
+    }
+
+    /* ---------- 版本记录抽屉 ---------- */
+
+    const VER_STATE_PILL = {
+      "正式版": "is-live", "预览版": "is-preview", "草稿版": "is-draft",
+      "待发布": "is-high", "已回滚": "is-rolled", "已交付": "is-live", "历史": "is-hist"
+    };
+
+    function openVersionDrawer(siteId) {
+      const site = SHIPPED_ITEMS.find((i) => i.id === siteId);
+      if (!site || !site.history) return;
+      reviewState.revertTarget = siteId;
+      el("versionDrawerTitle").textContent = "版本记录 · " + site.name;
+      el("versionDrawerSub").textContent = "共 " + site.history.length + " 版，当前正式版 " + site.version;
+
+      el("versionTimeline").innerHTML = site.history.map((h) => {
+        const isCurrent = h.v === site.version && h.state !== "待发布";
+        let ops = '';
+        if (h.state === "待发布") {
+          ops = '<button class="button button-primary button-compact" data-ver-review="' + (h.reviewId || "") + '"><i class="ph ph-seal-check"></i>去确认</button>';
+        } else if (isCurrent) {
+          ops = '<button class="button button-tertiary button-compact" data-ver-open="' + h.v + '"><i class="ph ph-eye"></i>打开这一版</button>';
+        } else {
+          ops = '<button class="button button-tertiary button-compact" data-ver-open="' + h.v + '"><i class="ph ph-eye"></i>看这一版</button>' +
+                '<button class="button button-secondary button-compact" data-ver-restore="' + h.v + '"><i class="ph ph-arrow-counter-clockwise"></i>还原到这一版</button>';
+        }
+        return (
+          '<div class="vt-item' + (isCurrent ? " is-current" : "") + '">' +
+            '<div><span class="vt-v">' + h.v + '</span><span class="vt-when">' + h.time + '</span></div>' +
+            '<div class="vt-main">' +
+              '<div class="vt-top">' +
+                '<span class="rv-pill ' + (VER_STATE_PILL[h.state] || "is-hist") + '">' + h.state + '</span>' +
+                (isCurrent ? '<span class="vt-who">← 现在线上跑的就是这一版</span>' : '<span class="vt-who">' + h.who + '</span>') +
+              '</div>' +
+              '<p class="vt-what">' + h.what + '</p>' +
+              '<div class="vt-ops">' + ops + '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+
+      qsa("[data-ver-open]").forEach((b) => b.addEventListener("click", () =>
+        showToast("原型演示：在预览地址打开 " + b.dataset.verOpen + "，不影响线上正式版")));
+      qsa("[data-ver-review]").forEach((b) => b.addEventListener("click", () => {
+        closeDrawer("versionDrawer");
+        showResourceCenter("review");
+        if (b.dataset.verReview) openReviewDetail(b.dataset.verReview);
+      }));
+      qsa("[data-ver-restore]").forEach((b) => b.addEventListener("click", () => {
+        const target = b.dataset.verRestore;
+        const it = SHIPPED_ITEMS.find((i) => i.id === reviewState.revertTarget);
+        if (it) {
+          it.history.forEach((h) => { if (h.state === "正式版") h.state = "历史"; });
+          const hit = it.history.find((h) => h.v === target);
+          if (hit) hit.state = "正式版";
+          it.version = target;
+          it.errors = 0;
+          it.updated = "刚刚";
+        }
+        openVersionDrawer(reviewState.revertTarget);
+        renderShipped();
+        showToast("已还原到 " + target + "。线上立刻生效，其它版本都还在，随时可以再切回来");
+      }));
+
+      openDrawer("versionDrawer");
+    }
+
+    /* ---------- 站点 ---------- */
+
+    const STAGE_META = {
+      draft:   { label: "草稿副本", pill: "is-draft",   hint: "随便改，不影响别人正在用的版本" },
+      preview: { label: "预览版",   pill: "is-preview", hint: "只有受邀的人能打开" },
+      live:    { label: "正式版",   pill: "is-live",    hint: "已经在被人使用" },
+      done:    { label: "已交付",   pill: "is-live",    hint: "一次性交付物，保留版本记录" }
+    };
+
+    function stageBar(stage) {
+      if (stage === "done") return "";
+      const order = ["draft", "preview", "live"];
+      const at = order.indexOf(stage);
+      return '<div class="sh-stages">' + order.map((k, i) => (
+        (i ? '<i class="ph ph-caret-right sh-stage-arrow"></i>' : '') +
+        '<div class="sh-stage' + (i === at ? " is-on" : "") + '">' +
+          '<strong>' + STAGE_META[k].label + '</strong>' +
+          '<span>' + (i < at ? "已过" : i === at ? "当前" : "未开始") + '</span>' +
+        '</div>'
+      )).join("") + '</div>';
+    }
+
+    const SCOPE_META = {
+      private: { icon: "ph-lock-simple", cls: "is-private" },
+      invited: { icon: "ph-users-three", cls: "" },
+      team:    { icon: "ph-buildings",   cls: "" },
+      link:    { icon: "ph-globe-hemisphere-east", cls: "is-public" }
+    };
+
+    function stageMini(stage) {
+      if (stage === "done") return '';
+      const order = [["draft", "草稿"], ["preview", "预览"], ["live", "正式"]];
+      const at = order.findIndex((o) => o[0] === stage);
+      return '<span class="sh-stage-mini">' + order.map((o, i) => (
+        (i ? '<span>›</span>' : '') + '<b class="' + (i === at ? "is-now" : "") + '">' + o[1] + '</b>'
+      )).join("") + '</span>';
+    }
+
+    function renderShipped() {
+      /* 同样不放大数字，只说「现在有什么要处理」 */
+      const kpis = el("shippedKpis");
+      const live = SHIPPED_ITEMS.filter((i) => i.stage === "live");
+      const users = live.reduce((n, i) => n + i.users, 0);
+      const pending = SHIPPED_ITEMS.filter((i) => i.pendingVersion).length;
+      const broken = SHIPPED_ITEMS.filter((i) => i.errors > 0).length;
+      if (kpis) {
+        kpis.className = "rv-summary-line";
+        kpis.innerHTML =
+          '<span class="is-ok"><i class="ph ph-broadcast"></i><b>' + live.length + '</b> 个在跑，<b>' + users + '</b> 人在用</span>' +
+          (pending ? '<span class="is-warn"><i class="ph ph-seal-check"></i><b>' + pending + '</b> 个有改动等你确认</span>' : '') +
+          (broken ? '<span class="is-warn"><i class="ph ph-warning"></i><b>' + broken + '</b> 个本周报过错，可一键还原</span>' : '') +
+          '<span><i class="ph ph-arrow-bend-up-right"></i><b>1</b> 个已交专业开发</span>';
+      }
+
+      const keyword = (el("shippedSearchInput")?.value || "").trim().toLowerCase();
+      const list = SHIPPED_ITEMS.filter((i) =>
+        i.kind === shippedState.tab &&
+        (!keyword || (i.name + i.project + i.desc).toLowerCase().includes(keyword))
+      );
+
+      el("shippedGrid").innerHTML = list.map((item) => {
+        const stage = STAGE_META[item.stage];
+        const sc = SCOPE_META[item.scopeKind] || SCOPE_META.invited;
+
+        /* 主操作：按当前状态给唯一一个最该做的动作 */
+        let primary;
+        if (item.handoff) {
+          primary = '<button class="button button-secondary button-compact" data-shipped-track="' + item.id + '"><i class="ph ph-arrow-bend-up-right"></i>看开发进度</button>';
+        } else if (item.pendingVersion) {
+          primary = '<button class="button button-primary button-compact" data-shipped-review="' + item.reviewId + '"><i class="ph ph-seal-check"></i>去确认</button>';
+        } else if (item.stage === "draft") {
+          primary = '<button class="button button-secondary button-compact" data-shipped-publish="' + item.id + '"><i class="ph ph-eye"></i>生成预览版</button>';
+        } else if (item.stage === "preview") {
+          primary = '<button class="button button-primary button-compact" data-shipped-publish="' + item.id + '"><i class="ph ph-paper-plane-tilt"></i>发布</button>';
+        } else if (item.stage === "live") {
+          primary = '<button class="button button-secondary button-compact" data-shipped-publish="' + item.id + '"><i class="ph ph-users"></i>改共享范围</button>';
+        } else {
+          primary = '<button class="button button-secondary button-compact" data-shipped-open="' + item.id + '"><i class="ph ph-eye"></i>打开</button>';
+        }
+
+        /* 溢出菜单：Codex 只有「…」，我们把治理动作放进去 */
+        const menu =
+          '<div class="sh-more-menu" hidden>' +
+            '<button class="sh-more-item" data-shipped-open="' + item.id + '"><i class="ph ph-arrow-square-out"></i>打开站点</button>' +
+            '<button class="sh-more-item" data-shipped-versions="' + item.id + '"><i class="ph ph-clock-counter-clockwise"></i>版本记录（共 ' + (item.history ? item.history.length : 1) + ' 版）</button>' +
+            (item.stage === "live"
+              ? '<button class="sh-more-item" data-shipped-revert="' + item.id + '"><i class="ph ph-arrow-counter-clockwise"></i>还原到上一版</button>'
+              : '') +
+            '<div class="sh-more-sep"></div>' +
+            '<div class="sh-more-label">交出去</div>' +
+            (item.handoff
+              ? '<button class="sh-more-item" data-shipped-track="' + item.id + '"><i class="ph ph-arrow-bend-up-right"></i>看开发进度</button>'
+              : '<button class="sh-more-item" data-shipped-handoff="' + item.id + '"><i class="ph ph-arrow-bend-up-right"></i>请专业开发接管</button>') +
+            '<button class="sh-more-item" data-shipped-audit="' + item.id + '"><i class="ph ph-scroll"></i>操作记录</button>' +
+            (item.stage === "live"
+              ? '<div class="sh-more-sep"></div><button class="sh-more-item is-danger" data-shipped-unpublish="' + item.id + '"><i class="ph ph-prohibit"></i>停止访问</button>'
+              : '') +
+          '</div>';
+
+        /* 在用情况 */
+        let liveCol;
+        if (item.stage === "draft") {
+          liveCol = '<div class="sh-live"><strong>还没发布</strong><span>改坏了也不影响别人</span></div>';
+        } else if (item.errors) {
+          liveCol = '<div class="sh-live"><strong>' + item.users + ' 人在用</strong>' +
+                    '<span class="sh-err">本周 ' + item.errors + ' 次报错 · 可一键还原</span></div>';
+        } else if (item.pendingVersion) {
+          liveCol = '<div class="sh-live"><strong>' + item.users + ' 人在用</strong>' +
+                    '<span class="sh-alert">' + item.note + '</span></div>';
+        } else if (item.stage === "done") {
+          liveCol = '<div class="sh-live"><strong>已交付</strong><span>被打开 ' + item.opens + ' 次</span></div>';
+        } else {
+          liveCol = '<div class="sh-live"><strong>' + item.users + ' 人在用</strong>' +
+                    '<span>本周打开 ' + item.opens + ' 次</span></div>';
+        }
+
+        const sub = item.url
+          ? '<span class="sh-sub-dot">·</span><span class="sh-url">' + item.url + '</span>'
+          : '<span class="sh-sub-dot">·</span><span>' + item.project + '</span>';
+
+        return (
+          '<div class="sh-row" data-shipped-row="' + item.id + '">' +
+            '<div class="sh-main">' +
+              siteThumb(item.site, "sh-thumb", item.stage === "draft") +
+              '<div class="sh-copy">' +
+                '<div class="sh-name-line">' +
+                  '<span class="sh-name">' + item.name + '</span>' +
+                  '<span class="rv-pill ' + stage.pill + '">' + stage.label + ' · ' + item.version + '</span>' +
+                  (item.handoff ? '<span class="rv-pill is-handoff"><i class="ph ph-arrow-bend-up-right"></i>开发中</span>' : '') +
+                '</div>' +
+                '<div class="sh-sub">' + item.updated + sub + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="sh-scope ' + sc.cls + '"><i class="ph ' + sc.icon + '"></i>' + item.scope + '</div>' +
+            liveCol +
+            '<div class="sh-ops">' + primary +
+              '<span class="sh-more-wrap">' +
+                '<button class="icon-button" data-shipped-more="' + item.id + '" aria-label="更多操作" title="更多操作"><i class="ph ph-dots-three"></i></button>' +
+                menu +
+              '</span>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+
+      el("shippedEmpty").hidden = list.length > 0;
+      bindShippedActions();
+    }
+
+    function closeAllShippedMenus() {
+      qsa(".sh-more-menu").forEach((m) => { m.hidden = true; });
+    }
+
+    function bindShippedActions() {
+      qsa("[data-shipped-more]").forEach((b) => b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = b.parentElement.querySelector(".sh-more-menu");
+        const wasOpen = !menu.hidden;
+        closeAllShippedMenus();
+        menu.hidden = wasOpen;
+      }));
+      qsa("[data-shipped-open]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        showToast("原型演示：在新标签页打开这个站点");
+      }));
+      qsa("[data-shipped-versions]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        openVersionDrawer(b.dataset.shippedVersions);
+      }));
+      qsa("[data-shipped-audit]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        showToast("原型演示：谁在什么时候改了什么、发布给了谁，全部可导出");
+      }));
+      qsa("[data-shipped-track]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        showToast("原型演示：跳到码道 IDE 的开发任务，你仍然在这里验收");
+      }));
+      qsa("[data-shipped-unpublish]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        showToast("原型演示：站点立刻停止访问，访客会看到「已下线」页");
+      }));
+      qsa("[data-shipped-review]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        showResourceCenter("review");
+        openReviewDetail(b.dataset.shippedReview);
+      }));
+      qsa("[data-shipped-publish]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        openPublish(b.dataset.shippedPublish);
+      }));
+      qsa("[data-shipped-revert]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        openRevert(b.dataset.shippedRevert);
+      }));
+      qsa("[data-shipped-handoff]").forEach((b) => b.addEventListener("click", () => {
+        closeAllShippedMenus();
+        el("handoffMask").classList.add("is-open");
+      }));
+    }
+
+    document.addEventListener("click", closeAllShippedMenus);
+
+    /* ---------- 发布 / 还原 / 移交 ---------- */
+
+    function openPublish(id) {
+      const item = SHIPPED_ITEMS.find((i) => i.id === id);
+      reviewState.publishTarget = id;
+      reviewState.publishScope = "preview";
+      el("publishTargetName").textContent = item ? item.name : "成果";
+      qsa("[data-publish-scope]").forEach((b) => b.classList.toggle("is-on", b.dataset.publishScope === "preview"));
+      el("publishMask").classList.add("is-open");
+    }
+
+    function openRevert(id) {
+      const item = SHIPPED_ITEMS.find((i) => i.id === id);
+      reviewState.revertTarget = id;
+      if (item) {
+        el("revertSub").innerHTML =
+          '「' + item.name + '」会从 <strong>' + item.version + '</strong> 退回上一版，' +
+          '正在使用的 ' + item.users + ' 人会立刻看到旧版本。这次操作会记进操作记录，随时可以再切回来。';
+      }
+      el("revertMask").classList.add("is-open");
+    }
+
+    function closeSheet(id) { el(id)?.classList.remove("is-open"); }
+
+    /* ---------- 事件绑定 ---------- */
+
+    qsa("[data-review-tab]").forEach((b) => b.addEventListener("click", () => setReviewTab(b.dataset.reviewTab)));
+    qsa("[data-drawer-close]").forEach((b) => b.addEventListener("click", () => closeDrawer(b.dataset.drawerClose)));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { closeDrawer("codeDrawer"); closeDrawer("versionDrawer"); }
+    });
+
+    el("reviewPreviewBtn")?.addEventListener("click", () => showToast("原型演示：在预览地址打开，看到的就是发布后的样子"));
+    el("reviewLaterBtn")?.addEventListener("click", () => {
+      showToast("已放回队列，不会自动上线");
+      advanceReview();
+    });
+
+    const RV_REJECT_REASONS = ["数据不对", "结论下得太满", "不是我要的方向", "缺来源标注", "样式问题", "范围超了"];
+    el("reviewRejectBtn")?.addEventListener("click", () => {
+      const box = el("reviewRejectBox");
+      box.hidden = false;
+      el("reviewRejectReasons").innerHTML = RV_REJECT_REASONS.map((r) => (
+        '<button class="filter-chip" data-rv-reject-reason="' + r + '">' + r + '</button>'
+      )).join("");
+      qsa("[data-rv-reject-reason]").forEach((b) => b.addEventListener("click", () => {
+        reviewState.rejectReason = b.dataset.rvRejectReason;
+        qsa("[data-rv-reject-reason]").forEach((x) => x.classList.toggle("is-selected", x === b));
+      }));
+      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+    el("reviewRejectCancel")?.addEventListener("click", () => { el("reviewRejectBox").hidden = true; });
+    el("reviewRejectSubmit")?.addEventListener("click", () => {
+      if (!reviewState.rejectReason) { showToast("先选一个原因，搭档才知道往哪个方向改"); return; }
+      const item = REVIEW_ITEMS.find((r) => r.id === reviewState.activeId);
+      if (item) item.status = "返工中";
+      el("reviewRejectBox").hidden = true;
+      showToast("已发回去改：只改你圈的这块，其它保留，改完会变成新的一版");
+      syncReviewBadge();
+      advanceReview();
+    });
+
+    el("reviewAcceptBtn")?.addEventListener("click", () => {
+      const item = REVIEW_ITEMS.find((r) => r.id === reviewState.activeId);
+      if (!item) return;
+      const warn = item.checks.filter((c) => !c.ok).length;
+      if (warn) {
+        showToast("还有 " + warn + " 项等你判断，处理完再发布更稳妥（也可以直接发布）");
+      }
+      if (item.target) { openPublish(item.target); }
+      else {
+        item.status = "已发布";
+        showToast("已发布，可在「站点」里随时一键还原");
+        syncReviewBadge();
+        advanceReview();
+      }
+    });
+
+    qsa("[data-publish-scope]").forEach((b) => b.addEventListener("click", () => {
+      reviewState.publishScope = b.dataset.publishScope;
+      qsa("[data-publish-scope]").forEach((x) => x.classList.toggle("is-on", x === b));
+    }));
+
+    el("publishConfirmBtn")?.addEventListener("click", () => {
+      const item = SHIPPED_ITEMS.find((i) => i.id === reviewState.publishTarget);
+      const scopeText = { preview: "已发布预览版，只有受邀的人能打开", team: "已发布给整个部门，32 人可以打开", link: "已生成组织内链接，公司内登录后可访问" };
+      if (item) {
+        if (reviewState.publishScope === "preview") {
+          item.stage = "preview"; item.scopeKind = "invited"; item.scope = "受邀的 4 人"; item.users = 4;
+          if (!item.url) item.url = item.id.replace("sh-", "") + ".preview.work.huaweicloud.com";
+        } else if (reviewState.publishScope === "team") {
+          item.stage = "live"; item.scopeKind = "team"; item.scope = "部门内 32 人"; item.users = 32;
+          if (!item.url) item.url = item.id.replace("sh-", "") + ".work.huaweicloud.com";
+        } else {
+          item.stage = "live"; item.scopeKind = "link"; item.scope = "组织内所有人"; item.users = 128;
+          if (!item.url) item.url = item.id.replace("sh-", "") + ".work.huaweicloud.com";
+        }
+        item.updated = "刚刚";
+        if (item.pendingVersion) { item.version = item.pendingVersion; item.pendingVersion = null; item.note = ""; item.reviewId = null; }
+      }
+      const rv = REVIEW_ITEMS.find((r) => r.id === reviewState.activeId);
+      if (rv) rv.status = "已发布";
+      /* 版本历史：待发布 → 正式版，旧的正式版降为历史 */
+      if (item && item.history) {
+        item.history.forEach((h) => { if (h.state === "正式版" || h.state === "预览版") h.state = "历史"; });
+        const head = item.history.find((h) => h.state === "待发布");
+        if (head) { head.state = reviewState.publishScope === "preview" ? "预览版" : "正式版"; head.time = "刚刚"; item.version = head.v; }
+      }
+      closeSheet("publishMask");
+      showToast(scopeText[reviewState.publishScope] + " · 出问题可一键还原");
+      syncReviewBadge();
+      advanceReview();
+      renderShipped();
+    });
+
+    el("revertConfirmBtn")?.addEventListener("click", () => {
+      const item = SHIPPED_ITEMS.find((i) => i.id === reviewState.revertTarget);
+      if (item) {
+        const n = parseInt(item.version.replace("v", ""), 10);
+        const prev = "v" + Math.max(1, n - 1);
+        if (item.history) {
+          item.history.forEach((h) => { if (h.state === "正式版") h.state = "历史"; });
+          const hit = item.history.find((h) => h.v === prev);
+          if (hit) hit.state = "正式版";
+        }
+        item.version = prev;
+        item.errors = 0;
+        item.updated = "刚刚";
+      }
+      closeSheet("revertMask");
+      showToast("已还原。在用的人现在看到的是上一版，这次操作已记进操作记录");
+      renderShipped();
+    });
+
+    el("handoffConfirmBtn")?.addEventListener("click", () => {
+      closeSheet("handoffMask");
+      showToast("已在码道 IDE 建好开发任务，资料与验收标准一并带过去了");
+    });
+
+    qsa("[data-sheet-close]").forEach((b) => b.addEventListener("click", () => closeSheet(b.dataset.sheetClose)));
+    qsa(".rv-sheet-mask").forEach((mask) => mask.addEventListener("click", (e) => {
+      if (e.target === mask) mask.classList.remove("is-open");
+    }));
+
+    el("shippedSearchInput")?.addEventListener("input", renderShipped);
+    qsa("[data-shipped-tab]").forEach((b) => b.addEventListener("click", () => {
+      shippedState.tab = b.dataset.shippedTab;
+      qsa("[data-shipped-tab]").forEach((x) => x.classList.toggle("is-selected", x === b));
+      renderShipped();
+    }));
+
+    syncReviewBadge();
 
     /* =====================================================================
        工作搭档：统一头部 tab（搭档 / 技能 / 连接器 / 灵感）
@@ -14774,11 +16902,47 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
     }
 
     let toastTimer;
-    function showToast(message) {
-      el("toastText").textContent = message;
+    let toastQueue = [];
+    let toastCurrent = null;
+
+    /* 队列化 toast：快速连续操作不再互相覆盖；可附一个动作按钮（用于“撤销”等） */
+    function showToast(message, opts = {}) {
+      const entry = { message, action: opts.action || null };
+      if (toastCurrent && toastCurrent.message === message) return;
+      if (toastQueue.length && toastQueue[toastQueue.length - 1].message === message) return;
+      toastQueue.push(entry);
+      if (toastQueue.length > 3) toastQueue.shift();
+      if (toastQueue.length === 1) drainToastQueue();
+    }
+    function hideToast() { el("toast").classList.remove("is-visible"); }
+    function renderToast(entry) {
+      el("toastText").textContent = entry.message;
+      const actionBtn = el("toastAction");
+      if (entry.action) {
+        actionBtn.textContent = entry.action.label;
+        actionBtn.hidden = false;
+        actionBtn.onclick = () => {
+          clearTimeout(toastTimer);
+          hideToast();
+          toastCurrent = null;
+          if (entry.action.fn) entry.action.fn();
+          toastTimer = setTimeout(drainToastQueue, 140);
+        };
+      } else {
+        actionBtn.hidden = true;
+        actionBtn.onclick = null;
+      }
       el("toast").classList.add("is-visible");
+    }
+    function drainToastQueue() {
+      if (!toastQueue.length) { toastCurrent = null; return; }
+      toastCurrent = toastQueue.shift();
+      renderToast(toastCurrent);
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el("toast").classList.remove("is-visible"), 2800);
+      toastTimer = setTimeout(() => {
+        hideToast();
+        toastTimer = setTimeout(drainToastQueue, 140);
+      }, 2600);
     }
 
     function bindAudienceButtons() {
@@ -14874,6 +17038,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       });
       project.updatedNote = `刚刚 · 你把「${task.title}」派给了${partner}`;
       el("projectTaskPrompt").value = "";
+      el("pcSendButton").disabled = true;
       state.projectTab = "tasks";
       renderProjectDetail();
       showToast(`已派给 ${partner}，执行时自动带上项目目标、指令与知识`);
@@ -14881,6 +17046,9 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
     el("pcSendButton")?.addEventListener("click", dispatchProjectTask);
     el("projectTaskPrompt")?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) { event.preventDefault(); dispatchProjectTask(); }
+    });
+    el("projectTaskPrompt")?.addEventListener("input", () => {
+      el("pcSendButton").disabled = !(el("projectTaskPrompt").value || "").trim();
     });
     el("pcPartnerButton")?.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -14906,12 +17074,11 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
     el("projectRailToggle")?.addEventListener("click", () => {
       const workbench = el("projectWorkbench");
       const hidden = workbench.classList.toggle("is-rail-hidden");
-      showToast(hidden ? "已收起项目信息栏" : "已展开项目信息栏：指令 / 知识 / 成员 / 动态");
+      showToast(hidden ? "已收起项目信息栏" : "已展开项目信息栏：成员 · 动态");
     });
     el("projectInviteButton")?.addEventListener("click", () => {
-      state.projectTab = "members";
-      renderProjectDetail();
-      showToast("已进入成员视图：可邀请人类成员，或从搭档中心添加搭档成员");
+      focusProjectMembers();
+      showToast("可邀请人类成员，或从搭档中心添加搭档成员");
     });
 
     /* 验收弹窗 */
@@ -15243,7 +17410,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
     });
     el("addExpertButton").addEventListener("click", () => showToast("可从搭档中心邀请或替换成员"));
     el("editTeamButton").addEventListener("click", () => showToast("选择智囊团即可调整成员组合"));
-    el("commandButton")?.addEventListener("click", () => showToast("快捷命令：新建任务 · 搜索搭档 · 打开成果"));
+    el("commandButton")?.addEventListener("click", () => showToast("快捷命令：新建任务 · 搜索搭档 · 打开站点"));
     el("themeButton").addEventListener("click", () => {
       const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
       document.documentElement.dataset.theme = nextTheme;
