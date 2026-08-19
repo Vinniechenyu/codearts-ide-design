@@ -327,6 +327,20 @@
     .titlebar .icon-button { color: var(--text-primary); }
     .titlebar .icon-button:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.32); }
     /* 窗口控制:移到右侧,分割线隔开 */
+    /* 角色视角切换（演示用）：验证决策点 16 */
+    .role-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 24px; padding: 0 9px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-family: inherit; font-size: 11.5px;
+      cursor: pointer; white-space: nowrap;
+    }
+    .role-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+    .role-chip i { font-size: 13px; }
+
     .titlebar-divider { width: 1px; height: 18px; margin: 0 6px; background: var(--border-subtle); align-self: center; flex: none; }
     .window-controls { display: inline-flex; align-items: center; gap: 2px; }
     .window-ctl i { font-size: 13px; }
@@ -7957,6 +7971,113 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       background: var(--surface-primary);
     }
 
+    /* ---------- 活动流（铃铛）----------
+       与「改动」的分工：
+         铃铛 = 搭档干了什么（信息，可以不看）
+         改动 = 什么在等你拍板（闸门，不看就不上线）
+       铃铛顶部会列出等你拍板的事，但点击一律跳进「改动」处理，不在这里处理。
+       ------------------------------------------------------------------ */
+    .bell-wrap { position: relative; display: inline-flex; }
+    .bell-dot {
+      position: absolute; top: 5px; right: 5px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--amber-600);
+      border: 1.5px solid var(--surface-primary);
+    }
+    .bell-dot[hidden] { display: none; }
+
+    .act-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 80;
+      width: 380px;
+      max-height: 72vh;
+      overflow: auto;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elevation-3);
+    }
+    .act-panel[hidden] { display: none; }
+
+    .act-head {
+      position: sticky; top: 0; z-index: 2;
+      display: flex; align-items: center;
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--surface-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13px; font-weight: 600;
+    }
+    .act-head button {
+      margin-left: auto; border: 0; background: transparent;
+      color: var(--text-disabled); font-family: inherit; font-size: 11.5px; cursor: pointer;
+    }
+    .act-head button:hover { color: var(--text-secondary); }
+
+    .act-group {
+      padding: var(--sp-3) var(--sp-4) 5px;
+      color: var(--text-disabled);
+      font-size: 11px; font-weight: 600; letter-spacing: .03em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .act-group.is-todo { color: var(--waiting-text); }
+    .act-group .act-group-n { margin-left: auto; font-weight: 500; }
+
+    .act-item {
+      display: flex; gap: var(--sp-2);
+      width: 100%;
+      padding: 9px var(--sp-4);
+      border: 0; background: transparent;
+      text-align: left; font-family: inherit;
+      cursor: default;
+    }
+    .act-item.is-todo { cursor: pointer; }
+    .act-item.is-todo:hover { background: var(--waiting-soft); }
+    .act-item i { flex: none; margin-top: 2px; font-size: 15px; color: var(--icon-secondary); }
+    .act-item.is-todo i { color: var(--amber-600); }
+    .act-item .act-copy { min-width: 0; flex: 1; }
+    .act-title { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .act-desc {
+      display: block; color: var(--text-secondary); font-size: 11.5px; line-height: 17px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .act-time { flex: none; color: var(--text-disabled); font-size: 10.5px; white-space: nowrap; margin-top: 2px; }
+    .act-go { flex: none; align-self: center; color: var(--waiting-text); font-size: 14px; }
+
+    .act-empty { padding: var(--sp-4); color: var(--text-disabled); font-size: 12px; }
+    .act-foot {
+      padding: 10px var(--sp-4);
+      border-top: 1px solid var(--border-subtle);
+      background: var(--surface-secondary);
+      color: var(--text-tertiary); font-size: 11px; line-height: 16px;
+    }
+
+    /* 导航分组：业务侧 / 工程侧
+       「改动」与 Codebase 的改动 tab 同名是刻意的（一体两面），
+       但导航必须让人看出：一个是跨站点收件箱，一个是按仓库归档。 */
+    .nav-group-sep {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: var(--sp-3) var(--sp-4) 4px;
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-disabled);
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+    .nav-group-help {
+      display: grid; place-items: center;
+      width: 14px; height: 14px;
+      padding: 0; border: 0; border-radius: 50%;
+      background: var(--surface-subtle);
+      color: var(--text-disabled);
+      font-size: 9px; cursor: pointer;
+    }
+    .nav-group-help:hover { background: var(--surface-active); color: var(--text-secondary); }
+    .nav-group-sep[hidden] { display: none; }
+
     /* ---------- 通用：风险与状态 pill ---------- */
     .rv-pill {
       display: inline-flex;
@@ -8316,6 +8437,258 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       resize: vertical;
     }
     .rv-reject textarea:focus { outline: none; border-color: var(--focus-border); }
+
+    /* ---------- Codebase · 仓库列表与详情 ----------
+       骨架借鉴 Cursor Origin（命名空间页 + 3 tab 仓库页），
+       补上它没有的两件事：同步来源状态、Agent 活动。
+       ------------------------------------------------------------------ */
+    /* 命名空间是上下文，不是页面标题——降级为工具栏里的可切换 chip */
+    .cb-nschip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 9px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-family: inherit; font-size: 11.5px;
+      cursor: pointer; white-space: nowrap;
+    }
+    .cb-nschip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+    .cb-nschip i { font-size: 13px; }
+
+    /* 工具栏按钮不换行 */
+    #codebaseCenterView .resource-toolbar .button { white-space: nowrap; flex: none; }
+    #codebaseCenterView .resource-toolbar .resource-search { min-width: 180px; }
+
+    /* 最近打开 */
+    .cb-recent { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-5, 20px); flex-wrap: wrap; }
+    .cb-recent-card {
+      display: flex; align-items: center; gap: var(--sp-2);
+      padding: 10px 13px;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      font-family: inherit; font-size: 12.5px; color: var(--text-primary);
+      cursor: pointer;
+    }
+    .cb-recent-card:hover { border-color: var(--border-hover); box-shadow: var(--elevation-2); }
+
+    /* 仓库表格 */
+    .cb-table { border-top: 1px solid var(--border-subtle); }
+    .cb-thead, .cb-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 178px 186px 150px 36px;
+      gap: var(--sp-3);
+      align-items: center;
+    }
+    .cb-thead {
+      padding: 10px var(--sp-3);
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-disabled); font-size: 11.5px;
+    }
+    .cb-row {
+      padding: var(--sp-3);
+      border-bottom: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease);
+    }
+    .cb-row:hover { background: var(--surface-hover); }
+    @media (max-width: 1160px) {
+      .cb-thead { display: none; }
+      .cb-row { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .cb-repo { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; }
+    .cb-repo-icon {
+      flex: none; width: 26px; height: 26px;
+      display: grid; place-items: center;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+    }
+    .cb-repo-icon.is-native { background: var(--brand-soft); color: var(--brand-solid); border: 1px solid var(--brand-border); }
+    .cb-repo-icon.is-mirror { background: var(--surface-subtle); color: var(--text-tertiary); border: 1px solid var(--border-default); }
+    .cb-repo-name { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .cb-sync { display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; color: var(--text-tertiary); }
+    .cb-sync strong { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+    .cb-sync .cb-gc { color: var(--info-text); }
+
+    /* Agent 活动 —— Cursor 列表没有这一列 */
+    .cb-act { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; }
+    .cb-act-run { display: inline-flex; align-items: center; gap: 5px; color: var(--running-text); font-weight: 600; }
+    .cb-act-run .cb-pulse {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--purple-600);
+      animation: cbPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes cbPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+    .cb-act-wait { color: var(--waiting-text); font-weight: 600; cursor: pointer; }
+    .cb-act-wait:hover { text-decoration: underline; }
+    .cb-act-idle { color: var(--text-disabled); }
+
+    .cb-upd { font-size: 11.5px; color: var(--text-tertiary); }
+    .cb-upd strong { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+
+    /* ---- 仓库详情 ---- */
+    .cb-crumb { display: flex; align-items: center; gap: 6px; margin-bottom: var(--sp-3); font-size: 12.5px; color: var(--text-tertiary); }
+    .cb-crumb .crumb-link { font-size: 12.5px; }
+
+    .cb-repo-head { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+    .cb-repo-head h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+
+    .cb-mirror-note {
+      display: flex; align-items: center; gap: var(--sp-2);
+      padding: 9px 12px; margin-bottom: var(--sp-4);
+      background: var(--info-soft); border: 1px solid var(--info-border);
+      border-radius: var(--radius-md);
+      color: var(--info-text); font-size: 12px;
+    }
+    .cb-mirror-note a { color: inherit; font-weight: 600; }
+    .cb-mirror-note .cb-mirror-ops { margin-left: auto; }
+
+    .cb-tabs { display: flex; gap: var(--sp-1); margin-bottom: var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+    .cb-tab {
+      padding: 8px 13px; border: 0; background: transparent;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      color: var(--text-tertiary); font-family: inherit; font-size: 13px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .cb-tab:hover { color: var(--text-primary); }
+    .cb-tab.is-on { color: var(--text-primary); font-weight: 600; border-bottom-color: var(--brand); }
+    .cb-tab .cb-tab-n {
+      min-width: 17px; height: 17px; padding: 0 5px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--surface-subtle); border-radius: var(--radius-full);
+      font-size: 10.5px; font-weight: 600;
+    }
+    .cb-tab.is-on .cb-tab-n { background: var(--brand-soft); color: var(--brand-text); }
+
+    /* 代码页 */
+    .cb-code-bar { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); flex-wrap: wrap; }
+    .cb-branch {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 11px;
+      background: var(--surface-primary); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      font-size: 12.5px; font-family: inherit; color: var(--text-primary); cursor: pointer;
+    }
+    .cb-code-bar .cb-code-right { margin-left: auto; display: flex; gap: var(--sp-2); }
+
+    .cb-commit-row {
+      display: flex; align-items: center; gap: var(--sp-2);
+      padding: 10px var(--sp-3);
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      font-size: 12.5px;
+    }
+    .cb-avatar {
+      flex: none; width: 20px; height: 20px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 9.5px; font-weight: 600; color: #fff;
+      background: var(--purple-600);
+    }
+    .cb-avatar.is-bot { background: var(--blue-600); }
+    .cb-commit-msg { color: var(--text-secondary); }
+    .cb-commit-right { margin-left: auto; display: flex; align-items: center; gap: var(--sp-3); color: var(--text-disabled); font-size: 11.5px; }
+    .cb-commit-right .cb-hash { font-family: var(--mono); }
+
+    .cb-files { border: 1px solid var(--border-default); border-top: 0; border-radius: 0 0 var(--radius-md) var(--radius-md); overflow: hidden; }
+    .cb-file {
+      display: flex; align-items: center; gap: var(--sp-2);
+      padding: 9px var(--sp-3);
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+    }
+    .cb-file:first-child { border-top: 0; }
+    .cb-file:hover { background: var(--surface-hover); }
+    .cb-file i { color: var(--icon-secondary); font-size: 15px; }
+    .cb-file-name { color: var(--text-primary); }
+    .cb-file-msg { color: var(--text-disabled); margin-left: var(--sp-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cb-file-time { margin-left: auto; color: var(--text-disabled); font-size: 11.5px; white-space: nowrap; }
+
+    .cb-readme {
+      margin-top: var(--sp-4);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .cb-readme-head {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px var(--sp-3);
+      background: var(--surface-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px; color: var(--text-tertiary);
+    }
+    .cb-readme-body { padding: var(--sp-5, 20px); }
+    .cb-readme-body h2 { margin: 0 0 10px; font-size: 17px; }
+    .cb-readme-body p { margin: 0 0 10px; color: var(--text-secondary); font-size: 13px; line-height: 21px; }
+    .cb-readme-body ul { margin: 0; padding-left: 18px; color: var(--text-secondary); font-size: 13px; line-height: 21px; }
+
+    /* PR 列表 */
+    .cb-pr {
+      display: flex; align-items: flex-start; gap: var(--sp-3);
+      padding: var(--sp-3);
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+    .cb-pr:hover { background: var(--surface-hover); }
+    .cb-pr-icon { flex: none; margin-top: 2px; font-size: 17px; }
+    .cb-pr-icon.is-open { color: var(--completed-text); }
+    .cb-pr-icon.is-merged { color: var(--brand-solid); }
+    .cb-pr-main { min-width: 0; flex: 1; }
+    .cb-pr-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+    .cb-pr-meta { color: var(--text-disabled); font-size: 11.5px; }
+    .cb-pr-meta .cb-pr-branch { font-family: var(--mono); font-size: 11px; }
+    .cb-pr-right { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+
+    /* 业务视图 / 开发视图 切换 —— 本方案的核心 */
+    .cb-viewswitch {
+      display: inline-flex; gap: 2px; padding: 3px;
+      background: var(--surface-subtle); border-radius: var(--radius-md);
+    }
+    .cb-viewswitch button {
+      padding: 5px 11px; border: 0; background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary); font-family: inherit; font-size: 12px; cursor: pointer;
+    }
+    .cb-viewswitch button.is-on { background: var(--surface-primary); color: var(--text-primary); font-weight: 600; box-shadow: var(--elevation-1); }
+
+    /* 一体两面提示条 */
+    .cb-twoface {
+      display: flex; align-items: center; gap: var(--sp-2);
+      padding: 10px 13px; margin-top: var(--sp-3);
+      background: var(--brand-soft); border: 1px solid var(--brand-border);
+      border-radius: var(--radius-md);
+      color: var(--brand-text); font-size: 12px; line-height: 18px;
+    }
+    .cb-twoface i { flex: none; font-size: 15px; }
+    .cb-twoface .cb-twoface-op { margin-left: auto; flex: none; }
+
+    /* 设置页 */
+    .cb-set-row {
+      display: flex; align-items: center; gap: var(--sp-3);
+      padding: var(--sp-3) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .cb-set-copy { min-width: 0; }
+    .cb-set-copy strong { display: block; font-size: 13px; color: var(--text-primary); }
+    .cb-set-copy span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--text-tertiary); line-height: 17px; }
+    .cb-set-row .cb-set-op { margin-left: auto; flex: none; }
+
+    /* 克隆命令块 */
+    .cb-cmd {
+      margin-top: var(--sp-2);
+      padding: 11px 13px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      font-family: var(--mono); font-size: 11.5px; line-height: 19px;
+      color: var(--text-secondary);
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .cb-cmd .cb-cmd-c { color: var(--text-disabled); }
 
     /* ---------- 右侧抽屉：看代码 / 看版本 ---------- */
     .side-drawer-mask {
@@ -8758,6 +9131,13 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         </div>
         <button class="icon-button" id="toggleSidebarBtn" title="收起 / 展开侧栏" aria-label="收起或展开侧栏"><i class="ph ph-sidebar-simple"></i></button>
         <button class="icon-button" id="globalSearchBtn" title="搜索" aria-label="搜索" aria-expanded="false"><i class="ph ph-magnifying-glass"></i></button>
+        <span class="bell-wrap">
+          <button class="icon-button" id="activityBtn" title="查看活动" aria-label="查看活动" aria-expanded="false">
+            <i class="ph ph-bell"></i>
+            <span class="bell-dot" id="bellDot"></span>
+          </button>
+          <div class="act-panel" id="actPanel" hidden></div>
+        </span>
       </div>
       <div class="title-center">
         <label class="titlebar-search" id="titlebarSearch" hidden>
@@ -8767,6 +9147,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       </div>
       <div class="title-right">
         <button class="icon-button" id="toggleArtifactBtn" title="显示 / 隐藏产物区" aria-label="显示或隐藏产物区"><i class="ph ph-sidebar-simple icon-flip-x"></i></button>
+        <button class="role-chip" id="roleChip" title="切换角色视角：业务方看不到 Codebase"></button>
         <button class="icon-button" id="themeButton" aria-label="切换主题" title="切换主题">
           <i class="ph ph-moon"></i>
         </button>
@@ -8806,7 +9187,19 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
           <button class="sidebar-nav-item" data-sidebar-action="review">
             <i class="ph ph-tray"></i>
             <span>改动</span>
+            <span class="nav-item-hint">跨站点</span>
             <span class="nav-item-badge" id="reviewNavBadge">3</span>
+          </button>
+          <div class="nav-group-sep" id="navDevGroup">
+            <span>工程</span>
+            <button class="nav-group-help" id="navDevHelp" title="这一组是给专业开发者的">
+              <i class="ph ph-question"></i>
+            </button>
+          </div>
+          <button class="sidebar-nav-item" data-sidebar-action="codebase">
+            <i class="ph ph-cube"></i>
+            <span>Codebase</span>
+            <span class="nav-item-hint">仓库 · GitCode</span>
           </button>
         </nav>
         <div class="task-list" id="taskList">
@@ -9291,6 +9684,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
                       <div class="rv-panel-label"><i class="ph ph-terminal-window"></i>构建与自检记录</div>
                       <div id="reviewRunLog"></div>
                     </div>
+                    <div class="cb-twoface" id="reviewCbLink" hidden></div>
                   </div>
 
                   <div class="rv-reject" id="reviewRejectBox" hidden>
@@ -9362,6 +9756,113 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
               <strong>还没有这一类站点</strong>
               <span>做完并确认发布后，站点会出现在这里。</span>
             </div>
+          </section>
+
+          <!-- =================================================================
+               Codebase · GitCode 的 Agent 工作台
+               骨架借鉴 Cursor Origin：命名空间页 + 仓库页只留三个 tab
+               关键差异：同步来源列、Agent 活动列、业务视图⇄开发视图双向跳转
+               ================================================================= -->
+          <section class="resource-center-view is-wide" id="codebaseCenterView" hidden>
+
+            <!-- 仓库列表 -->
+            <div id="cbListPanel">
+              <div class="resource-center-head">
+                <div>
+                  <h1>Codebase</h1>
+                  <p>搭档在哪些代码上干活、代码从哪来、现在有什么正在发生。</p>
+                </div>
+                <button class="button button-tertiary button-compact" id="cbSettingsBtn"><i class="ph ph-sliders-horizontal"></i>设置</button>
+              </div>
+
+              <div class="resource-kpis" id="cbKpis"></div>
+
+              <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">最近打开</div>
+              <div class="cb-recent" id="cbRecent"></div>
+
+              <div class="resource-toolbar">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                  <span style="font-size:13px;font-weight:600">全部仓库</span>
+                  <button class="cb-nschip" id="cbNsChip" title="切换命名空间">
+                    <i class="ph ph-buildings"></i><span>市场部品牌站群</span><i class="ph ph-caret-down"></i>
+                  </button>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <label class="resource-search">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="search" id="cbSearchInput" placeholder="搜索仓库">
+                  </label>
+                  <button class="button button-tertiary button-compact" id="cbNewRepoBtn"><i class="ph ph-plus"></i>新建</button>
+                  <button class="button button-primary button-compact" id="cbSyncBtn"><i class="ph ph-arrows-clockwise"></i>从 GitCode 同步</button>
+                </div>
+              </div>
+
+              <div class="cb-table">
+                <div class="cb-thead">
+                  <span>仓库</span><span>同步来源</span><span>搭档活动</span><span>最近更新</span><span></span>
+                </div>
+                <div id="cbRepoList"></div>
+              </div>
+            </div>
+
+            <!-- 仓库详情 -->
+            <div id="cbRepoPanel" hidden>
+              <nav class="cb-crumb" aria-label="位置">
+                <button class="crumb-link" id="cbBackBtn">Codebase</button>
+                <i class="ph ph-caret-right"></i>
+                <span id="cbCrumbRepo">仓库</span>
+              </nav>
+
+              <div class="cb-repo-head">
+                <span class="cb-repo-icon is-native" id="cbRepoIcon"><i class="ph ph-cube"></i></span>
+                <h1 id="cbRepoName">仓库名</h1>
+                <span class="rv-pill is-draft" id="cbRepoVis">团队内</span>
+              </div>
+
+              <div class="cb-mirror-note" id="cbMirrorNote" hidden>
+                <i class="ph ph-arrows-clockwise"></i>
+                <span id="cbMirrorText"></span>
+                <span class="cb-mirror-ops">
+                  <button class="button button-tertiary button-compact" id="cbSyncNowBtn">立即同步</button>
+                </span>
+              </div>
+
+              <div class="cb-tabs" role="tablist" aria-label="仓库视图">
+                <button class="cb-tab is-on" data-cb-tab="code" role="tab"><i class="ph ph-code"></i>代码</button>
+                <button class="cb-tab" data-cb-tab="pr" role="tab"><i class="ph ph-tray"></i>改动<span class="cb-tab-n" id="cbPrCount">0</span></button>
+                <button class="cb-tab" data-cb-tab="set" role="tab"><i class="ph ph-gear"></i>设置</button>
+              </div>
+
+              <!-- 代码 -->
+              <div id="cbTabCode">
+                <div class="cb-code-bar">
+                  <button class="cb-branch" id="cbBranchBtn"><i class="ph ph-git-branch"></i><span id="cbBranchName">main</span><i class="ph ph-caret-down"></i></button>
+                  <span style="font-size:12px;color:var(--text-tertiary)" id="cbBranchCount">3 个分支</span>
+                  <span class="cb-code-right">
+                    <button class="button button-tertiary button-compact" id="cbGotoFileBtn"><i class="ph ph-magnifying-glass"></i>跳到文件</button>
+                    <button class="button button-secondary button-compact" id="cbCloneBtn"><i class="ph ph-code"></i>获取代码</button>
+                  </span>
+                </div>
+                <div class="cb-commit-row" id="cbCommitRow"></div>
+                <div class="cb-files" id="cbFileList"></div>
+                <div class="cb-readme" id="cbReadme"></div>
+              </div>
+
+              <!-- 改动（PR） -->
+              <div id="cbTabPr" hidden>
+                <div class="cb-twoface">
+                  <i class="ph ph-arrows-left-right"></i>
+                  <span>这里的每一条改动，业务方在「<strong>改动</strong>」板块看到的是同一条——只是换了一套说法。两边任何一边合并，另一边同步变成已处理。</span>
+                </div>
+                <div id="cbPrList" style="margin-top:12px"></div>
+              </div>
+
+              <!-- 设置 -->
+              <div id="cbTabSet" hidden>
+                <div id="cbSetList"></div>
+              </div>
+            </div>
+
           </section>
 
           <section class="run-view" id="runView">
@@ -9818,6 +10319,59 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         回滚不会删掉任何版本——它只是把「正式版」指到另一版上，之后随时可以再切回来。所有切换都记进操作记录。
       </div>
     </aside>
+
+    <!-- 从 GitCode 同步 -->
+    <div class="rv-sheet-mask" id="gitcodeMask" role="dialog" aria-modal="true" aria-labelledby="gitcodeTitle">
+      <div class="rv-sheet">
+        <h2 id="gitcodeTitle">从 GitCode 同步仓库</h2>
+        <p class="rv-sheet-sub">把 GitCode 上已有的项目接进来，搭档就能在它上面持续干活。代码仍以 GitCode 为准。</p>
+
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">选择组织</div>
+        <div class="rv-scope" style="margin-bottom:18px">
+          <button class="rv-scope-item is-on" data-gc-org="huawei-brand">
+            <i class="ph ph-buildings"></i>
+            <span class="rv-scope-copy"><strong>huawei-brand</strong><span>市场部品牌站群 · 12 个仓库 · 已授权</span></span>
+          </button>
+          <button class="rv-scope-item" data-gc-org="codearts-demo">
+            <i class="ph ph-buildings"></i>
+            <span class="rv-scope-copy"><strong>codearts-demo</strong><span>码道演示组织 · 5 个仓库 · 已授权</span></span>
+          </button>
+        </div>
+
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">选择仓库</div>
+        <div class="rv-scope" id="gcRepoPick" style="margin-bottom:18px"></div>
+
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">同步方式</div>
+        <div class="rv-scope">
+          <button class="rv-scope-item is-on" data-gc-mode="readonly">
+            <i class="ph ph-arrow-down"></i>
+            <span class="rv-scope-copy"><strong>只读镜像（推荐）</strong><span>GitCode 改了这边跟着变；这边的改动不会写回去，不会影响别人</span></span>
+          </button>
+          <button class="rv-scope-item" data-gc-mode="two-way">
+            <i class="ph ph-arrows-left-right"></i>
+            <span class="rv-scope-copy"><strong>双向</strong><span>搭档的改动经你确认后，会推回 GitCode 变成一个 PR，不直接改主干</span></span>
+          </button>
+        </div>
+
+        <div class="rv-sheet-foot">
+          <button class="button button-tertiary" data-sheet-close="gitcodeMask">取消</button>
+          <button class="button button-primary" id="gcConfirmBtn"><i class="ph ph-arrows-clockwise"></i>开始同步</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 获取代码 -->
+    <div class="rv-sheet-mask" id="cloneMask" role="dialog" aria-modal="true" aria-labelledby="cloneTitle">
+      <div class="rv-sheet">
+        <h2 id="cloneTitle">获取代码</h2>
+        <p class="rv-sheet-sub">标准 git，不用装任何额外工具。</p>
+        <div id="cloneBody"></div>
+        <div class="rv-sheet-foot">
+          <button class="button button-tertiary" data-sheet-close="cloneMask">关闭</button>
+          <button class="button button-primary" id="cloneCopyBtn"><i class="ph ph-copy"></i>复制克隆命令</button>
+        </div>
+      </div>
+    </div>
 
     <!-- 发布范围 -->
     <div class="rv-sheet-mask" id="publishMask" role="dialog" aria-modal="true" aria-labelledby="publishTitle">
@@ -13877,7 +14431,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
 
     function hideResourceCenters() {
       if (el("partnerTabbar")) el("partnerTabbar").hidden = true;
-      ["scheduledCenterView", "capabilityCenterView", "projectCenterView", "inspirationCenterView", "reviewCenterView", "shippedCenterView"].forEach((id) => {
+      ["scheduledCenterView", "capabilityCenterView", "projectCenterView", "inspirationCenterView", "reviewCenterView", "shippedCenterView", "codebaseCenterView"].forEach((id) => {
         if (el(id)) el(id).hidden = true;
       });
       el("workspace").classList.remove("is-resource-center");
@@ -13894,7 +14448,8 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         inspiration: ["inspirationCenterView", "工作搭档 · 灵感"],
         project: ["projectCenterView", "项目"],
         review: ["reviewCenterView", "改动"],
-        shipped: ["shippedCenterView", "站点"]
+        shipped: ["shippedCenterView", "站点"],
+        codebase: ["codebaseCenterView", "Codebase"]
       };
       const target = viewMap[action];
       if (!target) return;
@@ -13925,6 +14480,7 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
       }
       if (action === "review") renderReviewCenter();
       if (action === "shipped") renderShipped();
+      if (action === "codebase") { cbBackToList(); renderCodebase(); }
     }
 
     /* =====================================================================
@@ -14435,6 +14991,31 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
         '</button>'
       )).join("");
 
+      /* 一体两面：这条改动在 Codebase 里就是一个 PR */
+      const link = prByReview(item.id);
+      const cbBox = el("reviewCbLink");
+      if (cbBox) {
+        if (link) {
+          cbBox.hidden = false;
+          cbBox.innerHTML =
+            '<i class="ph ph-arrows-left-right"></i>' +
+            '<span>这条改动在 Codebase 里是 <strong>' + link.repo.name + ' #' + link.pr.n + '</strong>' +
+            '（分支 <code style="font-family:var(--mono);font-size:11px">' + link.pr.branch + '</code>）' +
+            (link.repo.source === "gitcode" ? '，镜像自 ' + GC_HOST + '/' + link.repo.gcPath : '') +
+            '。你点「采纳并发布」＝开发者点合并，是同一个动作。</span>' +
+            '<span class="cb-twoface-op"><button class="button button-tertiary button-compact" data-rv-tocb="' + link.repo.id + '">' +
+            '<i class="ph ph-cube"></i>在 Codebase 中打开</button></span>';
+          qsa("[data-rv-tocb]").forEach((b) => b.addEventListener("click", () => {
+            showResourceCenter("codebase");
+            cbOpenRepo(b.dataset.rvTocb);
+            cbSetTab("pr");
+            showToast("同一条改动，换成开发者看到的说法");
+          }));
+        } else {
+          cbBox.hidden = true;
+        }
+      }
+
       el("reviewRunLog").innerHTML = item.log.map((l) => (
         '<div class="rv-file"><i class="ph ph-caret-right"></i><span class="rv-file-name">' + l + '</span></div>'
       )).join("");
@@ -14593,6 +15174,521 @@ body.pet-text-on .pet-flag,.pet-layer[data-size="64"] .pet-flag,
 
       openDrawer("versionDrawer");
     }
+
+    /* =====================================================================
+       Codebase · GitCode 的 Agent 工作台
+       —— 与「改动」是一体两面：同一个 PR，两套说法，双向可跳
+       ===================================================================== */
+
+    const GC_HOST = "gitcode.com";
+
+    const REPOS = [
+      {
+        id: "brand-cases", name: "brand-cases", title: "客户案例展示站",
+        source: "gitcode", gcPath: "huawei-brand/brand-cases", syncMode: "只读镜像", syncedAt: "5 分钟前",
+        vis: "团队内", branch: "main", branches: 3,
+        running: 2, reviewId: "rv-cases", site: "sh-cases",
+        updated: "12 分钟前", updatedBy: "建站搭档", bot: true,
+        commit: { who: "建站搭档", bot: true, msg: "新增 3 个案例页 + 首页改版", hash: "a3f81c2", time: "12 分钟前" },
+        files: [
+          { n: "app", d: 1, msg: "新增 cases 路由", t: "12 分钟前" },
+          { n: "components", d: 1, msg: "新增 CaseWall", t: "12 分钟前" },
+          { n: "content/cases", d: 1, msg: "3 个案例 mdx", t: "12 分钟前" },
+          { n: "README.md", d: 0, msg: "初始化", t: "3 周前" }
+        ],
+        readme: { h: "客户案例展示站", p: "市场部对外的客户案例站点，由建站搭档持续维护。", li: ["内容用 mdx 管理，放在 content/cases", "每个案例页含背景、做法、结果三段", "首页是案例墙，自动读取 content/cases"] },
+        prs: [
+          { n: 42, title: "新增 3 个案例页 + 首页改版", state: "open", branch: "agent/cases-wall", who: "建站搭档", bot: true, time: "12 分钟前", reviewId: "rv-cases", checks: "3/4 通过" },
+          { n: 41, title: "修复移动端导航遮挡首屏", state: "merged", branch: "agent/fix-nav", who: "建站搭档", bot: true, time: "3 小时前", checks: "全部通过" },
+          { n: 39, title: "首页换成视频背景", state: "merged", branch: "agent/video-hero", who: "建站搭档", bot: true, time: "2 天前", checks: "已回滚" }
+        ]
+      },
+      {
+        id: "brand-kb", name: "brand-kb", title: "部门知识库站点",
+        source: "gitcode", gcPath: "huawei-brand/brand-kb", syncMode: "只读镜像", syncedAt: "1 小时前",
+        vis: "团队内", branch: "main", branches: 2,
+        running: 0, reviewId: "rv-kb", site: "sh-kb",
+        updated: "1 小时前", updatedBy: "建站搭档", bot: true,
+        commit: { who: "建站搭档", bot: true, msg: "导航结构调整：5 个栏目合并成 3 个", hash: "7d21e90", time: "1 小时前" },
+        files: [
+          { n: "config", d: 1, msg: "nav.ts 栏目合并", t: "1 小时前" },
+          { n: "components", d: 1, msg: "搜索移到顶部", t: "1 小时前" },
+          { n: "docs", d: 1, msg: "138 篇文档", t: "1 天前" }
+        ],
+        readme: { h: "部门知识库", p: "内部文档站点，138 篇文档，支持全站搜索。", li: ["文档用 md 管理，放在 docs/", "栏目结构在 config/nav.ts", "改栏目会影响历史链接，需要配跳转"] },
+        prs: [
+          { n: 18, title: "导航结构调整：5 个栏目合并成 3 个", state: "open", branch: "agent/nav-merge", who: "建站搭档", bot: true, time: "1 小时前", reviewId: "rv-kb", checks: "2/3 通过" },
+          { n: 17, title: "新增 12 篇排障文档", state: "merged", branch: "agent/troubleshoot-docs", who: "建站搭档", bot: true, time: "1 天前", checks: "全部通过" }
+        ]
+      },
+      {
+        id: "q3-launch", name: "q3-launch", title: "新品发布活动页",
+        source: "native", gcPath: null, syncMode: null, syncedAt: null,
+        vis: "团队内", branch: "main", branches: 1,
+        running: 0, reviewId: "rv-launch", site: "sh-launch",
+        updated: "3 小时前", updatedBy: "建站搭档", bot: true,
+        commit: { who: "建站搭档", bot: true, msg: "首版页面与报名表单", hash: "c02fa8b", time: "3 小时前" },
+        files: [
+          { n: "app/launch", d: 1, msg: "活动页与表单", t: "3 小时前" },
+          { n: "app/api/signup", d: 1, msg: "报名接口", t: "3 小时前" },
+          { n: "styles", d: 1, msg: "首屏样式", t: "3 小时前" }
+        ],
+        readme: { h: "新品发布活动页", p: "Q3 新品上市的对外活动页，含倒计时与报名表单。", li: ["报名数据写入指定表格", "倒计时目标时间在 page.tsx 里配", "这个仓库是搭档直接建的，还没接 GitCode"] },
+        prs: [
+          { n: 3, title: "准备第一次上线", state: "open", branch: "agent/launch-v1", who: "建站搭档", bot: true, time: "3 小时前", reviewId: "rv-launch", checks: "全部通过" }
+        ]
+      },
+      {
+        id: "brand-join", name: "brand-join", title: "招聘落地页",
+        source: "gitcode", gcPath: "huawei-brand/brand-join", syncMode: "双向", syncedAt: "昨天",
+        vis: "对外公开", branch: "main", branches: 1,
+        running: 0, reviewId: null, site: "sh-join",
+        updated: "昨天", updatedBy: "建站搭档", bot: true,
+        commit: { who: "建站搭档", bot: true, msg: "配色统一到品牌绿", hash: "5e93aa1", time: "昨天" },
+        files: [
+          { n: "app", d: 1, msg: "岗位列表", t: "1 周前" },
+          { n: "styles/theme.css", d: 0, msg: "配色统一", t: "昨天" }
+        ],
+        readme: { h: "招聘落地页", p: "对外招聘页，岗位列表自动同步自 HR 系统。", li: ["双向同步：这边的改动会推回 GitCode 成 PR", "对外公开仓库，改动前注意合规"] },
+        prs: [
+          { n: 9, title: "配色统一到品牌绿", state: "merged", branch: "agent/brand-color", who: "建站搭档", bot: true, time: "昨天", checks: "低风险自动通过" }
+        ]
+      },
+      {
+        id: "brand-ui-kit", name: "brand-ui-kit", title: "站群公共组件库",
+        source: "gitcode", gcPath: "huawei-brand/brand-ui-kit", syncMode: "只读镜像", syncedAt: "2 天前",
+        vis: "团队内", branch: "main", branches: 4,
+        running: 1, reviewId: null, site: null,
+        updated: "2 天前", updatedBy: "李工", bot: false,
+        commit: { who: "李工", bot: false, msg: "Button 增加 loading 态", hash: "b71c4de", time: "2 天前" },
+        files: [
+          { n: "src/components", d: 1, msg: "Button / Card / Nav", t: "2 天前" },
+          { n: "package.json", d: 0, msg: "v2.3.0", t: "2 天前" }
+        ],
+        readme: { h: "站群公共组件库", p: "所有品牌站点共用的组件，由前端团队维护，搭档只读取不修改。", li: ["改这里会影响全部 5 个站点", "搭档默认只能读，改动需要前端团队合并"] },
+        prs: []
+      }
+    ];
+
+    const cbState = { repoId: null, tab: "code", gcOrg: "huawei-brand", gcMode: "readonly", gcRepos: [] };
+
+    function repoById(id) { return REPOS.find((r) => r.id === id); }
+    function repoByReview(rid) { return REPOS.find((r) => (r.prs || []).some((p) => p.reviewId === rid)); }
+    function prByReview(rid) {
+      const r = repoByReview(rid);
+      return r ? { repo: r, pr: r.prs.find((p) => p.reviewId === rid) } : null;
+    }
+
+    function waitingCount(repo) {
+      if (!repo.reviewId) return 0;
+      const it = REVIEW_ITEMS.find((x) => x.id === repo.reviewId);
+      return it && it.status === "待确认" ? 1 : 0;
+    }
+
+    /* ---------- 仓库列表 ---------- */
+
+    function renderCodebase() {
+      const totalRunning = REPOS.reduce((n, r) => n + r.running, 0);
+      const totalWaiting = REPOS.reduce((n, r) => n + waitingCount(r), 0);
+      const mirrored = REPOS.filter((r) => r.source === "gitcode").length;
+      el("cbKpis").innerHTML = [
+        ["仓库", REPOS.length, mirrored + " 个来自 GitCode"],
+        ["搭档正在跑的任务", totalRunning, "跨 " + REPOS.filter((r) => r.running).length + " 个仓库"],
+        ["等你确认的改动", totalWaiting, "点开可直接处理"]
+      ].map(([l, v, h]) => (
+        '<div class="resource-kpi"><div class="resource-kpi-label">' + l + '</div>' +
+        '<div class="resource-kpi-value">' + v + '</div>' +
+        '<div class="resource-kpi-hint">' + h + '</div></div>'
+      )).join("");
+
+      el("cbRecent").innerHTML = REPOS.slice(0, 3).map((r) => (
+        '<button class="cb-recent-card" data-cb-open="' + r.id + '">' +
+          '<span class="cb-repo-icon ' + (r.source === "native" ? "is-native" : "is-mirror") + '">' +
+            '<i class="ph ' + (r.source === "native" ? "ph-cube" : "ph-git-fork") + '"></i></span>' +
+          '<span>' + r.name + '</span>' +
+        '</button>'
+      )).join("");
+
+      const kw = (el("cbSearchInput")?.value || "").trim().toLowerCase();
+      const list = REPOS.filter((r) => !kw || (r.name + r.title + (r.gcPath || "")).toLowerCase().includes(kw));
+
+      el("cbRepoList").innerHTML = list.map((r) => {
+        const wait = waitingCount(r);
+        let act;
+        if (r.running && wait) {
+          act = '<span class="cb-act-run"><span class="cb-pulse"></span>' + r.running + ' 个任务在跑</span>' +
+                '<span class="cb-act-wait" data-cb-review="' + r.reviewId + '">' + wait + ' 条改动等确认</span>';
+        } else if (r.running) {
+          act = '<span class="cb-act-run"><span class="cb-pulse"></span>' + r.running + ' 个任务在跑</span>';
+        } else if (wait) {
+          act = '<span class="cb-act-wait" data-cb-review="' + r.reviewId + '">' + wait + ' 条改动等确认</span>';
+        } else {
+          act = '<span class="cb-act-idle">空闲</span>';
+        }
+
+        const sync = r.source === "gitcode"
+          ? '<strong class="cb-gc"><i class="ph ph-git-fork"></i>GitCode 镜像</strong>' +
+            '<span>' + r.gcPath + ' · ' + r.syncedAt + '同步</span>'
+          : '<strong><i class="ph ph-cube"></i>码道原生</strong><span>还没接 GitCode</span>';
+
+        return (
+          '<div class="cb-row" data-cb-open="' + r.id + '">' +
+            '<div class="cb-repo">' +
+              '<span class="cb-repo-icon ' + (r.source === "native" ? "is-native" : "is-mirror") + '">' +
+                '<i class="ph ' + (r.source === "native" ? "ph-cube" : "ph-git-fork") + '"></i></span>' +
+              '<span style="min-width:0">' +
+                '<span class="cb-repo-name">' + r.name + '</span>' +
+                '<span style="display:block;font-size:11.5px;color:var(--text-disabled)">' + r.title + '</span>' +
+              '</span>' +
+              '<span class="rv-pill ' + (r.vis === "对外公开" ? "is-live" : "is-draft") + '" style="margin-left:6px">' + r.vis + '</span>' +
+            '</div>' +
+            '<div class="cb-sync">' + sync + '</div>' +
+            '<div class="cb-act">' + act + '</div>' +
+            '<div class="cb-upd"><strong>' + r.updated + '</strong><span>' + r.updatedBy + '</span></div>' +
+            '<button class="icon-button" aria-label="更多"><i class="ph ph-dots-three"></i></button>' +
+          '</div>'
+        );
+      }).join("");
+
+      qsa("[data-cb-open]").forEach((n) => n.addEventListener("click", (e) => {
+        if (e.target.closest("[data-cb-review]")) return;
+        cbOpenRepo(n.dataset.cbOpen);
+      }));
+      qsa("[data-cb-review]").forEach((n) => n.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showResourceCenter("review");
+        openReviewDetail(n.dataset.cbReview);
+      }));
+    }
+
+    function cbBackToList() {
+      if (!el("cbListPanel")) return;
+      el("cbListPanel").hidden = false;
+      el("cbRepoPanel").hidden = true;
+      cbState.repoId = null;
+    }
+
+    /* ---------- 仓库详情 ---------- */
+
+    function cbOpenRepo(id) {
+      const r = repoById(id);
+      if (!r) return;
+      cbState.repoId = id;
+      el("cbListPanel").hidden = true;
+      el("cbRepoPanel").hidden = false;
+      el("cbCrumbRepo").textContent = r.name;
+      el("cbRepoName").textContent = r.name;
+      el("cbRepoIcon").className = "cb-repo-icon " + (r.source === "native" ? "is-native" : "is-mirror");
+      el("cbRepoIcon").innerHTML = '<i class="ph ' + (r.source === "native" ? "ph-cube" : "ph-git-fork") + '"></i>';
+      el("cbRepoVis").textContent = r.vis;
+
+      const mirror = r.source === "gitcode";
+      el("cbMirrorNote").hidden = !mirror;
+      if (mirror) {
+        el("cbMirrorText").innerHTML =
+          '本仓库镜像自 <a href="#" onclick="return false">' + GC_HOST + '/' + r.gcPath + '</a>' +
+          ' · ' + r.syncMode + ' · ' + r.syncedAt + '同步' +
+          (r.syncMode === "双向" ? ' · 搭档的改动经确认后会推回 GitCode 成为一个 PR' : ' · 这边的改动不会写回去');
+      }
+
+      el("cbBranchName").textContent = r.branch;
+      el("cbBranchCount").textContent = r.branches + " 个分支";
+
+      el("cbCommitRow").innerHTML =
+        '<span class="cb-avatar' + (r.commit.bot ? " is-bot" : "") + '">' + (r.commit.bot ? '<i class="ph ph-robot"></i>' : r.commit.who.slice(0, 1)) + '</span>' +
+        '<strong style="font-size:12.5px">' + r.commit.who + '</strong>' +
+        '<span class="cb-commit-msg">' + r.commit.msg + '</span>' +
+        '<span class="cb-commit-right"><span class="cb-hash">' + r.commit.hash + '</span><span>' + r.commit.time + '</span>' +
+        '<button class="button button-tertiary button-compact" data-cb-history="1"><i class="ph ph-clock-counter-clockwise"></i>历史</button></span>';
+
+      el("cbFileList").innerHTML = r.files.map((f) => (
+        '<div class="cb-file"><i class="ph ' + (f.d ? "ph-folder" : "ph-file") + '"></i>' +
+          '<span class="cb-file-name">' + f.n + '</span>' +
+          '<span class="cb-file-msg">' + f.msg + '</span>' +
+          '<span class="cb-file-time">' + f.t + '</span></div>'
+      )).join("");
+
+      el("cbReadme").innerHTML =
+        '<div class="cb-readme-head"><i class="ph ph-book-open"></i>README.md</div>' +
+        '<div class="cb-readme-body"><h2>' + r.readme.h + '</h2><p>' + r.readme.p + '</p><ul>' +
+        r.readme.li.map((x) => '<li>' + x + '</li>').join("") + '</ul></div>';
+
+      const openPrs = r.prs.filter((p) => p.state === "open").length;
+      el("cbPrCount").textContent = openPrs;
+
+      el("cbPrList").innerHTML = r.prs.length ? r.prs.map((p) => (
+        '<div class="cb-pr" data-cb-pr="' + p.n + '">' +
+          '<i class="ph ' + (p.state === "open" ? "ph-git-pull-request cb-pr-icon is-open" : "ph-git-merge cb-pr-icon is-merged") + '"></i>' +
+          '<div class="cb-pr-main">' +
+            '<div class="cb-pr-title">' + p.title + ' <span style="color:var(--text-disabled);font-weight:400">#' + p.n + '</span></div>' +
+            '<div class="cb-pr-meta">' +
+              '<span class="cb-pr-branch">' + p.branch + ' → ' + r.branch + '</span> · ' + p.who + ' · ' + p.time + ' · 自检 ' + p.checks +
+            '</div>' +
+          '</div>' +
+          '<div class="cb-pr-right">' +
+            '<span class="rv-pill ' + (p.state === "open" ? "is-high" : "is-live") + '">' + (p.state === "open" ? "等人确认" : "已合并") + '</span>' +
+            (p.reviewId ? '<button class="button button-tertiary button-compact" data-cb-biz="' + p.reviewId + '"><i class="ph ph-arrows-left-right"></i>用业务视图看</button>' : '') +
+          '</div>' +
+        '</div>'
+      )).join("") : '<div class="feed-empty"><i class="ph ph-tray"></i><strong>没有待处理的改动</strong><span>搭档改完之后会在这里出现一条。</span></div>';
+
+      el("cbSetList").innerHTML = [
+        ["可见性", r.vis, "谁能看到这个仓库", "更改"],
+        ["同步来源", r.source === "gitcode" ? (GC_HOST + "/" + r.gcPath) : "未接入 GitCode", r.source === "gitcode" ? ("当前为" + r.syncMode) : "可以把它推到 GitCode 托管", r.source === "gitcode" ? "改同步方式" : "接入 GitCode"],
+        ["谁能合并改动", "你 + 前端团队", "低风险改动可设为自动通过", "更改"],
+        ["部署到哪个站点", r.site ? (SHIPPED_ITEMS.find((x) => x.id === r.site) || {}).name || "—" : "未绑定", r.site ? "合并后自动发布到这个站点" : "绑定后合并即可发布", "更改"]
+      ].map(([k, v, hint, op]) => (
+        '<div class="cb-set-row"><div class="cb-set-copy"><strong>' + k + '：' + v + '</strong><span>' + hint + '</span></div>' +
+        '<span class="cb-set-op"><button class="button button-tertiary button-compact" data-cb-set="1">' + op + '</button></span></div>'
+      )).join("");
+
+      qsa("[data-cb-biz]").forEach((b) => b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showResourceCenter("review");
+        openReviewDetail(b.dataset.cbBiz);
+        showToast("同一条改动，换成业务方看到的说法");
+      }));
+      qsa("[data-cb-pr]").forEach((b) => b.addEventListener("click", () => showToast("原型演示：这里会展开这条改动的完整 diff 与评论")));
+      qsa("[data-cb-history]").forEach((b) => b.addEventListener("click", () => showToast("原型演示：提交历史")));
+      qsa("[data-cb-set]").forEach((b) => b.addEventListener("click", () => showToast("原型演示：设置项")));
+
+      cbSetTab("code");
+      document.querySelector(".control-scroll").scrollTop = 0;
+    }
+
+    function cbSetTab(t) {
+      cbState.tab = t;
+      qsa("[data-cb-tab]").forEach((b) => b.classList.toggle("is-on", b.dataset.cbTab === t));
+      el("cbTabCode").hidden = t !== "code";
+      el("cbTabPr").hidden = t !== "pr";
+      el("cbTabSet").hidden = t !== "set";
+    }
+
+    /* ---------- GitCode 同步 ---------- */
+
+    const GC_CATALOG = {
+      "huawei-brand": [
+        { p: "huawei-brand/brand-events", t: "活动站点模板", already: false },
+        { p: "huawei-brand/brand-press", t: "新闻中心站点", already: false },
+        { p: "huawei-brand/brand-cases", t: "客户案例展示站", already: true }
+      ],
+      "codearts-demo": [
+        { p: "codearts-demo/demo-portal", t: "演示门户", already: false },
+        { p: "codearts-demo/demo-docs", t: "演示文档站", already: false }
+      ]
+    };
+
+    function renderGcRepos() {
+      el("gcRepoPick").innerHTML = (GC_CATALOG[cbState.gcOrg] || []).map((r) => (
+        '<button class="rv-scope-item' + (r.already ? "" : "") + '" data-gc-repo="' + r.p + '"' + (r.already ? ' disabled style="opacity:.5;cursor:not-allowed"' : '') + '>' +
+          '<i class="ph ph-git-fork"></i>' +
+          '<span class="rv-scope-copy"><strong>' + r.p.split("/")[1] + '</strong>' +
+          '<span>' + r.t + (r.already ? " · 已经同步过了" : "") + '</span></span>' +
+        '</button>'
+      )).join("");
+      qsa("[data-gc-repo]").forEach((b) => b.addEventListener("click", () => {
+        b.classList.toggle("is-on");
+      }));
+    }
+
+    /* ---------- 事件绑定 ---------- */
+
+    el("cbBackBtn")?.addEventListener("click", () => { cbBackToList(); renderCodebase(); });
+    el("cbSearchInput")?.addEventListener("input", renderCodebase);
+    qsa("[data-cb-tab]").forEach((b) => b.addEventListener("click", () => cbSetTab(b.dataset.cbTab)));
+
+    el("cbSyncBtn")?.addEventListener("click", () => {
+      cbState.gcOrg = "huawei-brand"; cbState.gcMode = "readonly";
+      qsa("[data-gc-org]").forEach((x) => x.classList.toggle("is-on", x.dataset.gcOrg === "huawei-brand"));
+      qsa("[data-gc-mode]").forEach((x) => x.classList.toggle("is-on", x.dataset.gcMode === "readonly"));
+      renderGcRepos();
+      el("gitcodeMask").classList.add("is-open");
+    });
+    qsa("[data-gc-org]").forEach((b) => b.addEventListener("click", () => {
+      cbState.gcOrg = b.dataset.gcOrg;
+      qsa("[data-gc-org]").forEach((x) => x.classList.toggle("is-on", x === b));
+      renderGcRepos();
+    }));
+    qsa("[data-gc-mode]").forEach((b) => b.addEventListener("click", () => {
+      cbState.gcMode = b.dataset.gcMode;
+      qsa("[data-gc-mode]").forEach((x) => x.classList.toggle("is-on", x === b));
+    }));
+    el("gcConfirmBtn")?.addEventListener("click", () => {
+      const picked = qsa("[data-gc-repo].is-on").map((b) => b.dataset.gcRepo);
+      if (!picked.length) { showToast("先选一个要同步的仓库"); return; }
+      picked.forEach((p) => {
+        const meta = (GC_CATALOG[cbState.gcOrg] || []).find((x) => x.p === p);
+        REPOS.unshift({
+          id: p.split("/")[1], name: p.split("/")[1], title: meta ? meta.t : p,
+          source: "gitcode", gcPath: p,
+          syncMode: cbState.gcMode === "readonly" ? "只读镜像" : "双向", syncedAt: "刚刚",
+          vis: "团队内", branch: "main", branches: 1,
+          running: 0, reviewId: null, site: null,
+          updated: "刚刚", updatedBy: "从 GitCode 同步", bot: false,
+          commit: { who: "GitCode", bot: false, msg: "从 " + p + " 首次同步", hash: "0000000", time: "刚刚" },
+          files: [{ n: "README.md", d: 0, msg: "从 GitCode 同步", t: "刚刚" }],
+          readme: { h: meta ? meta.t : p, p: "本仓库镜像自 " + GC_HOST + "/" + p + "。", li: ["代码以 GitCode 为准", "搭档可以在这里读取并发起改动"] },
+          prs: []
+        });
+      });
+      closeSheet("gitcodeMask");
+      showToast("已接入 " + picked.length + " 个仓库，搭档现在可以在上面干活了");
+      renderCodebase();
+    });
+
+    el("cbSyncNowBtn")?.addEventListener("click", () => showToast("已从 GitCode 拉取最新代码"));
+    el("cbNewRepoBtn")?.addEventListener("click", () => showToast("原型演示：也可以让搭档直接开一个新仓库并写入首版代码"));
+    el("cbSettingsBtn")?.addEventListener("click", () => showToast("原型演示：Codebase 设置"));
+    el("cbNsChip")?.addEventListener("click", () => showToast("原型演示：切换命名空间（对应 GitCode 的组织）"));
+
+    /* =====================================================================
+       活动流（铃铛）
+       —— 与「改动」分工：这里只告诉你发生了什么；要拍板的一律跳进「改动」
+       ===================================================================== */
+
+    const ACTIVITY = [
+      { day: "今天", icon: "ph-rocket-launch", title: "招聘落地页 已发布 v3",
+        desc: "配色统一到品牌绿。低风险改动，按你设的规则自动通过，没打扰你。", time: "昨天" },
+      { day: "今天", icon: "ph-arrows-clockwise", title: "brand-cases 从 GitCode 同步完成",
+        desc: "拉到 5 个新提交，其中 3 个来自前端团队的组件库升级。", time: "5 分钟前" },
+      { day: "今天", icon: "ph-shield-check", title: "自检拦下 1 个问题，没让它到你手上",
+        desc: "新品发布活动页的报名表单提交失败，搭档自己发现并修好后才交付。", time: "2 小时前" },
+      { day: "今天", icon: "ph-robot", title: "建站搭档 开始处理「部门知识库站点」",
+        desc: "按你上次说的「栏目太多」，正在把 5 个栏目合并成 3 个。", time: "3 小时前" },
+      { day: "昨天", icon: "ph-arrow-counter-clockwise", title: "客户案例展示站 已还原到 v5",
+        desc: "v6 的视频背景导致首屏加载慢，你点了还原，32 位在用的同事已切回旧版。", time: "昨天 16:40" },
+      { day: "昨天", icon: "ph-users", title: "新品发布活动页 预览版分享给 4 人",
+        desc: "市场部 3 位同事 + 你，链接 7 天后过期。", time: "昨天 11:20" },
+      { day: "更早", icon: "ph-arrow-bend-up-right", title: "供应商对账小工具 已交给专业开发",
+        desc: "涉及生产财务数据，超出你需要负责的范围。交接包已带走资料与验收标准。", time: "3 天前" }
+    ];
+
+    const actState = { read: false };
+
+    function actTodos() {
+      return REVIEW_ITEMS.filter((r) => r.status === "待确认");
+    }
+
+    function renderActivity() {
+      const todos = actTodos();
+      let html = '<div class="act-head">活动<button id="actMarkRead">全部标记已读</button></div>';
+
+      /* 顶部：等你拍板 —— 只做入口，不在这里处理 */
+      html += '<div class="act-group is-todo"><i class="ph ph-warning-circle"></i>等你拍板' +
+              '<span class="act-group-n">' + todos.length + '</span></div>';
+      html += todos.length
+        ? todos.map((t) => {
+            const warn = t.checks.filter((c) => !c.ok).length;
+            return '<button class="act-item is-todo" data-act-review="' + t.id + '">' +
+              '<i class="ph ph-tray"></i>' +
+              '<span class="act-copy"><span class="act-title">' + t.name + '</span>' +
+              '<span class="act-desc">' + t.change + ' · ' +
+              (warn ? warn + ' 项需要你判断' : '自检全部通过，可直接发布') + '</span></span>' +
+              '<i class="ph ph-arrow-right act-go"></i></button>';
+          }).join("")
+        : '<div class="act-empty">没有需要你拍板的事</div>';
+
+      /* 下面：发生了什么 */
+      ["今天", "昨天", "更早"].forEach((d) => {
+        const list = ACTIVITY.filter((a) => a.day === d);
+        if (!list.length) return;
+        html += '<div class="act-group">' + d + '</div>';
+        html += list.map((a) => (
+          '<div class="act-item"><i class="ph ' + a.icon + '"></i>' +
+          '<span class="act-copy"><span class="act-title">' + a.title + '</span>' +
+          '<span class="act-desc">' + a.desc + '</span></span>' +
+          '<span class="act-time">' + a.time + '</span></div>'
+        )).join("");
+      });
+
+      html += '<div class="act-foot">这里只告诉你发生了什么。需要你拍板的事都在「改动」里处理——不确认就不会上线。</div>';
+      el("actPanel").innerHTML = html;
+
+      qsa("[data-act-review]").forEach((b) => b.addEventListener("click", () => {
+        closeActivity();
+        showResourceCenter("review");
+        openReviewDetail(b.dataset.actReview);
+      }));
+      el("actMarkRead")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        actState.read = true;
+        syncBellDot();
+        showToast("已标记为已读。等你拍板的事不会因此消失，它们在「改动」里");
+      });
+    }
+
+    function syncBellDot() {
+      const dot = el("bellDot");
+      if (dot) dot.hidden = actState.read;
+    }
+
+    function closeActivity() {
+      el("actPanel").hidden = true;
+      el("activityBtn")?.setAttribute("aria-expanded", "false");
+    }
+
+    el("activityBtn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const p = el("actPanel");
+      if (p.hidden) { renderActivity(); p.hidden = false; el("activityBtn").setAttribute("aria-expanded", "true"); }
+      else closeActivity();
+    });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".bell-wrap")) closeActivity();
+    });
+    syncBellDot();
+
+    /* ---------- 决策点 16：Codebase 按角色显示 ----------
+       业务用户默认看不到工程组——这才是「看着重复」的根本解法：
+       对任何单个用户，两者几乎不会同时出现在导航里。 */
+    const roleState = { dev: true };
+
+    function applyRole() {
+      const devNav = document.querySelector('[data-sidebar-action="codebase"]');
+      const sep = el("navDevGroup");
+      if (devNav) devNav.hidden = !roleState.dev;
+      if (sep) sep.hidden = !roleState.dev;
+      const chip = el("roleChip");
+      if (chip) {
+        chip.innerHTML = '<i class="ph ' + (roleState.dev ? "ph-code" : "ph-briefcase") + '"></i>' +
+          '<span>' + (roleState.dev ? "开发者视角" : "业务方视角") + '</span>';
+      }
+      /* 业务视角下若正停在 Codebase，退回改动 */
+      if (!roleState.dev && state.currentView === "codebase") showResourceCenter("review");
+    }
+
+    el("navDevHelp")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showToast("「改动」是跨站点的待办队列；Codebase 是按仓库归档的代码。业务方只需要前者");
+    });
+
+    el("roleChip")?.addEventListener("click", () => {
+      roleState.dev = !roleState.dev;
+      applyRole();
+      showToast(roleState.dev
+        ? "已切到开发者视角：多出 Codebase，能看到仓库、分支和 PR"
+        : "已切到业务方视角：只剩改动与站点，不需要知道代码在哪个仓库");
+    });
+
+    applyRole();
+    el("cbGotoFileBtn")?.addEventListener("click", () => showToast("原型演示：按文件名快速跳转"));
+
+    el("cbCloneBtn")?.addEventListener("click", () => {
+      const r = repoById(cbState.repoId);
+      if (!r) return;
+      const url = r.source === "gitcode"
+        ? "https://" + GC_HOST + "/" + r.gcPath + ".git"
+        : "https://codebase.work.huaweicloud.com/git/huawei-brand/" + r.name;
+      el("cloneBody").innerHTML =
+        '<div style="font-size:12px;color:var(--text-tertiary);margin-bottom:6px">克隆到本地</div>' +
+        '<div class="cb-cmd">git clone ' + url + '</div>' +
+        (r.source === "gitcode"
+          ? '<div class="cb-cmd" style="margin-top:10px"><span class="cb-cmd-c"># 这个仓库托管在 GitCode，克隆地址就是 GitCode 的地址</span></div>'
+          : '<div style="font-size:12px;color:var(--text-tertiary);margin:14px 0 6px">把它推到 GitCode 托管</div>' +
+            '<div class="cb-cmd">git remote add gitcode https://' + GC_HOST + '/huawei-brand/' + r.name + '.git\ngit push -u gitcode main</div>');
+      el("cloneMask").classList.add("is-open");
+    });
+    el("cloneCopyBtn")?.addEventListener("click", () => { closeSheet("cloneMask"); showToast("已复制克隆命令"); });
 
     /* ---------- 站点 ---------- */
 
