@@ -21,6 +21,8 @@
   --bl-100:#eef4ff; --bl-200:#dfeaff; --bl-400:#a5c4fa; --bl-700:#1a56c4; --bl-800:#14479f; --bl-900:#0f3a80;
 
   --surface-1:var(--bg-100); --surface-2:var(--bg-200); --page:#f2f2f2; --paper:#fafafa;
+  --kb-col:rgba(0,0,0,.045); --kb-card:#ffffff;
+  --heat-0:rgba(0,0,0,.05); --heat-1:#e7dcfd; --heat-2:#b694f5; --heat-3:#834df0; --heat-4:#5b2fb4;
   --seg-track:rgba(0,0,0,.055); --seg-track-bd:rgba(0,0,0,.07);
   --seg-chip:#ffffff; --seg-chip-bd:rgba(0,0,0,.10); --seg-chip-top:rgba(255,255,255,.9);
   --seg-chip-sh:0 1px 2px rgba(0,0,0,.09),0 1px 1px rgba(0,0,0,.05);
@@ -66,6 +68,8 @@
   --rd-100:#2c1214; --rd-200:#3b181b; --rd-400:#63292e; --rd-700:#e05a66; --rd-800:#ee7a83; --rd-900:#f49ba1;
   --bl-100:#0e1a2e; --bl-200:#13233c; --bl-400:#1f3c66; --bl-700:#4a8ae8; --bl-800:#6ba3f0; --bl-900:#9cc4f8;
   --surface-glass:rgba(28,28,28,.82); --glass-border:var(--a-300); --page:#101010; --paper:#212121;
+  --kb-col:rgba(0,0,0,.26); --kb-card:#262626;
+  --heat-0:rgba(255,255,255,.055); --heat-1:#3d2a5e; --heat-2:#533b7d; --heat-3:#7b45e5; --heat-4:#c4a9fb;
   --seg-track:rgba(0,0,0,.38); --seg-track-bd:rgba(255,255,255,.06);
   --seg-chip:#323232; --seg-chip-bd:rgba(255,255,255,.11); --seg-chip-top:rgba(255,255,255,.08);
   --seg-chip-sh:0 1px 2px rgba(0,0,0,.4);
@@ -112,6 +116,15 @@ svg{display:block}
   -webkit-backdrop-filter:blur(20px) saturate(150%);box-shadow:inset 0 1px 0 var(--a-200)}
 /* ---- Bento：每个功能域是一块独立的、带圆角的板 ---- */
 .panel{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--r-lg)}
+/* ---- 可拖动分隔条：占住 bento 的间隙，拖动时只改 DOM 宽度不触发重渲染 ---- */
+.rz{flex:0 0 8px;width:8px;position:relative;cursor:col-resize;touch-action:none;
+  display:flex;align-items:center;justify-content:center}
+.rz::after{content:"";width:2px;height:28px;border-radius:2px;background:transparent;
+  transition:background var(--mo-state) var(--ease),height var(--mo-state) var(--ease)}
+.rz:hover::after,.rz.dragging::after{background:var(--g-700);height:56px}
+.rz.dragging{cursor:col-resize}
+body.rzing{cursor:col-resize;user-select:none}
+body.rzing *{cursor:col-resize!important}
 /* 自绘标题栏 44px */
 .titlebar{height:44px;flex:0 0 44px;display:flex;align-items:center;gap:12px;padding:0 12px;
   background:transparent;position:relative;z-index:10;user-select:none}
@@ -135,14 +148,14 @@ svg{display:block}
 .ide-btn:hover svg{color:var(--text-1)}
 .kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:4px;background:var(--a-200);color:var(--text-3)}
 
-.shell-body{flex:1;display:flex;min-height:0;gap:8px;padding:0 8px 8px}
+.shell-body{flex:1;display:flex;min-height:0;padding:0 8px 8px}
 
 /* ===================== 全局导航 ===================== */
 .rail{flex:0 0 232px;width:232px;background:var(--surface-1);border:1px solid var(--border-subtle);
   border-radius:var(--r-lg);
   display:flex;flex-direction:column;transition:width var(--mo-pop) var(--ease),flex-basis var(--mo-pop) var(--ease)}
 .rail.collapsed{flex-basis:64px;width:64px}
-.rail-top{padding:12px 12px 8px}
+.rail-top{padding:12px 12px 2px}
 .rail.collapsed .rail-top{padding:12px 8px 8px}
 .modesw{display:flex;gap:2px;padding:3px;background:var(--seg-track);border-radius:var(--r-lg);margin-bottom:8px;
   box-shadow:inset 0 0 0 1px var(--seg-track-bd)}
@@ -153,10 +166,13 @@ svg{display:block}
   box-shadow:var(--seg-chip-sh),inset 0 0 0 1px var(--seg-chip-bd),inset 0 1px 0 var(--seg-chip-top)}
 .modesw.mini{flex-direction:column}
 .modesw.mini button span{display:none}
-.btn-new{width:100%;height:36px;display:flex;align-items:center;justify-content:center;gap:8px;
-  background:var(--brand-solid);color:var(--on-fill);border-radius:var(--r-sm);font-size:14px;font-weight:500;
-  transition:background var(--mo-state) var(--ease)}
-.btn-new:hover{background:var(--brand-solid-hover)}
+.btn-new{width:100%;height:34px;display:flex;align-items:center;gap:10px;padding:0 10px;
+  border-radius:var(--r-sm);color:var(--text-2);font-size:13px;
+  transition:background var(--mo-state) var(--ease),color var(--mo-state) var(--ease)}
+.btn-new svg{flex:0 0 16px;color:var(--icon-2)}
+.btn-new:hover{background:var(--int-subtle);color:var(--text-1)}
+.btn-new:hover svg{color:var(--text-1)}
+.rail.collapsed .btn-new{justify-content:center;padding:0}
 .rail.collapsed .btn-new span{display:none}
 .rail-nav{flex:1;padding:4px 8px;overflow-y:auto;overflow-x:hidden;border-radius:0 0 var(--r-lg) var(--r-lg)}
 .nav-group{margin-top:12px}
@@ -169,10 +185,9 @@ svg{display:block}
 .nav-item.on svg{color:var(--text-1)}
 .nav-item svg{flex:0 0 16px;color:var(--icon-2)}
 .nav-item .nm{flex:1;text-align:left;white-space:nowrap;overflow:hidden}
-.nav-item .cnt{font-size:11px;font-weight:500;color:var(--text-3);font-family:var(--mono)}
-.nav-item .dot{width:6px;height:6px;border-radius:var(--r-full);background:var(--wait-solid);flex:0 0 6px}
+.nav-item .dot{width:6px;height:6px;border-radius:var(--r-full);background:var(--p-700);flex:0 0 6px}
 .rail.collapsed .nav-item{justify-content:center;padding:0}
-.rail.collapsed .nav-item .nm,.rail.collapsed .nav-item .cnt{display:none}
+.rail.collapsed .nav-item .nm{display:none}
 .rail.collapsed .nav-item .dot{position:absolute;top:5px;right:12px}
 .nav-sub{width:100%;display:flex;align-items:center;gap:8px;padding:0 10px 0 28px;height:30px;border-radius:var(--r-sm);
   color:var(--text-2);font-size:12px;transition:background var(--mo-state) var(--ease);text-align:left}
@@ -181,7 +196,9 @@ svg{display:block}
 .nav-sub .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-sub .sd{width:6px;height:6px;border-radius:var(--r-full);flex:0 0 6px}
 .rail.collapsed .nav-sub{display:none}
-.nav-label .lk{font-size:11px;font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0}
+.nav-label .lk{font-size:11px;font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0;
+  padding:2px 4px;margin-right:-4px;border-radius:var(--r-sm);transition:color var(--mo-state) var(--ease),background var(--mo-state) var(--ease)}
+.nav-label .lk:hover{color:var(--text-1);background:var(--int-subtle)}
 .nav-label .lk:hover{color:var(--text-1)}
 .rail-foot{padding:8px;border-top:1px solid var(--border-subtle)}
 /* ---- 个人中心：常驻侧栏底部，面板向上弹出 ---- */
@@ -222,18 +239,16 @@ svg{display:block}
 
 /* ===================== 通用组件 ===================== */
 .chip{height:24px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-radius:var(--r-full);
-  font-size:12px;line-height:16px;border:1px solid;white-space:nowrap}
-.chip .d{width:6px;height:6px;border-radius:var(--r-full);flex:0 0 6px}
-.chip.run{background:var(--run-bg);border-color:var(--run-bd);color:var(--run-tx)}
+  font-size:12px;line-height:16px;white-space:nowrap;
+  background:var(--a-100);border:1px solid var(--border-subtle);color:var(--text-2)}
+.chip .d{width:6px;height:6px;border-radius:var(--r-full);flex:0 0 6px;background:var(--text-dis)}
 .chip.run .d{background:var(--run-solid);animation:breathe 1.6s var(--ease) infinite}
-.chip.wait{background:var(--wait-bg);border-color:var(--wait-bd);color:var(--wait-tx)}
 .chip.wait .d{background:var(--wait-solid)}
-.chip.done{background:var(--done-bg);border-color:var(--done-bd);color:var(--done-tx)}
 .chip.done .d{background:var(--done-solid)}
+.chip.info .d{background:var(--link)}
+/* 唯一保留色底的状态：失败必须一眼看见 */
 .chip.fail{background:var(--fail-bg);border-color:var(--fail-bd);color:var(--fail-tx)}
 .chip.fail .d{background:var(--fail-solid)}
-.chip.info{background:var(--info-bg);border-color:var(--info-bd);color:var(--info-tx)}
-.chip.info .d{background:var(--link)}
 .chip.btn{height:28px;cursor:pointer;transition:filter var(--mo-state) var(--ease)}
 .chip.btn:hover{filter:brightness(.97)}
 [data-theme="dark"] .chip.btn:hover{filter:brightness(1.18)}
@@ -248,8 +263,9 @@ svg{display:block}
 .btn.sm{height:28px;padding:0 10px;font-size:13px;line-height:18px}
 .btn.pri{background:var(--g-1000);color:var(--bg-100)}
 .btn.pri:hover{background:var(--g-900)}
-.btn.acc{background:var(--brand-solid);color:var(--on-fill)}
-.btn.acc:hover{background:var(--brand-solid-hover)}
+.btn.acc{background:var(--g-1000);color:var(--bg-100)}
+.btn.acc:hover{background:var(--g-900)}
+.btn.acc:active{background:var(--g-800)}
 .btn.sec{background:var(--surface-1);color:var(--text-1);box-shadow:inset 0 0 0 1px var(--border-strong)}
 .btn.sec:hover{background:var(--int-subtle);box-shadow:inset 0 0 0 1px var(--a-500)}
 .btn.ter{color:var(--text-2)}
@@ -259,6 +275,34 @@ svg{display:block}
 .iconbtn{width:28px;height:28px;display:grid;place-items:center;border-radius:var(--r-sm);color:var(--icon-1);
   transition:background var(--mo-state) var(--ease)}
 .iconbtn:hover{background:var(--int-subtle)}
+
+/* ── 左侧导航图标：hover 时按各自语义动一下 ──────────────────
+   每条动画都回到初始形态（spark/plus 四向对称，转 90° 等于没转；
+   clock 转满 360°），这样动画结束、鼠标仍在上面时不会「弹回去」。 */
+.rail .ico{transform-origin:center}
+@media (prefers-reduced-motion:no-preference){
+  .rail .nav-item:hover .i-spark,
+  .rail .btn-new:hover .i-plus{animation:ic-spark .55s var(--ease)}
+  .rail .nav-item:hover .i-board{animation:ic-board .5s var(--ease)}
+  .rail .nav-item:hover .i-folder{animation:ic-folder .45s var(--ease)}
+  .rail .nav-item:hover .i-clock{animation:ic-clock .8s var(--ease)}
+  .rail .nav-item:hover .i-pr{animation:ic-pr .55s var(--ease)}
+  .rail .modesw button:hover .i-doc{animation:ic-folder .45s var(--ease)}
+  .rail .modesw button:hover .i-code{animation:ic-code .5s var(--ease)}
+}
+/* 四角星：转 90° + 微微涨一下 */
+@keyframes ic-spark{0%{transform:rotate(0) scale(1)}50%{transform:rotate(52deg) scale(1.22)}100%{transform:rotate(90deg) scale(1)}}
+/* 看板：像列被依次推了一下 */
+@keyframes ic-board{0%,100%{transform:scaleX(1)}35%{transform:scaleX(.82)}70%{transform:scaleX(1.06)}}
+/* 文件夹：抬一下再落回，像被掀开 */
+@keyframes ic-folder{0%,100%{transform:translateY(0)}40%{transform:translateY(-2.5px)}}
+/* 时钟：走一整圈 */
+@keyframes ic-clock{to{transform:rotate(360deg)}}
+/* 合入：沿分支方向推一下 */
+@keyframes ic-pr{0%,100%{transform:translateX(0)}35%{transform:translateX(-2px)}70%{transform:translateX(1.5px)}}
+/* 尖括号：左右撑开再收回 */
+@keyframes ic-code{0%,100%{transform:scaleX(1)}45%{transform:scaleX(1.25)}}
+
 .seg{display:inline-flex;padding:3px;background:var(--seg-track);border-radius:var(--r-lg);gap:2px;
   box-shadow:inset 0 0 0 1px var(--seg-track-bd)}
 .seg button{height:28px;padding:0 13px;border-radius:9px;font-size:13px;line-height:18px;color:var(--text-3);
@@ -297,19 +341,129 @@ img.av.me{box-shadow:0 0 0 2px var(--surface-1),0 0 0 3px var(--border-strong)}
 .crumb .cur{color:var(--text-1)}
 .crumb .sepr{color:var(--icon-2)}
 
+/* ===== 个人工作台 ===== */
+.wb{padding:0 24px 56px}
+.wb-hero{max-width:1080px;margin:0 auto;padding:44px 0 8px;text-align:center}
+.wb-hi{margin:0;font-size:32px;line-height:40px;font-weight:600;letter-spacing:-.64px}
+.wb-sub{margin:8px 0 22px;font-size:14px;line-height:22px;color:var(--text-3)}
+.wb-sub b{color:var(--text-1);font-weight:600}
+/* 包围结构：外层浅底托住内层输入卡，底部信息条落在外层上 */
+.wb-shell{text-align:left;background:var(--a-100);border:1px solid var(--border-subtle);
+  border-radius:var(--r-xl);padding:5px 5px 0;transition:border-color var(--mo-state) var(--ease)}
+.wb-shell:focus-within{border-color:var(--border-strong)}
+.wb-box{position:relative;text-align:left;border:1px solid var(--border-subtle);border-radius:var(--r-lg);
+  background:var(--surface-1);box-shadow:var(--el-1);transition:border-color var(--mo-state) var(--ease)}
+.wb-box:focus-within{border-color:var(--border-strong)}
+.wb-foot{display:flex;align-items:center;gap:8px;padding:9px 12px 10px;
+  font-size:11px;line-height:16px;color:var(--text-3)}
+.wb-foot span{display:inline-flex;align-items:center;gap:5px}
+.wb-box:focus-within{border-color:var(--focus)}
+.wb-box textarea{width:100%;border:0;outline:0;resize:none;background:transparent;
+  font-family:var(--sans);font-size:15px;line-height:24px;padding:16px 18px 4px;min-height:72px}
+.wb-box textarea::placeholder{color:var(--text-dis)}
+.wb-box-f{display:flex;align-items:center;gap:6px;padding:6px 10px 10px;flex-wrap:wrap}
+/* 发送键：无输入时置灰不可点，有输入才亮起 */
+.wb-send{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border-radius:var(--r-md);
+  background:var(--g-1000);color:var(--bg-100);
+  transition:background var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
+.wb-send:hover:not(:disabled){background:var(--g-900);transform:translateY(-1px)}
+.wb-send:active:not(:disabled){transform:none}
+.wb-send:disabled{background:var(--a-200);color:var(--text-dis);cursor:not-allowed;transform:none}
+.quick{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.qpill{height:34px;padding:0 14px;border-radius:var(--r-full);display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;color:var(--text-2);background:var(--surface-1);
+  box-shadow:inset 0 0 0 1px var(--border-subtle);
+  transition:all var(--mo-state) var(--ease)}
+.qpill:hover{color:var(--text-1);box-shadow:inset 0 0 0 1px var(--border-strong);transform:translateY(-1px)}
+.qpill svg{color:var(--icon-2)}
+.qpill:hover svg{color:var(--text-1)}
+.qpill.icon{padding:0;width:34px;justify-content:center}
+.wb-sec{max-width:1080px;margin:0 auto;padding-top:36px}
+.wb-entry{width:100%;display:flex;align-items:center;gap:12px;padding:16px;border-radius:var(--r-xl);
+  transition:border-color var(--mo-state) var(--ease),background var(--mo-state) var(--ease)}
+.wb-entry:hover{border-color:var(--border-strong);background:var(--a-100)}
+.wb-sec-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+/* 概览与日历并排：左指标 2×2，右日历 */
+.wb-row{max-width:1080px;margin:0 auto;padding-top:36px;display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:stretch}
+@media (max-width:1100px){.wb-row{grid-template-columns:1fr}}
+.wb-col{min-width:0;display:flex;flex-direction:column}
+.wb-col .statgrid{flex:1}
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat-b{display:flex;align-items:flex-end;gap:10px;margin-top:2px}
+.stat-b>div{flex:1;min-width:0}
+.spark{width:76px;height:26px;flex:0 0 76px;margin-bottom:3px;overflow:visible}
+.statcard{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:14px 16px}
+.stat-h{display:flex;align-items:center;gap:8px;min-height:28px}
+.stat-dot{width:7px;height:7px;border-radius:var(--r-full);flex:0 0 7px}
+.stat-h .btn{opacity:0;transition:opacity var(--mo-state) var(--ease)}
+.statcard:hover .btn{opacity:1}
+.stat-v{font-size:30px;line-height:38px;font-weight:600;letter-spacing:-.6px;margin:2px 0 1px;
+  font-variant-numeric:tabular-nums}
+
+/* 活跃日历 */
+.heat-col-wrap .heat-wrap{padding:14px;flex:1;display:flex;flex-direction:column}
+.heat-wrap{padding:16px}
+.heat-scroll{overflow:visible}
+.heat-grid{display:grid;grid-template-columns:20px minmax(0,1fr);grid-template-rows:16px auto;gap:5px 6px}
+.heat-months{grid-column:2;grid-row:1;display:flex;gap:3px;font-size:11px;line-height:16px;color:var(--text-3)}
+.heat-months span{flex:1 1 0;min-width:0;white-space:nowrap}
+.heat-dows{grid-column:1;grid-row:2;display:grid;grid-template-rows:repeat(7,1fr);gap:3px;
+  font-size:10px;line-height:1;color:var(--text-3);text-align:right}
+.heat-dows span{display:flex;align-items:center;justify-content:flex-end}
+.heat-cols{grid-column:2;grid-row:2;display:flex;gap:3px;min-width:0}
+.heat-col{display:grid;grid-template-rows:repeat(7,1fr);gap:3px;flex:1 1 0;min-width:0}
+.heat-cell{width:100%;aspect-ratio:1;border-radius:2px;display:block;
+  box-shadow:inset 0 0 0 1px var(--a-200);transition:transform var(--mo-state) var(--ease)}
+.heat-col .heat-cell:hover{transform:scale(1.25)}
+.heat-legend{display:flex;align-items:center;gap:4px}
+.heat-legend .heat-cell{width:11px;height:11px;flex:0 0 11px;aspect-ratio:auto}
+.heat-foot{display:flex;align-items:center;gap:7px;margin-top:auto;padding-top:14px;
+  border-top:1px solid var(--border-subtle);font-size:12px;line-height:18px;color:var(--text-3);flex-wrap:wrap}
+.heat-foot b{color:var(--text-1);font-weight:600;font-variant-numeric:tabular-nums}
+.sepdot{opacity:.5}
+
+/* 交付分析 */
+.anarow{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;align-items:stretch}
+@media (max-width:1000px){.anarow{grid-template-columns:1fr}}
+.anacard{padding:16px;display:flex;flex-direction:column}
+.ana-h{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.ana-h .lg{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3)}
+.ana-h .lg i{width:6px;height:6px;border-radius:1px;display:block}
+.ana-h .lg i.dash{width:5px;height:5px;opacity:.6}
+.trend{width:100%;height:auto;flex:1;min-height:150px}
+.trend .ax{font-size:9px;fill:var(--text-3);font-family:var(--mono)}
+.donut-row{display:flex;align-items:center;gap:14px;flex:1}
+.donut{width:124px;height:124px;flex:0 0 124px}
+.donut-v{font-size:26px;font-weight:600;fill:var(--text-1);font-family:var(--sans)}
+.donut-l{font-size:10px;fill:var(--text-3);font-family:var(--sans)}
+.donut-legend{flex:1;min-width:0}
+.lgrow{display:flex;align-items:center;gap:7px;font-size:12px;line-height:22px}
+.lgrow i{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
+.lgrow .lgn{flex:1;color:var(--text-2)}
+.lgrow b{font-variant-numeric:tabular-nums}
+.lgrow .lgp{width:34px;text-align:right;color:var(--text-3);font-family:var(--mono);font-size:11px}
+.kv{display:flex;align-items:center;justify-content:space-between;font-size:12px;line-height:21px;color:var(--text-3)}
+.kv b{color:var(--text-1);font-variant-numeric:tabular-nums}
+
+/* 工作台内的看板：跟随页面滚动，不再自己占满高度 */
+.wb-board .kb{height:auto;overflow-x:visible}
+.wb-board .kb-col{max-height:none;min-width:0}
+.wb-board .kb-b{overflow:visible}
+.wb-board .graphwrap{height:auto}
+.wb-board .tbl thead th{top:-1px}
+
 /* ===== 看板 · 泳道视图 ===== */
 .kb{display:flex;gap:14px;height:100%;align-items:flex-start;overflow-x:auto;padding-bottom:8px}
-.kb-col{flex:1 1 0;min-width:268px;display:flex;flex-direction:column;background:var(--a-100);
+.kb-col{flex:1 1 0;min-width:268px;display:flex;flex-direction:column;background:var(--kb-col);
   border:1px solid var(--border-subtle);border-radius:var(--r-xl);max-height:100%}
-.kb-h{flex:0 0 auto;padding:11px 14px;display:flex;align-items:center;gap:8px;
-  position:sticky;top:0;background:var(--surface-glass);
-  backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
-  box-shadow:inset 0 1px 0 var(--a-200);border-radius:var(--r-xl) var(--r-xl) 0 0;z-index:10}
+.kb-h{flex:0 0 auto;padding:12px 14px 2px;display:flex;align-items:center;gap:8px;
+  position:sticky;top:0;background:var(--kb-col);border-radius:var(--r-xl) var(--r-xl) 0 0;z-index:10}
 .kb-h .nm{font-size:13px;line-height:18px;font-weight:600;flex:1}
 .kb-h .ct{font-family:var(--mono);font-size:11px;color:var(--text-3)}
-.kb-bar{height:2px;border-radius:2px;flex:0 0 auto;margin:0 12px}
+.kb-tick{width:3px;height:15px;border-radius:2px;flex:0 0 3px}
 .kb-b{flex:1;min-height:0;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px}
-.kb-card{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:13px;
+.kb-card{background:var(--kb-card);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:13px;
   cursor:pointer;display:flex;flex-direction:column;gap:8px;
   transition:border-color var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
 .kb-card:hover{border-color:var(--border-strong);transform:translateY(-1px)}
@@ -331,8 +485,7 @@ img.av.me{box-shadow:0 0 0 2px var(--surface-1),0 0 0 3px var(--border-strong)}
 .tbl .tname{font-size:14px;line-height:20px;font-weight:600;display:flex;align-items:center;gap:8px}
 .tbl .tsub{font-size:12px;line-height:16px;color:var(--text-3);margin-top:2px;display:flex;align-items:center;gap:6px}
 .kindico{width:18px;height:18px;border-radius:var(--r-sm);display:grid;place-items:center;flex:0 0 18px}
-.kindico.code{background:var(--cat1-bg);color:var(--cat1-fg)}
-.kindico.gen{background:var(--cat4-bg);color:var(--cat4-fg)}
+.kindico.code,.kindico.gen{background:var(--a-100);color:var(--icon-2)}
 .branch{font-family:var(--mono);font-size:11px;color:var(--text-3);display:inline-flex;align-items:center;gap:4px}
 .nextbtn{opacity:0;transition:opacity var(--mo-state) var(--ease)}
 tr:hover .nextbtn{opacity:1}
@@ -371,15 +524,13 @@ tr:hover .nextbtn{opacity:1}
 .legend{flex:1;padding:16px;background:var(--surface-2);border-radius:var(--r-lg);align-self:flex-start;max-width:380px}
 
 /* ===================== 三域工作台 ===================== */
-.three{flex:1;display:flex;min-height:0;gap:8px}
+.three{flex:1;display:flex;min-height:0}
 /* 左 · 任务记录域 */
 .dom-l{flex:0 0 296px;width:296px;display:flex;flex-direction:column;background:var(--surface-1);
   border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden}
 .dom-l-h{padding:12px;border-bottom:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:10px}
 .srch{height:32px;display:flex;align-items:center;gap:8px;padding:0 10px;border-radius:var(--r-sm);
   background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--border-strong);color:var(--text-3);font-size:13px}
-.lgroup{padding:12px 8px 4px}
-.lgroup-t{font-size:11px;font-weight:500;color:var(--text-3);padding:0 8px 6px;display:flex;align-items:center;gap:6px;letter-spacing:.04em}
 .mini{width:100%;text-align:left;padding:10px;border-radius:var(--r-md);display:flex;flex-direction:column;gap:6px;
   transition:background var(--mo-state) var(--ease);border:1px solid transparent}
 .mini:hover{background:var(--int-subtle)}
@@ -490,9 +641,19 @@ tr:hover .nextbtn{opacity:1}
 .pick:hover{background:var(--int-subtle);color:var(--text-1)}
 
 /* 右 · 工作对象域 */
-.dom-r{flex:0 0 460px;width:460px;display:flex;flex-direction:column;background:var(--surface-1);
+.dom-r{flex:0 1 640px;width:640px;min-width:360px;display:flex;flex-direction:column;background:var(--surface-1);
   border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden}
 .dom-r.hidden{display:none}
+/* 任务页只剩控制域 + 产物域两列 */
+.three.two .dom-c{min-width:400px}
+/* 左域收起：整列与其分隔条一起退场 */
+.three.lhide .dom-l,.three.lhide>.rz[data-rz="domLW"]{display:none}
+/* 右域全屏：中间与左侧让位，产物面板接管整块工作区 */
+.three.rfull .dom-l,.three.rfull .dom-c,.three.rfull>.rz[data-rz="domLW"],
+.three.rfull>.rz[data-rz="domRW"]{display:none}
+.three.rfull .dom-r{flex:1 1 auto!important;width:auto!important}
+.iconbtn.off{color:var(--icon-dis)}
+.iconbtn.off:hover{color:var(--icon-1)}
 .tabs{flex:0 0 auto;display:flex;gap:2px;padding:10px 12px 0;border-bottom:1px solid var(--border-subtle);align-items:center}
 .tab{height:32px;padding:0 10px;border-radius:var(--r-sm) var(--r-sm) 0 0;font-size:13px;color:var(--text-2);
   display:inline-flex;align-items:center;gap:6px;position:relative;transition:color var(--mo-state) var(--ease)}
@@ -529,6 +690,83 @@ tr:hover .nextbtn{opacity:1}
   border-radius:4px;margin-top:6px;display:inline-block;border:1px solid var(--border-subtle)}
 .shot{margin-top:8px;border-radius:var(--r-md);border:1px solid var(--border-subtle);overflow:hidden;background:var(--surface-2)}
 
+/* ===== 单 Session 轨迹 ===== */
+/* ── 轨迹：低噪密集表 ──────────────────────────────────────
+   6 张指标卡压成一行摘要，步骤行去掉卡片与进度条，
+   颜色只留在角色标签的文字上；选中行靠左侧细条表达。 */
+.tr-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tr-f{display:flex;gap:2px;flex:1;min-width:0;flex-wrap:wrap}
+.tr-f button{height:24px;padding:0 9px;border-radius:var(--r-sm);font-size:12px;color:var(--text-3);
+  display:inline-flex;align-items:center;gap:5px;transition:color var(--mo-state) var(--ease),background var(--mo-state) var(--ease)}
+.tr-f button:hover{color:var(--text-1);background:var(--int-subtle)}
+.tr-f button.on{color:var(--text-1);background:var(--a-200)}
+.tr-f button i{font-family:var(--mono);font-size:10px;font-style:normal;opacity:.6}
+.tr-srch{flex:0 0 132px;height:24px;padding:0 8px;border-radius:var(--r-sm);display:flex;align-items:center;gap:6px;
+  background:var(--a-100);border:1px solid var(--border-subtle);font-size:12px;color:var(--text-3)}
+
+.tr-strip{padding:2px 0 0;margin-bottom:10px}
+.tr-srow{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.tr-sl{width:30px;flex:0 0 30px;font-size:10px;line-height:14px;color:var(--text-3);text-align:right;
+  font-family:var(--mono)}
+.tr-sc{flex:1;display:flex;gap:3px;min-width:0;height:9px;justify-content:space-between}
+.tr-b{flex:1 1 0;min-width:3px;max-width:16px;border-radius:2px;background:var(--a-200);cursor:pointer;
+  transition:transform var(--mo-state) var(--ease),outline-color var(--mo-state) var(--ease);
+  outline:1.5px solid transparent;outline-offset:1.5px}
+.tr-b.hit.k-assistant{background:var(--p-600)}
+.tr-b.hit.k-sub{background:var(--gr-700)}
+.tr-b.hit.k-tool{background:var(--am-700)}
+.tr-b.hit.k-error{background:var(--rd-700)}
+.tr-b:hover{transform:scaleY(1.45)}
+.tr-b.on{outline-color:var(--focus)}
+.tr-axis{display:flex;margin-left:39px;padding-top:5px;font-family:var(--mono);font-size:10px;color:var(--text-3)}
+.tr-sum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0 10px;
+  border-top:1px solid var(--border-subtle);font-size:11px;line-height:16px;color:var(--text-3);font-family:var(--mono)}
+.tr-sum b{color:var(--text-1);font-weight:600}
+.tr-sum .sepdot{opacity:.45}
+.tr-sum .bad b{color:var(--fail-tx)}
+
+/* 主从分屏：只在产物面板放大后才铺开，640px 宽度下改为行内展开 */
+.tr-wrap{display:flex;gap:12px;align-items:flex-start;min-height:0}
+.tr-list{flex:1;min-width:0}
+.tr-item{border-bottom:1px solid var(--border-subtle)}
+.tr-item:first-child{border-top:1px solid var(--border-subtle)}
+.tr-row{width:100%;display:flex;align-items:center;gap:9px;padding:7px 10px 7px 8px;text-align:left;
+  position:relative;transition:background var(--mo-state) var(--ease)}
+.tr-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;
+  transition:background var(--mo-state) var(--ease)}
+.tr-row:hover{background:var(--int-subtle)}
+.tr-item.on .tr-row{background:var(--a-100)}
+.tr-item.on .tr-row::before{background:var(--focus)}
+.tr-dot{flex:0 0 5px;width:5px;height:5px;border-radius:50%;background:var(--text-dis)}
+.tr-item.k-assistant .tr-dot{background:var(--p-600)}
+.tr-item.k-tool .tr-dot{background:var(--am-700)}
+.tr-item.k-sub .tr-dot{background:var(--gr-700)}
+.tr-item.k-error .tr-dot{background:var(--rd-700)}
+.tr-k{flex:0 0 auto;font-size:10px;line-height:16px;font-weight:500;letter-spacing:.06em;
+  font-family:var(--mono);color:var(--text-3);width:54px;white-space:nowrap;flex:0 0 54px}
+.tr-item.k-assistant .tr-k{color:var(--cat2-fg)}
+.tr-item.k-tool .tr-k{color:var(--cat4-fg)}
+.tr-item.k-sub .tr-k{color:var(--cat3-fg)}
+.tr-item.k-error .tr-k{color:var(--fail-tx)}
+.tr-t{flex:1;min-width:0;font-size:12px;line-height:18px;color:var(--text-2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-d{flex:0 0 42px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text-3);
+  font-variant-numeric:tabular-nums}
+
+/* 详情：行内展开（窄）/ 右侧定栏（放大后） */
+.tr-detail{padding:10px 10px 12px 20px;background:var(--surface-2);border-bottom:1px solid var(--border-subtle)}
+.tr-pane{flex:0 0 288px;position:sticky;top:0;padding:12px;border:1px solid var(--border-subtle);
+  border-radius:var(--r-lg);background:var(--surface-2)}
+.tr-pane-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tr-pane-h .tr-k{width:auto}
+.tr-sec{font-size:10px;letter-spacing:.06em;color:var(--text-3);font-family:var(--mono);
+  margin:12px 0 4px;padding-top:9px;border-top:1px solid var(--border-subtle)}
+.tr-detail .kv,.tr-pane .kv{line-height:21px;font-size:12px}
+.tr-note{display:flex;align-items:flex-start;gap:6px;margin-top:9px;padding-top:9px;
+  border-top:1px solid var(--border-subtle);font-size:11px;line-height:16px;color:var(--text-3)}
+.tr-note svg{flex:0 0 12px;margin-top:2px}
+.tr-empty{padding:28px 12px;text-align:center;font-size:12px;color:var(--text-3)}
+
 /* ===================== Diff / 代码 ===================== */
 .filerow{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-sm);font-size:13px;
   transition:background var(--mo-state) var(--ease);cursor:pointer}
@@ -549,8 +787,8 @@ tr:hover .nextbtn{opacity:1}
 .dl.del{background:var(--diff-del)} .dl.del .ct{color:var(--git-del)}
 .dl.hunk{background:var(--info-bg)} .dl.hunk .ct{color:var(--info-tx)}
 .dl:hover .cmt-add{opacity:1}
-.cmt-add{position:absolute;left:-30px;top:1px;width:18px;height:18px;border-radius:4px;background:var(--brand-solid);
-  color:var(--on-fill);display:grid;place-items:center;font-size:13px;opacity:0;transition:opacity var(--mo-state) var(--ease)}
+.cmt-add{position:absolute;left:-30px;top:1px;width:18px;height:18px;border-radius:4px;background:var(--g-1000);
+  color:var(--bg-100);display:grid;place-items:center;font-size:13px;opacity:0;transition:opacity var(--mo-state) var(--ease)}
 .k{color:var(--syn-kw)} .s{color:var(--syn-str)} .n{color:var(--syn-num)} .c{color:var(--syn-cm)}
 
 /* 文档 diff */
@@ -602,13 +840,71 @@ tr:hover .nextbtn{opacity:1}
 .entry{padding:14px;display:flex;align-items:center;gap:11px;cursor:pointer;
   transition:border-color var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
 .entry:hover{border-color:var(--border-strong);background:var(--a-100);transform:translateY(-1px)}
-.ecard2.off{opacity:.62}
+.ecard2.off{opacity:.55}
+.conn-g{margin-bottom:26px}
+.conn-gh{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.conncard{padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;
+  transition:border-color var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
+.conncard:hover{border-color:var(--border-strong);transform:translateY(-1px)}
+.conncard.off{opacity:.68}
+.conncard.off:hover{opacity:1}
+.conn-ico{width:36px;height:36px;border-radius:var(--r-md);flex:0 0 36px;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--bg) 18%,transparent);color:var(--bg);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--bg) 32%,transparent)}
+.conn-ok{width:22px;height:22px;border-radius:var(--r-full);display:grid;place-items:center;flex:0 0 22px;
+  background:var(--done-bg);color:var(--done-tx)}
+.conncard .iconbtn{opacity:0;transition:opacity var(--mo-state) var(--ease)}
+.conncard:hover .iconbtn{opacity:1}
+/* 自动化卡片底部状态行：操作按钮 hover 才浮出，用卡片底色把右侧统计挡住 */
+.auto-s{display:flex;align-items:center;gap:8px;position:relative;min-height:26px}
+.auto-ops{position:absolute;right:-5px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:1px;
+  padding-left:14px;background:var(--surface-1);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px);mask-image:linear-gradient(90deg,transparent 0,#000 14px);
+  opacity:0;pointer-events:none;transition:opacity var(--mo-state) var(--ease)}
+.ecard2:hover .auto-ops,.auto-ops:has(.menu){opacity:1;pointer-events:auto}
+
+/* 执行记录时间轴（.rtl 前缀：.tl 已被对话流时间轴占用） */
+.rtl{padding:2px 0 8px}
+.rtl-i{position:relative;display:flex;gap:14px;cursor:pointer}
+.rtl-i::before{content:'';position:absolute;left:4px;top:18px;bottom:-1px;width:2px;
+  background:var(--border-subtle);border-radius:1px}
+.rtl-i:last-child::before{display:none}
+.rtl-rail{width:10px;flex:0 0 10px;display:flex;justify-content:center;padding-top:8px}
+.rtl-node{width:10px;height:10px;border-radius:2px;flex:0 0 10px;background:var(--text-dis)}
+.rtl-i.run .rtl-node{background:var(--run-solid);animation:breathe 1.6s var(--ease) infinite}
+.rtl-i.wait .rtl-node{background:var(--wait-solid)}
+.rtl-i.done .rtl-node{background:var(--done-solid)}
+.rtl-i.fail .rtl-node{background:var(--fail-solid)}
+.rtl-b{flex:1;min-width:0;margin-bottom:4px;padding:6px 12px 12px;border-radius:var(--r-lg);
+  border:1px solid transparent;transition:background var(--mo-state) var(--ease),border-color var(--mo-state) var(--ease)}
+.rtl-i:hover .rtl-b{background:var(--int-subtle);border-color:var(--border-subtle)}
+.rtl-h{display:flex;align-items:center;gap:8px;min-width:0}
+.rtl-t{font-size:14px;line-height:20px;font-weight:500;color:var(--text-1);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rtl-when{margin-left:auto;flex:0 0 auto;font-size:12px;color:var(--text-3);font-family:var(--mono)}
+.rtl-d{font-size:12px;line-height:18px;color:var(--text-3);margin-top:2px}
+.rtl-m{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.menuwrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);z-index:40;min-width:150px;padding:5px;
+  background:var(--surface-glass);backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid var(--glass-border);border-radius:var(--r-md);
+  box-shadow:var(--el-3),inset 0 1px 0 var(--a-300);animation:pop var(--mo-pop) var(--ease)}
+.menu-i{width:100%;display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;
+  border-radius:var(--r-sm);font-size:13px;color:var(--text-2);text-align:left;
+  transition:background var(--mo-state) var(--ease)}
+.menu-i:hover{background:var(--int-subtle);color:var(--text-1)}
+.menu-i.del{color:var(--fail-tx)}
+.menu-i.del:hover{background:var(--fail-bg)}
+.entry.on{border-color:var(--border-strong);background:var(--a-100)}
+.tplwrap{padding:16px;background:var(--a-100);border:1px solid var(--border-subtle);border-radius:var(--r-xl)}
 .pills{display:flex;gap:8px;flex-wrap:wrap}
 .pill{height:30px;padding:0 12px;border-radius:var(--r-full);font-size:13px;color:var(--text-2);
   background:var(--a-100);display:inline-flex;align-items:center;gap:6px;transition:all var(--mo-state) var(--ease)}
 .pill:hover{color:var(--text-1);background:var(--a-200)}
 .pill.on{background:var(--a-300);color:var(--text-1);font-weight:500;box-shadow:inset 0 0 0 1px var(--border-strong)}
-.pill .n{font-family:var(--mono);font-size:11px;opacity:.7}
+.pill .cn{font-family:var(--mono);font-size:11px;color:var(--p-900)}
+.pill.on .cn{color:var(--p-900)}
 /* ===== 专家卡：纸质简历 + 拍立得照片（尺寸/角度/阴影对齐现网实测） ===== */
 .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(336px,1fr));gap:44px 16px;
   padding-top:44px;align-content:start}
@@ -649,6 +945,7 @@ tr:hover .nextbtn{opacity:1}
 .ecard2-h{display:flex;gap:11px;align-items:flex-start}
 .ex-av{width:42px;height:42px;border-radius:var(--r-full);flex:0 0 42px;object-fit:cover;background:var(--catn-bg)}
 .sk-ico{width:34px;height:34px;border-radius:var(--r-md);flex:0 0 34px;display:grid;place-items:center}
+.sk-ico.neutral{background:var(--a-100);color:var(--icon-1);box-shadow:inset 0 0 0 1px var(--border-subtle)}
 .ecard2 .btn.sm,.ecard2 .iconbtn{opacity:0;transition:opacity var(--mo-state) var(--ease)}
 .ecard2:hover .btn.sm,.ecard2:hover .iconbtn{opacity:1}
 
@@ -658,18 +955,9 @@ tr:hover .nextbtn{opacity:1}
 .newhero{text-align:center;margin-bottom:28px;position:relative}
 .newtitle{margin:0;font-size:32px;line-height:40px;font-weight:600;letter-spacing:-.64px}
 .newsub{margin:8px 0 0;font-size:14px;line-height:22px;color:var(--text-3)}
-.newbox{border:1px solid var(--border-strong);border-radius:var(--r-xl);background:var(--surface-1);
-  box-shadow:var(--el-2);transition:border-color var(--mo-state) var(--ease)}
-.newbox:focus-within{border-color:var(--focus)}
-.newbox textarea{width:100%;border:0;outline:0;resize:none;background:transparent;
-  font-family:var(--sans);font-size:16px;line-height:26px;padding:18px 20px 6px;min-height:104px}
-.newbox textarea::placeholder{color:var(--text-dis)}
-.newbox-f{display:flex;align-items:center;gap:6px;padding:8px 12px 12px;flex-wrap:wrap}
+/* 新建页的输入卡与工作台同款，只是更高一点 */
+.newbox textarea{min-height:104px}
 .newsep{width:1px;height:18px;background:var(--border-subtle);margin:0 2px}
-.newbox-foot{display:flex;align-items:center;gap:8px;padding:9px 16px;border-top:1px solid var(--border-subtle);
-  font-size:11px;line-height:16px;color:var(--text-3);background:var(--a-100);
-  border-radius:0 0 var(--r-xl) var(--r-xl)}
-.newbox-foot span{display:inline-flex;align-items:center;gap:5px}
 .newtpl{margin-top:40px}
 .tplgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .tplcard{padding:0;overflow:hidden;text-align:left;display:flex;flex-direction:column;
@@ -758,6 +1046,10 @@ tr:hover .nextbtn{opacity:1}
 <g id="i-att"><path d="M12.4 7.6 8 12a3 3 0 0 1-4.3-4.3l4.8-4.8a2 2 0 0 1 2.9 2.9l-4.8 4.8a1 1 0 0 1-1.5-1.5l4.4-4.4"/></g>
 <g id="i-send"><path d="M14 2 7.4 8.6M14 2l-4.4 12-2.2-5.4L2 6.4z"/></g>
 <g id="i-gitcode"><circle cx="8" cy="8" r="6"/><path d="M8 4.6v6.8M4.6 8h6.8"/></g>
+<g id="i-up"><path d="M8 12.8V3.6M4.2 7.4 8 3.6l3.8 3.8"/></g>
+<g id="i-expand"><path d="M6.2 2.6H2.6v3.6M9.8 2.6h3.6v3.6M13.4 9.8v3.6H9.8M2.6 9.8v3.6h3.6"/></g>
+<g id="i-shrink"><path d="M2.6 6.2h3.6V2.6M13.4 6.2H9.8V2.6M9.8 9.8h3.6v3.6M6.2 9.8H2.6v3.6"/></g>
+<g id="i-sideL"><rect x="2" y="3" width="12" height="10" rx="1.8"/><path d="M6 3v10"/></g>
 <g id="i-ne"><path d="M5.6 10.4 10.4 5.6M6.2 5.6h4.2v4.2"/></g>
 <g id="i-globe"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2a9 9 0 0 1 0 12A9 9 0 0 1 8 2z"/></g>
 </defs></svg>
@@ -803,13 +1095,14 @@ const av = (c, k, size) =>
 const LOGO = 'data:image/png;base64,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';
 
 const ic = (n, s = 16, cls = '') =>
-  `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><use href="#i-${n}"/></svg>`;
+  `<svg class="ico i-${n} ${cls}" width="${s}" height="${s}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><use href="#i-${n}"/></svg>`;
 
 const S = {
-  theme: 'dark', mode: 'gen', page: 'board', railOpen: true,
-  taskId: 'T-2041', boardView: 'kanban', rTab: 'art', rOpen: true,
-  reviewId: null, expertTab: 'expert', dialog: null, projF: 'all', projOpen: 'team-workspace',
-  revF: 'all', revTab: 'sum', taskGroup: 'st', projTab: 'mine', newCat: 0, newTpl: null, acct: false, exCat: '全部', skCat: '全部',
+  theme: 'dark', mode: 'gen', page: 'home', railOpen: true,
+  taskId: 'T-2041', boardView: 'kanban', rTab: 'art', rOpen: true, lOpen: true, rFull: false,
+  railW: 232, domLW: 296, domRW: 640,
+  reviewId: null, expertTab: 'expert', dialog: null, projF: 'all', projOpen: new Set(['team-workspace']),
+  revF: 'all', revTab: 'sum', trStep: null, trF: 'all', projTab: 'mine', newCat: 0, newTpl: null, acct: false, goal: '', autoTab: 'mine', autoTpl: false, autoMenu: null, exCat: '全部', skCat: '全部',
   cmtLine: null, toast: null, tlOpen: true
 };
 
@@ -1083,27 +1376,63 @@ const DATA = {
       ci: ['done','已接受并归档'], cmt: 5, ts: '昨天 18:40', src: 'Space', by: "你 · 昨天 14:10 发起", desc: ["变更评审卡 v2：四段式结构与影响面表达方式定稿。", "已接受并归档，衍生 2 条编程任务。"], impact: "作为后续两条编程任务的依据，改动需同步通知。", rb: "已归档版本保留，可作为基线对比。" }
   ],
   autos: [
-    { k: 'gen', id: 'A-07', n: 'AI Agent 产品趋势周报', on: true, trig: '定时 · 每周一 09:30',
+    { k: 'gen', id: 'A-07', next: '3 天 21 小时后', n: 'AI Agent 产品趋势周报', on: true, trig: '定时 · 每周一 09:30',
       d: '采集 18 个来源 → 去重核验 → 归纳趋势 → 生成周报并提交评审',
       last: ['wait','今天 09:30 · 等待人工定调','T-2041'], runs: 36, rate: '34/36 成功' },
-    { k: 'code', id: 'A-05', n: '依赖漏洞每日巡检', on: true, trig: '定时 · 每日 07:00',
+    { k: 'code', id: 'A-05', next: '19 小时后', n: '依赖漏洞每日巡检', on: true, trig: '定时 · 每日 07:00',
       d: '扫描 package.json → 有高危时开工作线并提交修复评审',
       last: ['done','今天 07:00 · 无高危，未开线','—'], runs: 128, rate: '128/128 成功' },
-    { k: 'gen', id: 'A-04', n: '故障复盘自动起草', on: true, trig: '事件 · 故障单关闭',
+    { k: 'gen', id: 'A-04', next: '故障单关闭后触发', n: '故障复盘自动起草', on: true, trig: '事件 · 故障单关闭',
       d: '拉取时间线、构建记录与告警 → 起草复盘初稿 → 通知负责人',
       last: ['fail','2 小时前 · 连接器鉴权过期','T-2028'], runs: 9, rate: '8/9 成功' },
-    { k: 'gen', id: 'A-06', n: '会议纪要与待办分发', on: true, trig: '事件 · 会议结束后 15 分钟',
+    { k: 'gen', id: 'A-06', next: '会议结束后触发', n: '会议纪要与待办分发', on: true, trig: '事件 · 会议结束后 15 分钟',
       d: '转写录音 → 抽结论与待办 → 落责任人 → 按参会名单分发并跟踪回执',
       last: ['wait','8 分钟前 · 2 条待办待定归属','T-2044'], runs: 47, rate: '45/47 成功' },
-    { k: 'gen', id: 'A-03', n: '工单高频问题周度归拢', on: true, trig: '定时 · 每周五 17:00',
+    { k: 'gen', id: 'A-03', next: '2 天 5 小时后', n: '工单高频问题周度归拢', on: true, trig: '定时 · 每周五 17:00',
       d: '拉取本周工单 → 聚类高频问题 → 比对现有答复口径 → 有缺口时起草补充',
       last: ['done','上周五 17:00 · 新增 3 条口径','T-2039'], runs: 22, rate: '22/22 成功' },
-    { k: 'code', id: 'A-02', n: 'PR 合入后同步发布说明', on: false, trig: '事件 · PR 合入 main',
+    { k: 'gen', id: 'A-09', next: '4 天 6 小时后', n: '客户访谈纪要归档', on: true, trig: '定时 · 每周三 18:00',
+      d: '汇总本周访谈录音 → 抽取观点与矛盾点 → 归档到调研空间并更新问题库',
+      last: ['done', '9/10 18:00 · 归档 4 场访谈', '—'], runs: 14, rate: '14/14 成功' },
+    { k: 'gen', id: 'A-08', next: '16 天后', n: '月度费用汇总', on: false, trig: '定时 · 每月 1 日 09:00',
+      d: '从三个部门的源表取数 → 口径拉平 → 逐格校验后产出汇总表与差异说明',
+      last: ['done', '9/1 09:00 · 已接受并归档', '—'], runs: 7, rate: '7/7 成功' },
+    { k: 'gen', id: 'A-01', next: '页面变更时触发', n: '竞品官网变更监控', on: true, trig: '事件 · 页面内容变更',
+      d: '监控 6 个竞品站点 → 仅在措辞或功能有实质变化时起草一条变更说明',
+      last: ['run', '12 分钟前 · 正在核对 2 处变更', '—'], runs: 63, rate: '61/63 成功' },
+    { k: 'code', id: 'A-12', next: '6 天 18 小时后', n: '依赖许可证合规扫描', on: true, trig: '定时 · 每周一 06:00',
+      d: '扫描全部依赖的许可证 → 命中禁用清单时起单并附替代方案',
+      last: ['done', '今天 06:00 · 无新增风险', '—'], runs: 31, rate: '31/31 成功' },
+    { k: 'code', id: 'A-11', next: '构建失败时触发', n: '主干构建失败自动起单', on: true, trig: '事件 · main 构建失败',
+      d: '拉取失败日志 → 定位首个报错 → 开修复工作线并 @ 最近改动者',
+      last: ['done', '昨天 21:14 · 已修复并合入', '—'], runs: 18, rate: '17/18 成功' },
+    { k: 'code', id: 'A-10', next: '16 天后', n: '陈旧分支清理提醒', on: false, trig: '定时 · 每月 1 日 10:00',
+      d: '找出 60 天无提交且未合入的分支 → 列出负责人与最后改动 → 等人确认后归档',
+      last: ['done', '9/1 10:00 · 提醒 9 条', '—'], runs: 5, rate: '5/5 成功' },
+    { k: 'code', id: 'A-02', next: 'PR 合入后触发', n: 'PR 合入后同步发布说明', on: false, trig: '事件 · PR 合入 main',
       d: '汇总本次合入的变更摘要 → 更新发布说明 → 提交评审',
       last: ['done','3 天前 · 已更新 v1.4.2','—'], runs: 52, rate: '51/52 成功' }
   ],
   experts: [{"n": "工作台搭建专家", "en": "Wendy", "tags": ["工作台", "效率工具", "个人管理"], "d": "能够根据用户需求，调用 workbench-pro 技能生成美观大气的个人每日工作台，支持每日计划、习惯打卡、记账本、长期目标、灵感记录等模块，桌面版与移动版双模板，配置驱动、可换肤、数据本地存储。", "cat": "办公效率"}, {"n": "演示文稿生成专家", "en": "Peter", "tags": ["PPT生成", "演示文稿", "办公效率"], "d": "能够根据用户需求，调用 ppt-expert 技能生成专业级演示文稿，支持商务、科技、教育、金融、创意等全行业场景，支持 HTML 预览微调和 PPTX 直接生成两种交付模式，内置 20+ 套视觉风格。", "cat": "办公效率"}, {"n": "海报生成专家", "en": "Hazel", "tags": ["海报设计", "视觉创意", "高清出图"], "d": "能够根据用户需求生成专业级图片海报，支持广告海报、宣传海报、活动海报、产品海报等类型，内置设计规范、字体系统、布局系统，产出零依赖 HTML，一键导出高清 PNG。", "cat": "办公效率"}, {"n": "全能文档处理专家", "en": "Daniel", "tags": ["文档处理", "格式转换", "OCR识别"], "d": "文档处理套件：覆盖 Excel 电子表格、Word 文档、PowerPoint 演示文稿和 PDF 文件的创建、编辑与转换。支持从零创建专业文档、批量处理既有文件、跨格式转换、内容提取与 OCR 识别，让繁琐的填表、排版、转格式、提取内容变成一句话的事。", "cat": "办公效率"}, {"n": "HTML幻灯片制作专家", "en": "Chloe", "tags": ["HTML幻灯片", "动画演示", "零依赖网页"], "d": "零依赖打造动画网页演示文稿，支持从零创建、PPTX 转换与增强，提供风格预览、部署与 PDF 导出，固定 16:9 舞台跨设备不变形，拒绝千篇一律的 AI 美学，追求独特定制的视觉表达。", "cat": "办公效率"}, {"n": "深度文档编辑与续写专家", "en": "Sophia", "tags": ["长文档写作", "章节续写", "成稿质检"], "d": "把提纲、访谈、旧稿和零散素材整理成结构清晰的长文档，支持章节续写、限定范围改稿与成稿交付前检查。以用户提供的材料为内容依据，在当前对话中直接输出可编辑的结构与正文。覆盖材料启动、续写改稿与成稿收口三类核心场景，每轮交付一个清晰的写作增量。", "cat": "办公效率"}, {"n": "会议纪要总结专家", "en": "Mia", "tags": ["会议纪要", "信息提取", "待办管理"], "d": "将杂乱无章的语音转写、随手笔记或草稿转化为结构清晰、权责分明、可执行的正式会议纪要。具备信息清洗、实体识别、逻辑归纳与标准化商务表达能力，输出包含元信息、核心决策、议题讨论详情、待办事项及遗留问题的完整 Markdown 会议纪要。", "cat": "办公效率"}, {"n": "网页开发专家", "en": "Alex", "tags": ["网页开发", "HTML/CSS", "响应式设计"], "d": "能够根据用户需求设计、开发、调试和交付网页应用，支持 HTML/CSS/JavaScript 以及现代前端框架开发，并提供可预览的网页产物。", "cat": "软件开发"}, {"n": "前端性能优化专家", "en": "Ryan", "tags": ["性能优化", "Core Web Vitals", "渲染性能"], "d": "基于 Core Web Vitals 和浏览器性能分析定位主要瓶颈，在保证功能与页面行为不变的前提下完成针对性优化。", "cat": "软件开发"}, {"n": "前端开发工程师", "en": "David", "tags": ["前端开发", "React/Vue", "组件设计"], "d": "能够根据用户需求进行前端应用的设计、开发、调试和交付，支持 React/Vue/Angular 等现代前端框架以及原生 HTML/CSS/JavaScript 开发，覆盖组件开发、状态管理、性能优化、响应式设计、无障碍访问等前端工程全流程。", "cat": "软件开发"}, {"n": "后端服务工程师", "en": "James", "tags": ["后端开发", "Spring Boot", "API设计"], "d": "能够根据用户需求进行后端服务的设计、开发、调试和交付，支持 Java(Spring Boot)/Python(FastAPI/Django)/Go(Gin)/Node.js 等主流后端技术栈，覆盖 API 设计、数据库建模、业务逻辑实现、安全防护、性能优化、测试部署等后端工程全流程。", "cat": "软件开发"}, {"n": "编码工程师", "en": "Michael", "tags": ["编码实现", "Python", "工具开发"], "d": "能够根据用户需求进行软件设计、编码、调试、重构和交付，支持多种编程语言（Java/Python/Go/TypeScript/JavaScript/C++ 等），覆盖从需求理解、方案设计到代码实现、自测验证的全流程。", "cat": "软件开发"}, {"n": "编码规范与静态告警修复专家", "en": "Brian", "tags": ["编码规范", "静态分析", "代码修复"], "d": "能够针对静态分析工具（SonarQube、ESLint、Checkstyle、Pylint、golangci-lint、cppcheck 等）产出的编码规范违规和静态告警进行精准修复，提供告警分类、批量修复、修复后验证，支持直接修复代码、对话内输出修复说明、Markdown 修复报告三种输出格式。", "cat": "软件开发"}, {"n": "代码重构专家", "en": "Kevin", "tags": ["代码重构", "设计模式", "可维护性"], "d": "能够根据检测到的代码异味报告，制定重构方案并执行重构，确保功能不变的前提下改善代码结构。", "cat": "软件开发"}, {"n": "鸿蒙开发专家", "en": "Leo", "tags": ["鸿蒙开发", "ArkTS", "HarmonyOS"], "d": "能够基于 HarmonyOS/ArkTS 完成从需求理解、架构分析、编码实现、编译构建（hvigor/ohpm）、设备测试到收敛交付的全流程开发，覆盖 ArkUI 声明式 UI、状态管理 V1/V2、HAP/HAR/HSP 三种包形态、Navigation 路由，支持 L0-L3 四级测试金字塔和写码→编译→测试→修复的收敛循环。", "cat": "软件开发"}, {"n": "技术方案设计专家", "en": "Robert", "tags": ["技术方案", "架构设计", "模块拆解"], "d": "能够根据需求描述设计完整的技术方案，包含架构设计、模块拆解、接口定义和数据模型。", "cat": "软件开发"}, {"n": "需求分析专家", "en": "Jessica", "tags": ["需求分析", "需求文档", "验收标准"], "d": "能够对用户需求进行深度分析，产出结构化的需求文档，包含功能需求、非功能需求和验收标准。", "cat": "软件开发"}, {"n": "计划生成专家", "en": "Daniel", "tags": ["计划生成", "任务拆解", "项目规划"], "d": "能够根据需求文档生成分步实现计划，包含任务拆解、测试用例和提交节点。", "cat": "软件开发"}, {"n": "代码检视专家", "en": "Thomas", "tags": ["代码检视", "质量评估", "修复建议"], "d": "能够对代码进行全面检视，生成包含问题分级和修复建议的检视报告。", "cat": "软件开发"}, {"n": "安全代码审计专家", "en": "Andrew", "tags": ["安全审计", "漏洞检测", "安全修复"], "d": "能够审计代码中的安全漏洞，生成包含漏洞分级和修复建议的审计报告。", "cat": "软件开发"}, {"n": "代码异味检测专家", "en": "Steven", "tags": ["代码异味", "静态检测", "质量分析"], "d": "能够检测项目中的代码异味，输出结构化的检测报告供重构参考。", "cat": "软件开发"}, {"n": "开发者测试工程师", "en": "Eric", "tags": ["单元测试", "测试覆盖", "边界测试"], "d": "能够为指定方法生成高质量单元测试，覆盖正常路径、边界条件和异常场景。", "cat": "软件开发"}, {"n": "网站测试专家", "en": "Grace", "tags": ["网站测试", "交互验证", "截图记录"], "d": "能够测试本地运行的网页应用，验证关键交互功能并截图记录问题。", "cat": "软件开发"}, {"n": "独立结果验证专家", "en": "Marcus", "tags": ["结果验证", "回归测试", "问题发现"], "d": "能够验证项目改动的正确性，实际运行相关功能并尽可能找出隐藏问题。", "cat": "软件开发"}, {"n": "问题定位与修复工程师", "en": "Justin", "tags": ["问题定位", "Bug修复", "根因分析"], "d": "能够根据问题描述快速定位代码中的问题根因，并直接修改源文件完成修复。", "cat": "软件开发"}, {"n": "构建失败排查专家", "en": "Nathan", "tags": ["构建排查", "编译错误", "依赖冲突"], "d": "能够排查项目构建失败问题，定位编译错误、依赖冲突或配置问题并修复。", "cat": "软件开发"}, {"n": "漏洞修复工程师", "en": "Patrick", "tags": ["漏洞修复", "安全加固", "源码修复"], "d": "能够根据漏洞报告直接修复源文件中的安全漏洞，确保修复不引入功能回归。", "cat": "软件开发"}, {"n": "开源升级专家", "en": "Brandon", "tags": ["依赖升级", "兼容性分析", "版本迁移"], "d": "能够分析依赖升级的所有不兼容点并给出修复方案，完成版本升级。", "cat": "软件开发"}, {"n": "技术债盘点专家", "en": "Derek", "tags": ["技术债", "债务盘点", "偿还计划"], "d": "能够盘点项目中的技术债，生成结构化的技术债登记表，含优先级和偿还建议。", "cat": "软件开发"}, {"n": "接口性能优化专家", "en": "Vincent", "tags": ["接口优化", "性能瓶颈", "响应优化"], "d": "能够定位接口性能瓶颈并完成针对性优化，在保证功能正确和接口行为不变的前提下给出优化前后对比。", "cat": "软件开发"}, {"n": "数据库与SQL优化专家", "en": "Oscar", "tags": ["SQL优化", "索引调优", "数据库"], "d": "能够分析并优化项目中执行缓慢的 SQL 查询，涵盖索引优化、查询重写和 schema 调整。", "cat": "软件开发"}, {"n": "算法与计算性能优化专家", "en": "Felix", "tags": ["算法优化", "复杂度分析", "并行计算"], "d": "能够优化算法和数据处理代码的性能，通过复杂度分析、并行化和内存优化降低执行时间。", "cat": "软件开发"}, {"n": "缺陷复现工程师", "en": "Calvin", "tags": ["缺陷复现", "最小场景", "问题定位"], "d": "能够根据缺陷描述复现问题，最小化复现场景并输出复现步骤。", "cat": "软件开发"}, {"n": "部署运维专家", "en": "George", "tags": ["部署运维", "生产部署", "监控告警"], "d": "能够执行生产环境部署并配置运维流程，覆盖部署方案、回滚策略和监控告警。", "cat": "软件开发"}, {"n": "CI-CD流水线工程师", "en": "Henry", "tags": ["CI/CD", "流水线", "自动化"], "d": "能够为项目设计并实现 CI/CD 流水线，覆盖代码提交、构建、测试、部署全链路自动化。", "cat": "软件开发"}, {"n": "容器与部署配置专家", "en": "Ian", "tags": ["Docker", "Kubernetes", "容器化"], "d": "能够为项目编写 Dockerfile 和 Kubernetes 部署配置，覆盖镜像构建、编排和网络配置。", "cat": "软件开发"}, {"n": "可观测性配置专家", "en": "Simon", "tags": ["可观测性", "日志监控", "链路追踪"], "d": "能够为项目配置日志、指标和链路追踪，建立完整的可观测性体系。", "cat": "软件开发"}, {"n": "游戏开发专家", "en": "GameDev", "tags": ["游戏开发", "Canvas", "Three.js"], "d": "将用户抽象需求转化为完整可玩的 2D/3D 网页小游戏，调用 game-maker 技能生成游戏，支持贪吃蛇、打砖块、俄罗斯方块、3D 跑酷、3D 射击、3D 赛车等全类型，内置游戏闭环设计、状态管理、碰撞检测、粒子特效。", "cat": "软件开发"}, {"n": "技能开发专家", "en": "Scott", "tags": ["编码实现", "Skill开发", "工程化"], "d": "负责 Skill 全生命周期的工程 Agent：需求分析、设计、创建、静态校验、独立评审、修改到最终交付，确保 Skill 质量可传播。", "cat": "软件开发"}, {"n": "创意专家", "en": "Olivia", "tags": ["创意构思", "头脑风暴", "产品设计"], "d": "能够进行产品创意构思和头脑风暴，先对齐需求和方案再动手实现。", "cat": "产品设计"}, {"n": "高级产品规划与管理专家", "en": "Michael", "tags": ["产品规划", "PRD编写", "路线图管理"], "d": "覆盖产品经理全生命周期工作链路：功能规格与 PRD 编写、路线图规划与优先级管理、利益相关者沟通、用户研究综合、竞品分析以及产品指标体系设计与追踪。以价值判断为核心，用数据驱动决策，帮助用户从模糊想法走向可执行的产品规划。", "cat": "产品设计"}, {"n": "用户行为分析专家", "en": "Lisa", "tags": ["用户研究", "可用性测试", "行为分析"], "d": "用真实数据而非假设验证设计决策，专精用户行为分析和可用性测试。通过定性研究与定量分析相结合的方法，深入洞察用户真实需求与行为模式，将研究发现转化为可执行的产品设计建议，驱动体验持续优化。", "cat": "产品设计"}, {"n": "数据埋点架构师", "en": "Alex", "tags": ["埋点策略", "数据采集", "转化漏斗"], "d": "将业务需求与产品规划转化为结构化、标准化且严密的数据埋点策略（Event Tracking Strategy），确保数据采集的完整性、规范性与后续分析价值，产出可直接指导前端开发与数据仓库建模的策略文档。", "cat": "产品设计"}, {"n": "UI界面设计专家", "en": "David", "tags": ["设计系统", "无障碍设计", "组件库"], "d": "精通设计系统和组件库，追求像素级完美，打造无障碍用户界面。覆盖设计令牌体系、组件架构、响应式布局、暗色主题、无障碍合规与开发交付规范，从视觉基础到生产级界面方案，确保跨平台一致性与可访问性。", "cat": "产品设计"}, {"n": "UX交互设计专家", "en": "Emma", "tags": ["交互设计", "用户旅程", "可用性"], "d": "精通用户交互设计，擅长规划用户体验路径与交互流程，从信息架构到状态流转提供完整方案。覆盖用户旅程地图、任务流设计、交互模式选型、线框图绘制与可用性评审，帮助团队在开发前把交互逻辑设计到位，降低返工成本。", "cat": "产品设计"}, {"n": "AI前沿动态简报专家", "en": "Kevin", "tags": ["AI资讯", "实时简报", "动态追踪"], "d": "一句话查到每天精选的 AI 模型/产品/行业/论文动态，自动整理成中文简报，免配置免登录。通过调用 AI HOT 公开数据接口，实时获取最新 AI 行业资讯，按五大版块分类呈现，支持关键词搜索、分类筛选、时间窗口查询和日报归档浏览。", "cat": "深度研究"}, {"n": "深度研究专家", "en": "Marcus", "tags": ["多源检索", "事实验证", "研究报告"], "d": "综合性深度研究专家，支持多源信息检索、事实验证、知识发现和结构化报告生成。擅长将复杂问题拆解为可并行研究的子任务，综合网络搜索、微信公众号文章检索、网页全文抓取等渠道，产出包含数据支撑、来源引用和深度分析的专业研究报告。", "cat": "深度研究"}, {"n": "市场洞察专家", "en": "Emma", "tags": ["竞品对标", "SWOT分析", "战略建议"], "d": "聚焦市场趋势、竞品对标与用户行为洞察，输出 SWOT 分析与战略建议。将零散的市场信息转化为结构化、可执行的商业判断，覆盖行业趋势研判、竞争格局拆解、用户画像还原与战略路径规划，以决策可用为第一标准。", "cat": "深度研究"}, {"n": "战略洞察专家", "en": "Alex", "tags": ["指标诊断", "KPI框架", "决策报告"], "d": "将复杂数据转化为战略洞察，提供指标诊断、KPI 框架设计、数据质量评估与决策报告。从待决策问题出发而非从可用数据出发，以证据驱动结论，以行动收尾分析，覆盖指标变动归因、KPI 体系搭建、市场规模估算、数据可视化与仪表盘构建全流程。", "cat": "深度研究"}, {"n": "行业趋势分析专家", "en": "Victor", "tags": ["趋势识别", "市场测算", "竞争分析"], "d": "持续追踪行业与技术趋势，通过系统化市场调研、竞争情报和信号识别，为产品战略提供前瞻性洞察和可落地的决策建议。覆盖趋势识别、市场规模测算、竞争分析、技术监测与持续追踪。", "cat": "深度研究"}, {"n": "数据分析专家", "en": "Sarah", "tags": ["数据分析", "可视化报告", "统计建模"], "d": "能够根据结构化数据（Excel/CSV/JSON/Markdown 表格）进行分类建模、统计分析、洞察提炼，并生成交互式可视化报告（HTML + 图表），支持 Dashboard、统计汇总、明细表、核心发现等混合排版。", "cat": "数据分析"}, {"n": "Excel数据分析师", "en": "Jason", "tags": ["Excel分析", "数据可视化", "透视表建模"], "d": "数据分析专家，支持 Excel 电子表格的创建、编辑、分析、公式计算、格式化和数据可视化，擅长数据清洗、统计分析、透视表建模与图表呈现，并能检索中文行业信源为分析结论提供佐证，交付零公式错误的专业级电子表格与可执行洞察。", "cat": "数据分析"}, {"n": "SQL数据分析师", "en": "David", "tags": ["SQL查询", "数据可视化", "交互仪表板"], "d": "数据探索专家，支持 SQL 查询、数据探索、可视化、仪表板构建、数据验证和洞察生成。覆盖从数据抽取、质量校验、探索性分析到统计检验、可视化呈现的端到端链路，擅长跨多种数据库方言编写高性能 SQL，并能产出可交互的 HTML 仪表板。", "cat": "数据分析"}, {"n": "图片创作专家", "en": "Emma", "tags": ["图片创作", "海报设计", "视觉设计"], "d": "能够根据用户需求设计并输出高质量的图片素材，支持海报、图标、插画等多种视觉产物的创作。", "cat": "创意图表"}, {"n": "架构图绘制专家", "en": "Terry", "tags": ["技术图表", "架构图", "UML建模"], "d": "能够根据用户描述的技术场景，生成专业级技术图表，支持架构图、数据流图、流程图、时序图、UML 图、ER 图、网络拓扑、思维导图等，输出 SVG、PNG、GIF 动画、离线交互式 HTML。", "cat": "创意图表"}, {"n": "品牌策划专家", "en": "Olivia", "tags": ["品牌策划", "内容策略", "多平台营销"], "d": "擅长创作引人入胜的多平台内容，让品牌故事触达目标受众。涵盖内容策略制定、品牌叙事构建、跨平台内容适配、SEO 优化与效果分析，从编辑日历规划到深度长文撰写，全链路驱动品牌认知与转化增长。", "cat": "品牌营销"}, {"n": "画作互动游戏生成专家", "en": "Painter", "tags": ["画作游戏化", "互动游戏", "艺术作品"], "d": "负责从画作解析到可运行互动游戏的全链路交付，将静态画作中的角色、场景和故事转化为玩家可以探索、互动、体验的游戏世界。", "cat": "其他"}],
   skills: [{"n": "头脑风暴", "d": "在任何创造性工作之前必须使用此技能——创建功能、构建组件、添加功能或修改行为。通过协作对话探索用户意图、需求和设计，在实现之前完成方案设计。", "cat": "元技能"}, {"n": "编写计划", "d": "当有多步骤任务的规格或需求时，在编写代码之前使用。编写全面的实现计划，假设工程师对我们的代码库没有上下文。文档化他们需要知道的一切：每个任务要触及哪些文件、代码、测试、文档、如何测试。", "cat": "元技能"}, {"n": "代码库结构分析", "d": "分析项目并生成或改进 bug-fix 工作流所需的 codebase-structure.md 文档。当需要结构化的项目概览时使用，包括技术栈、目录结构、构建/测试命令和关键模块。支持 Java、TypeScript、JavaScript、Python、C 和 C++。", "cat": "开发者工具"}, {"n": "构建命令修复", "d": "使用轻量级、仓库原生、配置感知的检查来验证和迭代修复 codebase-structure.md 中记录的构建命令。支持 Maven、Gradle 和 Node.js。", "cat": "开发者工具"}, {"n": "文本人性化", "d": "移除文本中 AI 生成的写作痕迹。在编辑或审阅文本时使用，使其听起来更自然、更像人类写作。检测并修复包括夸大象征、推广性语言、浅薄分析、模糊归因、破折号过度使用、三连法则、AI 词汇等模式。", "cat": "开发者工具"}, {"n": "网页风格迁移", "d": "分析参考网页的视觉设计语言，提取 Design Tokens 和组件视觉规则，将这些视觉语言迁移到用户当前前端项目。Style Transfer, not Page Clone——只学习和迁移其视觉设计语言。", "cat": "开发者工具"}, {"n": "反蒸馏", "d": "反蒸馏防御：清洗 Skill 文件，看起来完整但核心知识已脱敏。", "cat": "开发者工具"}, {"n": "浏览器使用", "d": "浏览器自动化（导航、点击、截图、数据提取、多会话、云浏览器）。", "cat": "开发者工具"}, {"n": "PDF处理", "d": "当用户需要对 PDF 文件进行任何操作时使用此技能。包括读取或提取文本/表格、合并或拆分 PDF、旋转页面、添加水印、创建新 PDF、填写表单、加密/解密、提取图片以及对扫描件进行 OCR。", "cat": "开发者工具"}, {"n": "PPTX处理", "d": "当涉及 .pptx 或 .potx 文件时使用此技能。包括创建幻灯片、读取或提取文本、编辑或修改演示文稿、合并或拆分幻灯片文件、使用模板等。", "cat": "开发者工具"}, {"n": "微信文章搜索", "d": "微信公众号文章检索工具。当用户需要进行网页检索、深度研究时，优先使用此技能检索微信公众号文章——公众号文章质量高、信息密度大，是优质的中文信息源。", "cat": "开发者工具"}, {"n": "Excel表格处理", "d": "当电子表格文件是主要输入或输出时使用此技能。包括打开、读取、编辑或修复 .xlsx、.xlsm、.xltx、.csv 或 .tsv 文件，从头创建新电子表格，或在表格文件格式之间转换。", "cat": "开发者工具"}, {"n": "问题复现", "d": "从规范的问题分析生成、编译、执行并迭代优化最小复现测试；自主确定最小执行上下文；收集执行证据；输出符合 schema 的复现结果记录。", "cat": "技能测试"}, {"n": "技能评审器", "d": "通用 Skill 质量评审能力。对 Skill 进行隔离语义评审，从用户需求匹配、触发设计、工作流、工具设计等 8 个维度打分，输出结构化评审报告。", "cat": "技能评估"}, {"n": "动态根因定位", "d": "仅 bug-fix 代理可使用。首先收集动态执行轨迹，然后基于收集到的轨迹进行证据驱动的根因定位。", "cat": "质量保证"}, {"n": "问题分析", "d": "将原始问题描述解析为规范的问题分析 JSON，并确定提取的问题信息是否足以启动 Bug 修复工作流。", "cat": "质量保证"}, {"n": "补丁生成", "d": "基于根因定位结果生成、应用、验证并迭代优化最小通用补丁。在根因定位之后使用此技能消除已定位的缺陷，通过重建和验证确认修复。", "cat": "质量保证"}, {"n": "静态根因定位", "d": "通过提取证据锚点、将分析限制在已记录的模块目录中，并应用确定性的基于锚点的搜索来识别高置信度候选者，执行知识范围的静态根因定位。", "cat": "质量保证"}, {"n": "画布设计", "d": "使用设计理念创建精美的视觉艺术作品（.png 和 .pdf 文档）。当用户要求创建海报、艺术作品、设计或其他静态作品时使用。", "cat": "生成器"}, {"n": "个人工作台", "d": "零依赖的个人每日工作台生成器：纯前端 HTML，把每日计划、打卡、记账、长期目标、灵感记录统一在一处，数据存 localStorage 并支持导出导入。提供桌面版与移动版双模板。", "cat": "生成器"}, {"n": "海报生成", "d": "图片海报生成技能，支持从零创建各种图片海报，包含完整设计规范、模板系统和内容生成能力。", "cat": "生成器"}, {"n": "技术图表", "d": "创建技术图表，如软件架构图、数据流图、流程图、时序图、UML、ER 图、网络拓扑、时间线和技术概念图，导出 SVG、PNG、语义动画 GIF 或离线交互式 HTML。", "cat": "生成器"}, {"n": "工作台Pro", "d": "融合 personal-workbench 功能底座 + theme-dashboard 主题皮肤的双端工作台生成器。注入 4 主题配色系统 + 8 维度视觉增强，生成 4 主题 × 2 端 = 8 个 HTML 文件。", "cat": "生成器"}, {"n": "演示文稿生成专家", "d": "智能 PPT 生成助手。根据用户描述的主题、行业、风格，自动生成专业级演示文稿。支持 HTML 预览微调和 PPTX 直接生成两种模式，内置 20+ 套视觉风格，支持中英文双语。", "cat": "生成器"}, {"n": "Word文档处理", "d": "当用户需要创建、读取、编辑或操作 Word 文档（.docx）或模板（.dotx）时使用。包括生成带目录、标题、页码或信头的专业文档，提取或重组内容，插入或替换图片，查找替换，处理修订和批注等。", "cat": "生成器"}, {"n": "长文档核心", "d": "将大纲、访谈、笔记、草稿片段和完稿转化为长篇文档的流程。当长文档专家需要创建初稿、继续或修订有限章节，或完成交付草稿时使用。", "cat": "生成器"}, {"n": "市场研究", "d": "市场调研专家，提供市场分析、消费者洞察与机会评估。", "cat": "生成器"}, {"n": "MiniMax文档", "d": "Word 文档生成与编辑。", "cat": "生成器"}, {"n": "小说写作", "d": "章节正文生成器——根据章节大纲、Voice Profile 和角色档案构建 LLM 提示词，用于生成章节正文。", "cat": "生成器"}, {"n": "小说创作", "d": "AI 长篇网文创作技能包。用于解决长篇网络小说创作中的核心痛点：上下文丢失、文风不一致、设定冲突、节奏失控、多线混乱、质量不稳。", "cat": "生成器"}, {"n": "智能人像抠图", "d": "当用户上传包含人物的照片，并要求抠图、去除背景、提取人物、生成透明背景图片时使用。精确保留原始人物及头发、手指、衣物和随身配饰，不重新生成人物。", "cat": "生成器"}, {"n": "技能生成器", "d": "Skill 开发、修改、校验和交付能力。覆盖从需求分析、目录初始化、SKILL.md 编写、静态校验到打包安装的完整流程。", "cat": "技能开发"}, {"n": "前端设计品味", "d": "资深 UI/UX 工程师技能。构建数字界面，覆盖 LLM 默认偏好。执行基于指标的规则、严格的组件架构、CSS 硬件加速和平衡的设计工程。", "cat": "其他"}, {"n": "Office 文档工具", "d": "使用 officecli CLI 工具创建、分析、校对和修改 Office 文档（.docx、.xlsx、.pptx）。", "cat": "其他"}, {"n": "Web 应用测试", "d": "使用 Playwright 与本地 Web 应用交互和测试的工具包。支持验证前端功能、调试 UI 行为、捕获浏览器截图和查看浏览器日志。", "cat": "其他"}],
+  connGroups: [
+    ['已接入', [
+      { n: 'GitCode', d: '代码仓、分支、Pull Request 与流水线状态双向同步', ico: 'gitcode', tone: '#f0603a', st: 'ok', meta: '2 个仓库 · 读写' },
+      { n: 'CodeArts 需求', d: '从需求单直接开工作线，状态与评审结果回写需求', ico: 'board', tone: '#4c8dff', st: 'ok', meta: '1 个项目 · 读写' },
+      { n: '企业 IM', d: '关键节点触达：携带原因、影响面与回到现场的直达链接', ico: 'bot', tone: '#17b26a', st: 'ok', meta: '已绑定 · 仅推关键节点' },
+      { n: 'CodeArts 流水线', d: '拉取构建与部署结果，作为验收证据回写任务', ico: 'play', tone: '#e0872e', st: 'err', meta: '鉴权已过期 · 影响 A-04' }
+    ]],
+    ['内置能力', [
+      { n: '内置浏览器', d: '页面 QA、元素审查与截图取证，产出直接注册为证据', ico: 'globe', tone: '#7c5cfc', st: 'ok', meta: '本地 · 无需配置' },
+      { n: '远程运行时', d: '把搭档放到远端机器执行，保留完整工具权限', ico: 'term', tone: '#8a8f96', st: 'off', meta: '未配置' }
+    ]],
+    ['办公与协作', [
+      { n: '飞书', d: '文档、表格与多维表的读写，纪要可直接归档到知识库', ico: 'doc', tone: '#3370ff', st: 'off', meta: '未接入' },
+      { n: '企业微信', d: '按参会名单分发纪要与待办，跟踪认领与回执', ico: 'bot', tone: '#07c160', st: 'off', meta: '未接入' },
+      { n: '钉钉', d: '审批流与待办同步，关键节点推送到工作通知', ico: 'plug', tone: '#1677ff', st: 'off', meta: '未接入' },
+      { n: 'Confluence', d: '把方案与复盘同步到团队空间，保留版本与评论', ico: 'folder', tone: '#2684ff', st: 'off', meta: '未接入' }
+    ]]
+  ],
   conns: [
     { n: 'GitCode', d: '代码仓、分支、Pull Request 与流水线状态双向同步', ico: 'gitcode', c: 'c1', st: 'ok', meta: '2 个仓库 · 权限：读写' },
     { n: 'CodeArts 流水线', d: '拉取构建与部署结果，作为验收证据回写任务', ico: 'play', c: 'c3', st: 'err', meta: '鉴权已过期 · 影响 A-04' },
@@ -1128,6 +1457,165 @@ const DATA = {
 
 // 任务的对话流执行过程：叙述 + 可折叠工具组 + 子 Agent 行
 const FLOW = {"T-2044": {"pre": [["say", "先把 62 分钟录音按议题切开，再抽结论和待办 —— 按时间切会把一个议题劈成两半。"], ["tools", "执行工具 3 次", [["读取文件", "会议录音-0915.m4a"], ["语音转写", "62 分钟 → 11,482 字"], ["已思考", "按议题切分比按时间切分更容易对齐结论"]]], ["say", "转写完成，按议题切成 5 段。接下来逐段抽结论，每条都要能回指到原话位置。"], ["sub", "研究核验搭档", "核验结论出处", "done", "59s", "c2"], ["tools", "执行工具 2 次", [["抽取结论", "7 条 · 均已回指时间点"], ["抽取待办", "9 条"]]], ["say", "7 条结论都能回指到录音时间点。待办 9 条里，7 条在录音中点了名，2 条没有。"], ["think", "这两条只说了「这个我们回头看一下」。我可以猜，但猜错会让待办空转一周 —— 这个判断该问人。"]], "post": [["say", "已按「按发言人归属」落责任人，开始成稿。"], ["tools", "执行工具 2 次", [["写入文件", "评审会纪要 v2.md"], ["写入文件", "待办清单.csv"]]], ["sub", "评审搭档", "通读全文并与录音比对", "done", "34s", "c1"]]}, "T-2038": {"pre": [["say", "先复现一下，确认是不是每次都白屏。"], ["tools", "执行工具 4 次", [["启动开发服务器", "pnpm dev · localhost:5173"], ["内置浏览器", "打开 /board"], ["刷新", "10 次"], ["已思考", "10 次里 4 次白屏，是竞态不是必现"]]], ["say", "复现 4/10 次，说明是首帧竞态。看数据是怎么进来的。"], ["tools", "执行工具 3 次", [["读取文件", "src/board/useTaskFeed.ts"], ["全局搜索", "useTaskFeed"], ["已思考", "首帧 tasks 是 undefined，渲染层没兜住"]]], ["say", "定位到了：首帧 tasks 为 undefined，列表直接 map 就炸了。加首帧空态和骨架占位。"], ["tools", "执行工具 2 次", [["编辑文件", "useTaskFeed.ts · +21 −4"], ["新建文件", "BoardSkeleton.tsx · +13"]]], ["sub", "测试与验证搭档", "构建校验与单元测试", "run", "运行中", "c3"]], "post": []}, "T-2036": {"pre": [["say", "先看仓库里有没有现成的图布局依赖，能不新增就不新增。"], ["tools", "执行工具 3 次", [["读取文件", "package.json"], ["读取文件", "CLAUDE.md"], ["已思考", "d3-hierarchy 已在依赖内，直接用"]]], ["say", "冲突风险不能只看文件是否重叠 —— 两条线都改同一个文件，但一个改 2 行一个改 200 行，风险完全不同。按改动密度加权。"], ["tools", "执行工具 4 次", [["新建文件", "src/board/conflict.ts · +58"], ["新建文件", "src/board/LaneGraph.tsx · +162"], ["编辑文件", "BoardHeader.tsx · +14 −9"], ["编辑文件", "styles/board.css · +8"]]], ["sub", "测试与验证搭档", "单元测试与浏览器取证", "done", "2m 14s", "c3"], ["say", "单测 11 例全过，1440 / 1280 / 768 三档断点截图已归档。GitCode 流水线 #2418 还在排队，回传前不会放开「接受」。"]], "post": []}};
+
+// 活跃日历数据：固定种子生成，工作日高于周末，含两段连续高活跃
+const HEAT = (() => {
+  let seed = 20260915;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const days = [];
+  const today = new Date(2026, 8, 15);
+  const start = new Date(today); start.setDate(start.getDate() - 125);
+  // 对齐到周一
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+    const dow = (d.getDay() + 6) % 7;
+    const weekend = dow >= 5;
+    const idx = Math.round((d - start) / 86400000);
+    const burst = (idx > 42 && idx < 58) || (idx > 92 && idx < 106) ? 2 : 0;
+    let n = weekend ? Math.floor(rnd() * 3.4) : 1 + Math.floor(rnd() * 5.6);
+    n += burst;
+    if (rnd() < (weekend ? 0.22 : 0.04)) n = 0;
+    days.push({ d: new Date(d), n: Math.min(n, 9) });
+  }
+  return days;
+})();
+// 近 14 天派生序列（同一颗种子，保证与热力图口径一致）
+const SERIES = (() => {
+  let sd = 77003;
+  const r = () => (sd = (sd * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const tail = HEAT.slice(-14);
+  return {
+    days: tail.map(x => x.d),
+    ok:   tail.map(x => x.n),
+    back: tail.map((x, i) => (x.n >= 5 ? 1 : 0) + (i === 4 || i === 10 ? 1 : 0)),
+    wait: tail.map(() => 1 + Math.floor(r() * 4)),
+    run:  tail.map(() => 1 + Math.floor(r() * 4)),
+    verify: tail.map(() => Math.floor(r() * 4)),
+    auto: tail.map(() => 2 + Math.floor(r() * 7))
+  };
+})();
+
+// 迷你点阵：用于指标卡右上角，一列一天，点越高当天量越大
+function spark(vals, tone) {
+  const cols = vals.length, rows = 5, W = 76;
+  const dx = W / cols, dy = 5.4, H = rows * dy;
+  const r = Math.min(1.7, dx / 2 - 0.55);
+  const max = Math.max(...vals, 1);
+  let out = '';
+  vals.forEach((v, i) => {
+    const on = v ? Math.max(1, Math.round(v / max * rows)) : 0;
+    for (let j = 0; j < rows; j++) {
+      const lit = j < on, last = i === cols - 1;
+      const sz = (lit ? r : r * 0.62) * 2;
+      out += `<rect x="${(i * dx + dx / 2 - sz / 2).toFixed(2)}" y="${(H - j * dy - dy / 2 - sz / 2).toFixed(2)}"
+        width="${sz.toFixed(2)}" height="${sz.toFixed(2)}" rx=".3" fill="var(--${tone}-solid)"
+        opacity="${lit ? (last ? 1 : .6) : .16}"/>`;
+    }
+  });
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${out}</svg>`;
+}
+
+// 环形图：任务结束状态分布
+function donut(parts, total, label) {
+  const R = 52, C = 2 * Math.PI * R;
+  let off = 0;
+  return `<svg viewBox="0 0 140 140" class="donut">
+    <circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--a-200)" stroke-width="16"/>
+    ${parts.map(([n, v, tone]) => {
+      const len = total ? (v / total) * C : 0;
+      const el = `<circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--${tone}-solid)" stroke-width="16"
+        stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"
+        transform="rotate(-90 70 70)" stroke-linecap="butt"><title>${n} ${v}</title></circle>`;
+      off += len; return el;
+    }).join('')}
+    <text x="70" y="68" text-anchor="middle" class="donut-v">${total}</text>
+    <text x="70" y="86" text-anchor="middle" class="donut-l">${label}</text>
+  </svg>`;
+}
+
+// 双序列点阵折线：交付趋势。曲线本身是等距圆点，下方用点阵代替面积填充
+function trend(days, a, b) {
+  const w = 560, h = 150, pad = 22, base = h - 26, max = Math.max(...a, ...b, 1);
+  const X = i => pad + i * ((w - pad * 2) / (days.length - 1));
+  const Y = v => base - (v / max) * (h - 52);
+  const path = vals => vals.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join('');
+  const ticks = [0, Math.ceil(max / 2), max];
+
+  // 面积改为点阵场：每 12px 一列，从基线向上排到曲线高度
+  const step = 12, dy = 10;
+  let field = '';
+  for (let x = pad; x <= w - pad; x += step) {
+    const t = (x - pad) / ((w - pad * 2) / (days.length - 1));
+    const i0 = Math.min(Math.floor(t), a.length - 2), f = t - i0;
+    const yv = Y(a[i0] + (a[i0 + 1] - a[i0]) * f);
+    for (let y = base - dy / 2; y > yv; y -= dy) {
+      field += `<rect x="${x - 1.3}" y="${(y - 1.3).toFixed(1)}" width="2.6" height="2.6" fill="var(--done-solid)"
+        opacity="${(0.1 + 0.2 * (1 - (base - y) / (base - yv + .001))).toFixed(2)}"/>`;
+    }
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" class="trend">
+    ${ticks.map(t => `<g><line x1="${pad}" x2="${w - pad}" y1="${Y(t)}" y2="${Y(t)}"
+      stroke="var(--border-subtle)" stroke-width="1.8" stroke-linecap="butt" stroke-dasharray="1.8 4.4"/>
+      <text x="${pad - 6}" y="${Y(t) + 4}" text-anchor="end" class="ax">${t}</text></g>`).join('')}
+    ${field}
+    <path d="${path(b)}" fill="none" stroke="var(--wait-solid)" stroke-width="2"
+      stroke-linecap="butt" stroke-dasharray="2 3.6" opacity=".7"/>
+    <path d="${path(a)}" fill="none" stroke="var(--done-solid)" stroke-width="2.3"
+      stroke-linecap="butt" stroke-dasharray="2.3 2.7"/>
+    ${days.map((d, i) => i % 3 === 0
+      ? `<text x="${X(i)}" y="${h - 8}" text-anchor="middle" class="ax">${d.getMonth() + 1}/${d.getDate()}</text>` : '').join('')}
+    ${a.map((v, i) => `<rect x="${(X(i) - 2.5).toFixed(1)}" y="${(Y(v) - 2.5).toFixed(1)}" width="5" height="5" rx=".6" fill="var(--done-solid)"><title>${d2(days[i])} 已接受 ${v}</title></rect>`).join('')}
+  </svg>`;
+}
+const d2 = d => `${d.getMonth() + 1}月${d.getDate()}日`;
+
+// ===== 单 Session 可观测：从执行流派生一条可下钻的轨迹 =====
+const MODELS = ['Pangu-Coder 5', 'GLM-5.2', 'Pangu-Coder 5'];
+function buildTrace(tid) {
+  const f = FLOW[tid]; if (!f) return null;
+  let sd = tid.split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7) & 0x7fffffff;
+  const r = () => (sd = (sd * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const steps = []; let t0 = 0, llm = 0, tool = 0, tok = 0, err = 0;
+  const push = (kind, label, extra) => {
+    const dur = extra.dur != null ? extra.dur : +(0.6 + r() * 4.2).toFixed(2);
+    const st = t0; t0 += dur;
+    steps.push(Object.assign({ kind, label, start: +st.toFixed(2), dur }, extra));
+  };
+  [['pre', f.pre], ['post', f.post || []]].forEach(([seg, list]) => {
+    list.forEach((x, i) => {
+      if (x[0] === 'say' || x[0] === 'think') {
+        const inTok = 900 + Math.floor(r() * 2600), outTok = 60 + Math.floor(r() * 420);
+        llm++; tok += inTok + outTok;
+        push('assistant', x[1], { model: MODELS[llm % MODELS.length], inTok, outTok,
+          ttft: +(0.4 + r() * 1.6).toFixed(2), think: x[0] === 'think' });
+      } else if (x[0] === 'tools') {
+        x[2].forEach(([n, v]) => {
+          if (n === '已思考') {
+            const inTok = 700 + Math.floor(r() * 1800), outTok = 40 + Math.floor(r() * 260);
+            llm++; tok += inTok + outTok;
+            push('assistant', v, { model: MODELS[llm % MODELS.length], inTok, outTok,
+              ttft: +(0.3 + r() * 1.1).toFixed(2), think: true });
+          } else { tool++; push('tool', n, { arg: v, ok: true }); }
+        });
+      } else if (x[0] === 'sub') {
+        const running = x[3] === 'run';
+        if (!running) llm += 3; tool += 2;
+        const inTok = 4200 + Math.floor(r() * 5200), outTok = 300 + Math.floor(r() * 900);
+        tok += inTok + outTok;
+        push('sub', x[1] + ' · ' + x[2], { agent: x[1], work: x[2], running,
+          inTok, outTok, dur: running ? 0 : parseFloat(x[4]) || 60 });
+      }
+    });
+  });
+  const t = T(tid);
+  if (t && t.st === 'fail') { err = 1; push('error', '连接器鉴权过期，拉取构建记录失败', { dur: 0.4 }); }
+  return { steps, llm, tool, err, tok, dur: t0,
+    cost: +(tok / 1000 * 0.012).toFixed(4) };
+}
+const TRACE = {};
+const trace = tid => (TRACE[tid] = TRACE[tid] || buildTrace(tid));
+
+const heatLv = n => n === 0 ? 0 : n <= 1 ? 1 : n <= 3 ? 2 : n <= 5 ? 3 : 4;
 
 const T = id => DATA.tasks.find(t => t.id === id);
 // 编程任务用分支表达位置；通用任务用产物表达，不把 git 概念顶到通用用户面前
@@ -1202,11 +1690,14 @@ function acctPanel() {
   </div>`;
 }
 
+const THREE = ['task', 'review'];
+
 function shell() {
   const mt = DATA.tasks.filter(t => t.kind === S.mode);
   const mr = DATA.reviews.filter(r => r.kind === 'code');
   const ma = DATA.autos.filter(a => a.k === S.mode);
   const nav = [
+    ['home', 'spark', '工作台', null, false],
     ['board', 'board', '任务看板', mt.filter(t => t.st !== 'done').length, mt.some(t => t.st === 'wait' || t.st === 'fail')],
     ['proj', 'folder', '项目', modeProjects().length, false],
     // 变更评审只在「编程」下出现：通用任务的变更在任务内的产物域直接评审，不需要独立的合入队列
@@ -1217,14 +1708,16 @@ function shell() {
   const item = ([p, i, n, c, d]) => `
     <button class="nav-item tip ${S.page === p ? 'on' : ''}" data-act="page" data-v="${p}" data-tip="${n}">
       ${ic(i)}<span class="nm">${n}</span>
-      ${d ? '<i class="dot"></i>' : ''}${c !== null ? `<span class="cnt">${c}</span>` : ''}
+
     </button>`;
 
   return `
   <div class="titlebar">
     <div class="traffic"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
-    <button class="iconbtn tip" data-act="toggleRail" data-tip="${S.railOpen ? '收起侧边栏' : '展开侧边栏'}"
+    <button class="iconbtn tip" data-act="toggleRail" data-tip="${S.railOpen ? '收起导航' : '展开导航'}"
       style="margin-left:2px">${ic('panel')}</button>
+    ${S.page === 'review' ? `<button class="iconbtn tip ${S.lOpen ? '' : 'off'}" data-act="toggleL"
+      data-tip="${S.lOpen ? '收起左侧列表' : '展开左侧列表'}">${ic('sideL')}</button>` : ''}
     <button class="tb-space" data-act="noop">
       <img class="tb-logo" src="${LOGO}" alt="码道CodeArts">
       <span class="t-13" style="font-weight:600">码道CodeArts</span>
@@ -1237,6 +1730,9 @@ function shell() {
       <span class="kbd">⌘K</span>
     </button>
     <div class="tb-right">
+      ${THREE.includes(S.page) ? `<button class="iconbtn tip ${S.rOpen ? '' : 'off'}" data-act="toggleR"
+        data-tip="${S.rOpen ? '收起右侧面板' : '展开右侧面板'}">${ic('panel')}</button>
+      <span style="width:1px;height:18px;background:var(--border-subtle);margin:0 4px"></span>` : ''}
       <button class="ide-btn tip" data-act="toast" data-tip="在码道 IDE 中打开当前项目空间"
         data-v="已在码道 IDE 打开「${esc(curProjLabel())}」—— 同一份检出、同一套任务状态，IDE 里的改动会回到这条评审流">
         <span>IDE</span>${ic('ne', 14)}
@@ -1245,7 +1741,7 @@ function shell() {
     </div>
   </div>
   <div class="shell-body">
-    <nav class="rail ${S.railOpen ? '' : 'collapsed'}">
+    <nav class="rail ${S.railOpen ? '' : 'collapsed'}" style="${S.railOpen ? `flex-basis:${S.railW}px;width:${S.railW}px` : ''}">
       <div class="rail-top">
         <div class="modesw ${S.railOpen ? '' : 'mini'}">
           ${Object.keys(KIND).map(k => `
@@ -1256,24 +1752,23 @@ function shell() {
         <button class="btn-new" data-act="new">${ic('plus')}<span>新建任务</span></button>
       </div>
       <div class="rail-nav scroll">
-        <div class="nav-group" style="margin-top:4px">
+        <div class="nav-group" style="margin-top:0">
           ${nav.map(item).join('')}
           ${nav2.map(item).join('')}
         </div>
         <div class="nav-group">
           <div class="nav-label">
-            <span style="flex:1">最近打开</span>
+            <span style="flex:1">工作空间</span>
+            <button class="lk" data-act="projAll">${modeProjects().every(x => S.projOpen.has(x.n)) ? '收起全部' : '展开全部'}</button>
           </div>
           ${modeProjects().map(p => {
             const ts = DATA.tasks.filter(t => t.proj === p.n && t.kind === S.mode);
             const live = ts.filter(t => t.st !== 'done');
-            const open = S.projOpen === p.n;
+            const open = S.projOpen.has(p.n);
             return `
             <button class="nav-item tip ${S.page === 'board' && S.projF === p.n ? 'on' : ''}" data-act="proj" data-v="${p.n}" data-tip="${esc(p.label)}">
               <span style="display:flex;width:16px;justify-content:center;transform:rotate(${open ? 90 : 0}deg);transition:transform var(--mo-state) var(--ease)">${ic('chev', 11)}</span>
               <span class="nm">${esc(p.label)}</span>
-              ${live.some(t => t.st === 'wait' || t.st === 'fail') ? '<i class="dot"></i>' : ''}
-              <span class="cnt">${live.length}</span>
             </button>
             ${open ? ts.map(t => `
               <button class="nav-sub ${S.page === 'task' && S.taskId === t.id ? 'on' : ''}" data-act="task" data-v="${t.id}" title="${esc(t.title)}">
@@ -1297,12 +1792,14 @@ function shell() {
         </div>
       </div>
     </nav>
+    <div class="rz" data-rz="railW" data-target=".rail" data-min="180" data-max="360"></div>
     <main class="stage">${page()}</main>
   </div>`;
 }
 
 function page() {
   switch (S.page) {
+    case 'home': return pHome();
     case 'board': return pBoard();
     case 'task': return pTask();
     case 'review': return pReview();
@@ -1317,6 +1814,150 @@ function page() {
 /* =====================================================================
    页面 · 任务看板（列表 / 网格 / 依赖图）
    ===================================================================== */
+function pHome() {
+  const views = [['kanban', 'board', '看板'], ['list', 'list', '列表'], ['grid', 'grid', '并行监看'], ['graph', 'graph', '依赖图']];
+  const h = new Date().getHours();
+  const hello = h < 6 ? '还没睡' : h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
+  const all = DATA.tasks;
+  const waitN = all.filter(t => t.st === 'wait' || t.st === 'fail').length;
+  const verifyN = all.filter(t => t.st === 'verify').length;
+  const runN = all.filter(t => t.st === 'run').length;
+  const autoRuns = DATA.autos.reduce((a, x) => a + x.runs, 0);
+
+  const stats = [
+    ['需要我判断', waitN, '个任务停在这里等你', 'wait', waitN ? ['去处理', 'T-2044'] : null, SERIES.wait],
+    ['正在跑', runN, '不需要你盯着', 'run', null, SERIES.run],
+    ['等待验收', verifyN, '验证过了才放开「接受」', 'verify', verifyN ? ['去验收', 'T-2043'] : null, SERIES.verify],
+    ['自动运行', autoRuns, '累计次数 · 成功率 96%', 'done', null, SERIES.auto]
+  ];
+  const endOk = SERIES.ok.reduce((a, b) => a + b, 0);
+  const endBack = SERIES.back.reduce((a, b) => a + b, 0);
+  const endFail = 4;
+  const endTotal = endOk + endBack + endFail;
+
+  return `
+  <div class="pbody wb scroll">
+    <!-- 欢迎语 + 输入 -->
+    <section class="wb-hero">
+      <h1 class="wb-hi">${hello}，Vinnie</h1>
+      <p class="wb-sub">${waitN
+        ? `有 <b>${waitN}</b> 个任务在等你判断，其余 ${runN + verifyN} 个都在自己往前走`
+        : '今天没有需要你判断的节点，剩下的交给搭档'}</p>
+      <div class="wb-shell">
+      <div class="wb-box">
+        <textarea id="wbGoal" data-sync="goal" placeholder="${S.mode === 'code'
+          ? '交给码道一个改动：说清要什么结果，不用说怎么做…'
+          : '交给码道一件事：说清要什么结果，不用说怎么做…'}">${esc(S.goal)}</textarea>
+        <div class="wb-box-f">
+          <button class="pick" data-act="noop">${ic('att', 14)}附件</button>
+          <button class="pick" data-act="noop">${ic('folder', 14)}${S.mode === 'code' ? 'codearts-space' : 'team-workspace'}${ic('chevd', 12)}</button>
+          <button class="pick" data-act="noop">模型：自动选择${ic('chevd', 12)}</button>
+          <div style="flex:1"></div>
+          <button class="wb-send" data-act="wbcreate" title="创建任务" ${S.goal.trim() ? '' : 'disabled'}>${ic('up', 16)}</button>
+        </div>
+      </div>
+      <div class="wb-foot">
+        <span>${ic('branch', 12)}工作线自动创建 · 基于 main —— 不用先想分支名</span>
+        <div style="flex:1"></div>
+        <span>内容由 AI 生成，验收前请核对证据</span>
+      </div>
+      </div>
+    </section>
+
+    <!-- 本周概览 + 活跃日历：一行左右分布 -->
+    <section class="wb-row">
+      <div class="wb-col">
+        <div class="wb-sec-h">
+          <span class="t-h16">本周概览</span>
+          <span class="note">含通用与编程全部任务 · 近 14 天趋势</span>
+        </div>
+        <div class="statgrid">
+          ${stats.map(([n, v, d, tone, cta, ser]) => `
+            <div class="statcard">
+              <div class="stat-h">
+                <i class="stat-dot" style="background:var(--${STATUS[tone].k}-solid)"></i>
+                <span class="t-13 sec" style="flex:1">${n}</span>
+                ${cta ? `<button class="btn sm ter" data-act="task" data-v="${cta[1]}">${cta[0]}${ic('chev', 12)}</button>` : ''}
+              </div>
+              <div class="stat-b">
+                <div>
+                  <div class="stat-v">${v}</div>
+                  <div class="t-12 ter">${d}</div>
+                </div>
+                ${spark(ser, STATUS[tone].k)}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="wb-col heat-col-wrap">
+        <div class="wb-sec-h">
+          <span class="t-h16">活跃日历</span>
+          <span class="note">近 18 周</span>
+          <div style="flex:1"></div>
+          <div class="heat-legend">
+            <span class="t-11 ter">少</span>
+            ${[0, 1, 2, 3, 4].map(l => `<i class="heat-cell" style="background:var(--heat-${l})"></i>`).join('')}
+            <span class="t-11 ter">多</span>
+          </div>
+        </div>
+        ${heatmap()}
+      </div>
+    </section>
+
+    <!-- 交付分析 -->
+    <section class="wb-sec">
+      <div class="wb-sec-h">
+        <span class="t-h16">交付分析</span>
+        <span class="note">近 14 天 · 已接受与退回重做的对比</span>
+      </div>
+      <div class="anarow">
+        <div class="card anacard">
+          <div class="ana-h">
+            <span class="t-h14" style="flex:1">交付趋势</span>
+            <span class="lg"><i style="background:var(--done-solid)"></i>已接受</span>
+            <span class="lg"><i class="dash" style="background:var(--wait-solid)"></i>退回重做</span>
+          </div>
+          ${trend(SERIES.days, SERIES.ok, SERIES.back)}
+        </div>
+        <div class="card anacard">
+          <div class="ana-h"><span class="t-h14">任务结束状态</span></div>
+          <div class="donut-row">
+            ${donut([['已接受', endOk, 'done'], ['退回重做', endBack, 'wait'], ['失败中止', endFail, 'fail']], endTotal, '个任务')}
+            <div class="donut-legend">
+              ${[['已接受', endOk, 'done'], ['退回重做', endBack, 'wait'], ['失败中止', endFail, 'fail']].map(([n, v, t]) => `
+                <div class="lgrow">
+                  <i style="background:var(--${t}-solid)"></i>
+                  <span class="lgn">${n}</span>
+                  <b>${v}</b>
+                  <span class="lgp">${Math.round(v / endTotal * 100)}%</span>
+                </div>`).join('')}
+              <div class="divider" style="margin:10px 0 8px"></div>
+              <div class="kv"><span>一次通过率</span><b>${Math.round(endOk / endTotal * 100)}%</b></div>
+              <div class="kv"><span>平均交付时长</span><b>8 分 12 秒</b></div>
+              <div class="kv"><span>平均介入次数</span><b>0.4 次</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 看板入口 -->
+    <section class="wb-sec">
+      <button class="card wb-entry" data-act="page" data-v="board">
+        <span class="sk-ico neutral">${ic('board', 17)}</span>
+        <span style="flex:1;text-align:left">
+          <span class="t-h14" style="display:block">${KIND[S.mode][1]}任务看板</span>
+          <span class="t-12 ter" style="display:block;margin-top:2px">
+            ${visible().filter(t => t.st !== 'done').length} 个进行中 · 看板 / 列表 / 并行监看 / 依赖图 四种视图
+          </span>
+        </span>
+        ${ic('chev', 16, 'ter')}
+      </button>
+    </section>
+  </div>`;
+}
+
 function pBoard() {
   const views = [['kanban', 'board', '看板'], ['list', 'list', '列表'], ['grid', 'grid', '并行监看'], ['graph', 'graph', '依赖图']];
   return `
@@ -1324,7 +1965,7 @@ function pBoard() {
     <div class="phead-row">
       <div>
         <div class="t-h20" style="display:flex;align-items:center;gap:10px">
-          ${S.projF === 'all' ? KIND[S.mode][1] + '任务' : esc(P(S.projF).label)}
+          ${S.projF === 'all' ? KIND[S.mode][1] + '任务看板' : esc(P(S.projF).label)}
           ${S.projF === 'all' ? '' : `<button class="tag" style="height:26px;gap:6px" data-act="proj" data-v="all">${ic('x', 12)}退出该空间</button>`}
         </div>
         <div class="t-13 ter" style="margin-top:2px">
@@ -1344,6 +1985,54 @@ function pBoard() {
   <div class="pbody scroll">${S.boardView === 'kanban' ? bKanban() : S.boardView === 'list' ? bList() : S.boardView === 'grid' ? bGrid() : bGraph()}</div>`;
 }
 
+// 快捷起手式：填进输入框即可，不跳页
+const QUICK = {
+  gen: [['整理会议纪要', 'doc'], ['写一份汇报材料', 'board'], ['做竞品调研', 'search'], ['拉平几份报价', 'grid']],
+  code: [['修一个缺陷', 'shield'], ['按需求单实现', 'code'], ['升级依赖', 'plug'], ['拆分大改动', 'graph']]
+};
+
+const MON = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+function heatmap() {
+  // 按周切列
+  const weeks = [];
+  for (let i = 0; i < HEAT.length; i += 7) weeks.push(HEAT.slice(i, i + 7));
+  // 月份标签：某周的周一进入新月份时打标
+  let lastM = -1;
+  const labels = weeks.map(w => {
+    const m = w[0].d.getMonth();
+    if (m !== lastM) { lastM = m; return MON[m]; }
+    return '';
+  });
+  const total = HEAT.reduce((a, x) => a + x.n, 0);
+  const active = HEAT.filter(x => x.n > 0).length;
+  // 最长连续活跃
+  let best = 0, cur = 0;
+  HEAT.forEach(x => { cur = x.n > 0 ? cur + 1 : 0; if (cur > best) best = cur; });
+
+  return `<div class="card heat-wrap">
+    <div class="heat-scroll scroll">
+      <div class="heat-grid">
+        <div class="heat-months">${labels.map(l => `<span>${l}</span>`).join('')}</div>
+        <div class="heat-dows">${['一', '', '三', '', '五', '', '日'].map(d => `<span>${d}</span>`).join('')}</div>
+        <div class="heat-cols">
+          ${weeks.map(w => `<div class="heat-col">${w.map(x => {
+            const ds = `${x.d.getMonth() + 1}月${x.d.getDate()}日`;
+            return `<i class="heat-cell" style="background:var(--heat-${heatLv(x.n)})" title="${ds} · ${x.n ? x.n + ' 个任务完成' : '无活动'}"></i>`;
+          }).join('')}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="heat-foot">
+      <span>近 18 周共完成 <b>${total}</b> 个任务</span>
+      <span class="sepdot">·</span>
+      <span><b>${active}</b> 天有产出</span>
+      <span class="sepdot">·</span>
+      <span>最长连续 <b>${best}</b> 天</span>
+    </div>
+  </div>`;
+}
+
 function bKanban() {
   const list = visible();
   const lanes = [
@@ -1356,15 +2045,14 @@ function bKanban() {
     const items = list.filter(t => sts.includes(t.st));
     return `<div class="kb-col">
       <div class="kb-h">
-        <i style="width:8px;height:8px;border-radius:9999px;background:var(--${STATUS[tone].k}-solid)"></i>
+        <i class="kb-tick" style="background:var(--${STATUS[tone].k}-solid)"></i>
         <span class="nm">${n}</span><span class="ct">${items.length}</span>
       </div>
-      <div class="kb-bar" style="background:var(--${STATUS[tone].k}-bd)"></div>
       <div class="kb-b scroll">
         <div class="note" style="margin:-2px 2px 2px">${hint}</div>
         ${items.length ? items.map(t => `
           <div class="kb-card" data-act="task" data-v="${t.id}">
-            <div class="kt">${kindIco(t.kind)}<span class="tx">${esc(t.title)}</span></div>
+            <div class="kt"><span class="tx">${esc(t.title)}</span></div>
             <div class="kn">${esc(t.now)}</div>
             <div class="kf">
               ${where(t)}
@@ -1491,46 +2179,11 @@ function bGraph() {
    ===================================================================== */
 function pTask() {
   const t = T(S.taskId);
-  const mt = DATA.tasks.filter(x => x.kind === S.mode);
-  const groups = S.taskGroup === 'pj'
-    ? modeProjects().map(p => [p.label, mt.filter(x => x.proj === p.n)])
-    : [
-      ['需要我', mt.filter(x => x.st === 'wait' || x.st === 'fail')],
-      ['运行中', mt.filter(x => x.st === 'run')],
-      ['待验收', mt.filter(x => x.st === 'verify')],
-      ['已完成', mt.filter(x => x.st === 'done')]
-    ];
-  return `<div class="three">
-    <!-- 左 · 任务记录域 -->
-    <div class="dom-l">
-      <div class="dom-l-h">
-        <div style="display:flex;align-items:center;gap:8px">
-          <button class="iconbtn" data-act="page" data-v="board">${ic('back')}</button>
-          <span class="t-h14" style="flex:1">任务</span>
-          <button class="iconbtn" data-act="new">${ic('plus')}</button>
-        </div>
-        <div class="srch">${ic('search', 14)}<span style="flex:1">筛选任务…</span></div>
-        <div class="seg" style="width:100%">
-          ${[['st', '按状态'], ['pj', '按空间']].map(([k, n]) =>
-            `<button class="${S.taskGroup === k ? 'on' : ''}" style="flex:1;justify-content:center" data-act="tgroup" data-v="${k}">${n}</button>`).join('')}
-        </div>
-      </div>
-      <div class="scroll" style="flex:1;padding-bottom:12px">
-        ${groups.filter(([, l]) => l.length).map(([n, list]) => `
-          <div class="lgroup">
-            <div class="lgroup-t">${n}<span class="mono" style="opacity:.7">${list.length}</span></div>
-            ${list.map(x => `
-              <button class="mini ${x.id === S.taskId ? 'on' : ''}" data-act="task" data-v="${x.id}">
-                <div class="mtitle">${kindIco(x.kind)}<span class="tx">${esc(x.title)}</span></div>
-                <div class="mmeta">${chip(x.st)}<span>${x.ts}</span></div>
-              </button>`).join('')}
-          </div>`).join('')}
-      </div>
-    </div>
-
+  return `<div class="three two ${S.rFull ? 'rfull' : ''}">
     <!-- 中 · 任务控制域 -->
     <div class="dom-c">
       <div class="dom-c-h">
+        <button class="iconbtn tip" data-tip="回到任务看板" data-act="page" data-v="board">${ic('back')}</button>
         ${kindIco(t.kind)}
         <div style="flex:1;min-width:0">
           <div class="t-h16" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title)}</div>
@@ -1544,7 +2197,6 @@ function pTask() {
         ${chip(t.st)}
         <button class="iconbtn tip" data-tip="在码道 IDE 中打开" data-act="toast" data-v="已在码道 IDE 打开工作线 ${t.branch}：同一份检出、同一个任务状态，改动会回到这条评审流">${ic('code')}</button>
         <button class="iconbtn tip" data-tip="复制任务链接" data-act="toast" data-v="已复制直达链接 madao://space/task/${t.id} — 可贴进 IM、需求单或评审意见">${ic('link')}</button>
-        <button class="iconbtn" data-act="toggleR">${ic('panel')}</button>
       </div>
 
       <div class="stream scroll">${stream(t)}</div>
@@ -1565,7 +2217,7 @@ function pTask() {
     </div>
 
     <!-- 右 · 工作对象域 -->
-    ${S.rOpen ? domR(t) : ''}
+    ${S.rOpen ? `<div class="rz" data-rz="domRW" data-target=".dom-r" data-min="360" data-max="860" data-inv="1"></div>` + domR(t) : ''}
   </div>`;
 }
 
@@ -1779,16 +2431,20 @@ function overviewBar(t) {
 
 /* ---------- 右 · 工作对象域 ---------- */
 function domR(t) {
-  const tabs = [['art', '产物', t.arts.length], ['diff', '变更', t.files ? t.files.length : (t.diffDoc ? 3 : 0)], ['ev', '证据', t.ev.length]];
+  const tr = trace(t.id);
+  const tabs = [['art', '产物', t.arts.length], ['diff', '变更', t.files ? t.files.length : (t.diffDoc ? 3 : 0)],
+                ['ev', '证据', t.ev.length], ['trace', '轨迹', tr ? tr.steps.length : 0]];
   const canAccept = t.ev.length > 0 && (DATA.rt.evPassed[t.id] || t.ev.every(e => e[0] === 'pass'));
-  return `<div class="dom-r">
+  return `<div class="dom-r" style="flex-basis:${S.domRW}px;width:${S.domRW}px">
     <div class="tabs">
-      ${tabs.map(([k, n, c]) => `<button class="tab ${S.rTab === k ? 'on' : ''}" data-act="rtab" data-v="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}
+      ${tabs.map(([k, n, c]) => `<button class="tab ${S.rTab === k ? 'on' : ''}" data-act="rtab" data-v="${k}">${n}${c ? `<span class="cn">${c}</span>` : ''}</button>`).join('')}
       <div style="flex:1"></div>
-      <button class="iconbtn" data-act="toggleR">${ic('x', 14)}</button>
+      <button class="iconbtn tip" data-act="rfull" data-tip="${S.rFull ? '退出全屏' : '全屏查看'}">${ic(S.rFull ? 'shrink' : 'expand', 14)}</button>
+      <button class="iconbtn tip" data-act="toggleR" data-tip="收起产物面板">${ic('x', 14)}</button>
     </div>
-    <div class="rpane scroll">${S.rTab === 'art' ? rArt(t) : S.rTab === 'diff' ? rDiff(t) : rEv(t)}</div>
-    ${t.st === 'verify' || t.st === 'wait' ? `
+    <div class="rpane scroll">${S.rTab === 'art' ? rArt(t) : S.rTab === 'diff' ? rDiff(t)
+      : S.rTab === 'trace' ? rTrace(t) : rEv(t)}</div>
+    ${(t.st === 'verify' || t.st === 'wait') && S.rTab !== 'trace' ? `
     <div class="accept">
       ${DATA.rt.accepted[t.id] ? `<div class="banner done">${ic('check', 16)}
         <div style="flex:1"><div class="t-13" style="font-weight:600">已接受并归档</div>
@@ -1945,6 +2601,117 @@ function docDiff(t) {
   </div>` : ''}`;
 }
 
+function rTrace(t) {
+  const tr = trace(t.id);
+  if (!tr) return `<div class="empty">${ic('graph', 28)}<div class="t-13">这条任务还没有可观测轨迹</div>
+    <div class="t-12">任务开始执行后，每一次模型调用与工具调用都会记录在这里</div></div>`;
+  const fmtD = v => v >= 60 ? `${Math.floor(v / 60)}m ${Math.round(v % 60)}s` : `${v.toFixed(1)}s`;
+  const KIND_L = { assistant: '模型', tool: '工具', sub: '子 Agent', error: '错误' };
+  const maxD = Math.max(...tr.steps.map(x => x.dur), 1);
+  const cnt = k => tr.steps.filter(x => x.kind === k).length;
+  const filters = [['all', '全部', tr.steps.length], ['assistant', '模型', cnt('assistant')],
+                   ['tool', '工具', cnt('tool')], ['sub', '子 Agent', cnt('sub')]];
+  // 过滤只作用于下方列表；上方泳道始终是完整时间线，否则就读不出间隔了
+  const rows = tr.steps.map((x, i) => [x, i]).filter(([x]) => S.trF === 'all' || x.kind === S.trF);
+  const sel = S.trStep !== null ? tr.steps[S.trStep] : null;
+
+  // 详情：窄面板下行内展开，产物面板放大后改为右侧定栏
+  const detail = (x) => `
+    <div class="kv"><span>来源</span><b class="mono">Step ${tr.steps.indexOf(x) + 1} / ${tr.steps.length}</b></div>
+    ${x.kind === 'assistant' ? `
+      <div class="kv"><span>模型</span><b>${x.model}</b></div>
+      <div class="kv"><span>状态</span><b>已完成</b></div>
+      <div class="kv"><span>Token 合计</span><b>${(x.inTok + x.outTok).toLocaleString()}</b></div>
+      <div class="kv"><span style="padding-left:10px">输入</span><b>${x.inTok.toLocaleString()}</b></div>
+      <div class="kv"><span style="padding-left:10px">输出</span><b>${x.outTok.toLocaleString()}</b></div>
+      <div class="tr-sec">请求时序</div>
+      <div class="kv"><span>起点</span><b class="mono">${x.start}s</b></div>
+      <div class="kv"><span>总耗时</span><b class="mono">${x.dur.toFixed(2)} s</b></div>
+      <div class="kv"><span>首字延迟</span><b class="mono">${x.ttft} s</b></div>
+      <div class="kv"><span>吞吐</span><b class="mono">${(x.outTok / Math.max(x.dur - x.ttft, .3)).toFixed(1)} tok/s</b></div>
+      ${x.think ? `<div class="tr-note">${ic('spark', 12)}这一步是判断，不改任何文件</div>` : ''}`
+    : x.kind === 'tool' ? `
+      <div class="kv"><span>状态</span><b style="color:var(--done-tx)">成功</b></div>
+      <div class="kv"><span>入参</span><b class="mono" style="font-size:11px">${esc(x.arg)}</b></div>
+      <div class="tr-sec">请求时序</div>
+      <div class="kv"><span>起止</span><b class="mono">${x.start}s → ${(x.start + x.dur).toFixed(2)}s</b></div>
+      <div class="kv"><span>总耗时</span><b class="mono">${x.dur.toFixed(2)} s</b></div>
+      <div class="tr-note">${ic('info', 12)}工具调用不计入模型 Token</div>`
+    : x.kind === 'sub' ? `
+      <div class="kv"><span>搭档</span><b>${esc(x.agent)}</b></div>
+      <div class="kv"><span>工作</span><b>${esc(x.work)}</b></div>
+      <div class="kv"><span>状态</span><b style="color:var(--${x.running ? 'run' : 'done'}-tx)">${x.running ? '运行中' : '已完成'}</b></div>
+      <div class="kv"><span>Token 合计</span><b>${(x.inTok + x.outTok).toLocaleString()}</b></div>
+      <div class="tr-sec">请求时序</div>
+      <div class="kv"><span>总耗时</span><b class="mono">${x.dur.toFixed(2)} s</b></div>
+      <div class="tr-note">${ic('info', 12)}子 Agent 有自己的独立上下文，不占用主线窗口</div>`
+    : `
+      <div class="kv"><span>状态</span><b style="color:var(--fail-tx)">失败</b></div>
+      <div class="tr-note" style="color:var(--fail-tx)">${ic('alert', 12)}已在对话流中抛出介入卡，等待你决定</div>`}`;
+
+  return `
+  <div class="tr-top">
+    <div class="tr-f">
+      ${filters.map(([k, n, c]) => `<button class="${S.trF === k ? 'on' : ''}" data-act="trf" data-v="${k}">${n}<i>${c}</i></button>`).join('')}
+    </div>
+    <div class="tr-srch">${ic('search', 12)}<span>搜索步骤</span></div>
+  </div>
+
+  <div class="tr-strip">
+    ${['输入', '模型', '工具'].map((row, ri) => `
+      <div class="tr-srow">
+        <span class="tr-sl">${row}</span>
+        <div class="tr-sc">
+          ${tr.steps.map((x, i) => {
+            const hit = (ri === 0 && i === 0) || (ri === 1 && (x.kind === 'assistant' || x.kind === 'sub'))
+              || (ri === 2 && (x.kind === 'tool' || x.kind === 'error'));
+            return `<i class="tr-b ${hit ? 'hit' : ''} ${S.trStep === i ? 'on' : ''} k-${x.kind}"
+              style="opacity:${hit ? (0.45 + 0.55 * (x.dur / maxD)).toFixed(2) : ''}"
+              data-act="trstep" data-v="${i}" title="${esc(x.label.slice(0, 40))} · ${fmtD(x.dur)}"></i>`;
+          }).join('')}
+        </div>
+      </div>`).join('')}
+    <div class="tr-axis"><span>0.0s</span><div style="flex:1"></div><span>${fmtD(tr.dur)}</span></div>
+  </div>
+
+  <div class="tr-sum">
+    <span><b>${fmtD(tr.dur)}</b> 耗时</span><span class="sepdot">·</span>
+    <span><b>${(tr.tok / 1000).toFixed(1)}k</b> tok</span><span class="sepdot">·</span>
+    <span><b>¥${tr.cost}</b></span><span class="sepdot">·</span>
+    <span><b>${tr.llm}</b> 模型</span><span class="sepdot">·</span>
+    <span><b>${tr.tool}</b> 工具</span><span class="sepdot">·</span>
+    <span class="${tr.err ? 'bad' : ''}"><b>${tr.err}</b> 错误</span>
+  </div>
+
+  <div class="tr-wrap">
+    <div class="tr-list">
+      ${rows.length ? rows.map(([x, i]) => `
+        <div class="tr-item k-${x.kind} ${S.trStep === i ? 'on' : ''}">
+          <button class="tr-row" data-act="trstep" data-v="${i}">
+            <i class="tr-dot"></i>
+            <span class="tr-k">${KIND_L[x.kind]}</span>
+            <span class="tr-t">${esc(x.label)}</span>
+            <span class="tr-d">${fmtD(x.dur)}</span>
+          </button>
+          ${S.trStep === i && !S.rFull ? `<div class="tr-detail">${detail(x)}</div>` : ''}
+        </div>`).join('') : '<div class="tr-empty">这一类下没有步骤</div>'}
+    </div>
+    ${S.rFull && sel ? `
+      <div class="tr-pane">
+        <div class="tr-pane-h">
+          <span class="tr-k">${KIND_L[sel.kind]}</span>
+          <span class="t-12 ter" style="flex:1">Step ${S.trStep + 1}</span>
+          <button class="iconbtn" data-act="trstep" data-v="${S.trStep}">${ic('x', 13)}</button>
+        </div>
+        <div class="t-13" style="margin-bottom:8px">${esc(sel.label)}</div>
+        ${detail(sel)}
+      </div>` : ''}
+  </div>
+  <div class="note" style="margin-top:12px">
+    ${ic('info', 12)} 点任意一步看它的模型、Token 与时序${S.rFull ? '' : '；放大产物面板后详情会移到右侧定栏'}
+  </div>`;
+}
+
 function rEv(t) {
   if (!t.ev.length) return `<div class="empty">${ic('shield', 28)}<div class="t-13">还没有证据</div>
     <div class="t-12">证据由搭档在验证阶段产生并注册进任务，不会留成散落的本地文件。</div></div>`;
@@ -1997,7 +2764,7 @@ function pReview() {
 
   return `<div class="three">
     <!-- 中 · 评审列表域 -->
-    <div class="dom-l" style="flex:0 0 340px;width:340px">
+    <div class="dom-l" style="flex-basis:${S.domLW + 44}px;width:${S.domLW + 44}px">
       <div class="dom-l-h">
         <div style="display:flex;align-items:center;gap:8px">
           <span class="t-h14" style="flex:1">变更评审</span>
@@ -2027,6 +2794,7 @@ function pReview() {
       </div>
     </div>
 
+    <div class="rz" data-rz="domLW" data-target=".dom-l" data-min="264" data-max="504" data-off="44"></div>
     <!-- 右 · 详情域 -->
     <div class="dom-c">${r ? revDetail(r) : `<div class="empty">${ic('pr', 28)}<div class="t-13">选择左侧的一条评审</div></div>`}</div>
   </div>`;
@@ -2144,12 +2912,40 @@ const AUTO_TPL = [
   ['每日代码审查提醒', '每日梳理待审查的 PR 与代码变更，输出审查优先级清单与关注点', 'pr', 'c4', 'code']
 ];
 
+// 执行记录：跨自动化的运行流水
+const AUTO_RUNS = {
+  gen: [
+    ['wait', 'A-07', 'AI Agent 产品趋势周报', '今天 09:30', '等待人工定调 · 已通过 IM 提醒', '4 分 12 秒', 'T-2041'],
+    ['run',  'A-01', '竞品官网变更监控', '12 分钟前', '正在核对 2 处变更', '—', '—'],
+    ['wait', 'A-06', '会议纪要与待办分发', '8 分钟前', '2 条待办待定归属', '3 分 08 秒', 'T-2044'],
+    ['fail', 'A-04', '故障复盘自动起草', '2 小时前', '连接器鉴权过期，拉取构建记录失败', '1 分 02 秒', 'T-2028'],
+    ['done', 'A-09', '客户访谈纪要归档', '9/10 18:00', '归档 4 场访谈，新增 11 条观点', '12 分 47 秒', '—'],
+    ['done', 'A-03', '工单高频问题周度归拢', '9/12 17:00', '新增 3 条答复口径', '6 分 21 秒', 'T-2039'],
+    ['done', 'A-07', 'AI Agent 产品趋势周报', '9/8 09:30', '已接受并归档 · 第 36 期', '11 分 04 秒', 'T-2019'],
+    ['done', 'A-08', '月度费用汇总', '9/1 09:00', '已接受并归档', '9 分 33 秒', '—'],
+    ['fail', 'A-07', 'AI Agent 产品趋势周报', '8/25 09:30', '来源站点超时，重试 2 次后中止', '2 分 31 秒', 'T-1968']
+  ],
+  code: [
+    ['done', 'A-12', '依赖许可证合规扫描', '今天 06:00', '无新增风险', '1 分 18 秒', '—'],
+    ['done', 'A-05', '依赖漏洞每日巡检', '今天 07:00', '无高危，未开线', '48 秒', '—'],
+    ['done', 'A-11', '主干构建失败自动起单', '昨天 21:14', '已开修复线并合入', '17 分 05 秒', '—'],
+    ['done', 'A-05', '依赖漏洞每日巡检', '昨天 07:00', '1 个中危，已开线修复', '3 分 52 秒', '—'],
+    ['done', 'A-02', 'PR 合入后同步发布说明', '9/12 15:20', '已更新 v1.4.2', '2 分 09 秒', '—'],
+    ['fail', 'A-11', '主干构建失败自动起单', '9/9 03:40', '日志服务不可达，未能定位', '31 秒', '—'],
+    ['done', 'A-10', '陈旧分支清理提醒', '9/1 10:00', '提醒 9 条，7 条已处理', '55 秒', '—']
+  ]
+};
+
 function pAuto() {
   const entries = [
-    ['手动创建', '自己定目标、周期与停下来找人的条件', 'clock', 'c2'],
-    ['在对话中创建', '把已经跑过一次的任务直接存成周期任务', 'bot', 'c4'],
-    ['从模板创建', '挑一个模板，改两处就能开始跑', 'grid', 'c1']
+    ['手动创建', '自己定目标、周期与停下来找人的条件', 'clock', 'c2', 'noop'],
+    ['在对话中创建', '把已经跑过一次的任务直接存成周期任务', 'bot', 'c4', 'noop'],
+    ['从模板创建', S.autoTpl ? '收起模板库' : '挑一个模板，改两处就能开始跑', 'grid', 'c1', 'autotpl']
   ];
+  const list = DATA.autos.filter(a => a.k === S.mode);
+  const on = list.filter(a => a.on).length;
+  const tabs = [['mine', '我的自动化', list.length], ['runs', '执行记录', AUTO_RUNS[S.mode].length]];
+
   return `
   <div class="phead">
     <div class="phead-row">
@@ -2159,73 +2955,101 @@ function pAuto() {
       </div>
     </div>
     <div class="entry-row">
-      ${entries.map(([n, d, i, c]) => `
-        <button class="card entry" data-act="toast" data-v="${n}：${d}">
-          <span class="sk-ico" style="background:var(--${c}-bg);color:var(--${c}-fg)">${ic(i, 17)}</span>
+      ${entries.map(([n, d, i, c, act]) => `
+        <button class="card entry ${act === 'autotpl' && S.autoTpl ? 'on' : ''}" data-act="${act}" data-v="${n}：${d}">
+          <span class="sk-ico neutral">${ic(i, 17)}</span>
           <span style="flex:1;text-align:left">
             <span class="t-h14" style="display:block">${n}</span>
             <span class="t-12 ter" style="display:block;margin-top:2px">${d}</span>
           </span>
-          ${ic('plus', 16, 'ter')}
+          ${act === 'autotpl' ? ic(S.autoTpl ? 'chevd' : 'chev', 16, 'ter') : ic('plus', 16, 'ter')}
         </button>`).join('')}
+    </div>
+    ${S.autoTpl ? `
+      <div class="tplwrap">
+        <div class="wb-sec-h" style="margin-bottom:12px">
+          <span class="t-h14">从模板入手</span>
+          <span class="note">模板预置了触发方式、产物形态与停下来找人的条件</span>
+          <div style="flex:1"></div>
+          <button class="btn sm ter" data-act="autotpl">${ic('x', 13)}收起</button>
+        </div>
+        <div class="cards2">${AUTO_TPL.filter(t => t[4] === S.mode).map(([n, d, i, c]) => `
+          <div class="card ecard2" data-act="toast" data-v="已从模板「${n}」创建：确认周期与停下来找人的条件后即可启用">
+            <div class="ecard2-h">
+              <span class="sk-ico neutral">${ic(i, 17)}</span>
+              <div style="flex:1;min-width:0"><div class="t-h14">${n}</div></div>
+              <button class="iconbtn" data-act="toast" data-v="已从模板「${n}」创建">${ic('plus', 15)}</button>
+            </div>
+            <div class="t-12 ter" style="line-height:19px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${d}</div>
+          </div>`).join('')}</div>
+      </div>` : ''}
+    <div class="phead-row">
+      <div class="seg">${tabs.map(([k, n, c]) =>
+        `<button class="${S.autoTab === k ? 'on' : ''}" data-act="autotab" data-v="${k}">${n}<span class="t-11 ter">${c}</span></button>`).join('')}</div>
+      <div class="sp"></div>
+      ${S.autoTab === 'mine'
+        ? `<span class="note">${on} 个已启用 · ${list.length - on} 个未启用</span>`
+        : `<span class="note">近 30 天 · 含全部自动化</span>`}
     </div>
   </div>
 
   <div class="pbody scroll">
-    <div class="t-h16" style="margin-bottom:12px;display:flex;align-items:center;gap:10px">
-      运行中的自动化
-      <span class="tag mono">${DATA.autos.filter(a => a.k === S.mode && a.on).length} 启用 / ${DATA.autos.filter(a => a.k === S.mode).length}</span>
-    </div>
-    <div class="cards2">${DATA.autos.filter(a => a.k === S.mode).map(a => `
-      <div class="card ecard2 ${a.on ? '' : 'off'}" data-act="${a.last[2] !== '—' ? 'task' : 'noop'}" data-v="${a.last[2]}">
-        <div class="ecard2-h">
-          <span class="sk-ico" style="background:var(--${a.last[0] === 'fail' ? 'fail' : a.on ? 'run' : 'catn'}-bg);color:var(--${a.last[0] === 'fail' ? 'fail' : a.on ? 'run' : 'catn'}-tx)">
-            ${ic(a.trig.startsWith('定时') ? 'clock' : 'plug', 17)}</span>
-          <div style="flex:1;min-width:0">
-            <div class="t-h14" style="display:flex;align-items:center;gap:7px">
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.n)}</span>
-              <span class="tag mono">${a.id}</span>
+    ${S.autoTab === 'mine' ? `
+      <div class="cards2">${list.map(a => `
+        <div class="card ecard2 ${a.on ? '' : 'off'}" data-act="${a.last[2] !== '—' ? 'task' : 'noop'}" data-v="${a.last[2]}">
+          <div class="ecard2-h">
+            <span class="sk-ico neutral">${ic(a.trig.startsWith('定时') ? 'clock' : 'plug', 17)}</span>
+            <div style="flex:1;min-width:0">
+              <div class="t-h14" style="display:flex;align-items:center;gap:7px">
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.n)}</span>
+                <span class="tag mono">${a.id}</span>
+              </div>
+              <div class="t-11 ter" style="margin-top:3px;display:flex;align-items:center;gap:5px">${ic(a.trig.startsWith('定时') ? 'clock' : 'plug', 11)}${esc(a.trig)}</div>
             </div>
-            <div class="t-11 ter" style="margin-top:3px;display:flex;align-items:center;gap:5px">${ic(a.trig.startsWith('定时') ? 'clock' : 'plug', 11)}${esc(a.trig)}</div>
+            <span class="swrow" data-act="sw" data-v="${a.id}"><span class="sw ${a.on ? 'on' : ''}"><i></i></span></span>
           </div>
-          <span class="swrow" data-act="sw" data-v="${a.id}"><span class="sw ${a.on ? 'on' : ''}"><i></i></span></span>
-        </div>
-        <div class="t-12 ter" style="line-height:19px">${esc(a.d)}</div>
-        <div class="divider"></div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          ${chip(a.last[0])}
-          <span class="t-12 ter" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.last[1])}</span>
-          <span class="t-11 ter mono">${a.rate}</span>
-        </div>
-      </div>`).join('')}</div>
-
-    <div class="t-h16" style="margin:28px 0 12px">从模板入手</div>
-    <div class="cards2">${AUTO_TPL.filter(t => t[4] === S.mode).map(([n, d, i, c]) => `
-      <div class="card ecard2" data-act="toast" data-v="已从模板「${n}」创建：确认周期与停下来找人的条件后即可启用">
-        <div class="ecard2-h">
-          <span class="sk-ico" style="background:var(--${c}-bg);color:var(--${c}-fg)">${ic(i, 17)}</span>
-          <div style="flex:1;min-width:0"><div class="t-h14">${n}</div></div>
-          <button class="iconbtn" data-act="toast" data-v="已从模板「${n}」创建">${ic('plus', 15)}</button>
-        </div>
-        <div class="t-12 ter" style="line-height:19px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${d}</div>
-      </div>`).join('')}</div>
-
-    <div class="t-h16" style="margin:28px 0 12px">A-07 · 最近运行</div>
-    <div class="rows">
-      ${[['wait', '今天 09:30', '等待人工定调 · 已通过 IM 提醒', '4 分 12 秒', 'T-2041'],
-         ['done', '9/8 09:30', '已接受并归档 · 第 36 期', '11 分 04 秒', 'T-2019'],
-         ['done', '9/1 09:30', '已接受并归档 · 第 35 期', '9 分 47 秒', 'T-1993'],
-         ['fail', '8/25 09:30', '来源站点超时，重试 2 次后中止', '2 分 31 秒', 'T-1968']].map(([st, when, d, dur, tid]) => `
-        <div class="row" data-act="${tid === 'T-2041' ? 'task' : 'noop'}" data-v="${tid}">
-          ${chip(st)}
-          <div class="main"><div class="rt t-13">${when}</div><div class="rs">${d}</div></div>
-          <span class="t-12 ter mono">${dur}</span>
-          <span class="tag mono">${tid}</span>
-        </div>`).join('')}
-    </div>
-    <div class="note" style="margin-top:12px">
-      ${ic('info', 13)} 每次运行都是一条独立任务，保留完整的对话、证据与产物 ——「上周那期是怎么得出这个结论的」可以直接翻回去。
-    </div>
+          <div class="t-12 ter" style="line-height:19px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(a.d)}</div>
+          <div class="divider"></div>
+          <div class="auto-s">
+            ${a.on ? chip(a.last[0]) : '<span class="chip info"><i class="d"></i>未启用</span>'}
+            <span class="t-12 ter" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.last[1])}</span>
+            <span class="t-11 ter mono">${a.rate}</span>
+            <div class="auto-ops" data-stop>
+              <button class="iconbtn" data-act="toast" data-v="已触发「${esc(a.n)}」本次运行" title="立即运行">${ic('play', 15)}</button>
+              <button class="iconbtn" data-act="toast" data-v="编辑「${esc(a.n)}」" title="编辑">${ic('doc', 15)}</button>
+              <div class="menuwrap">
+                <button class="iconbtn" data-act="amenu" data-v="${a.id}" title="更多">${ic('more', 15)}</button>
+                ${S.autoMenu === a.id ? `<div class="menu" data-stop>
+                  ${[['board', '在任务中定位'], ['clock', a.on ? '暂停' : '启用'], ['doc', '编辑'], ['x', '删除']].map(([i, n]) => `
+                    <button class="menu-i ${n === '删除' ? 'del' : ''}" data-act="toast" data-v="${n}「${esc(a.n)}」">${ic(i, 14)}${n}</button>`).join('')}
+                </div>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>`).join('')}</div>`
+    : `
+      <div class="rtl">
+        ${AUTO_RUNS[S.mode].map(([st, id, n, when, d, dur, tid]) => `
+          <div class="rtl-i ${st}" data-act="${tid !== '—' && T(tid) ? 'task' : 'noop'}" data-v="${tid}">
+            <div class="rtl-rail"><i class="rtl-node"></i></div>
+            <div class="rtl-b">
+              <div class="rtl-h">
+                <span class="rtl-t">${esc(n)}</span>
+                <span class="tag mono">${id}</span>
+                <span class="rtl-when">${when}</span>
+              </div>
+              <div class="rtl-d">${esc(d)}</div>
+              <div class="rtl-m">
+                ${chip(st)}
+                <span class="t-11 ter mono">用时 ${dur}</span>
+                ${tid !== '—' ? `<span class="tag mono">${tid}</span>` : ''}
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="note" style="margin-top:12px">
+        ${ic('info', 13)} 每次运行都是一条独立任务，保留完整的对话、证据与产物 ——「上次是怎么得出这个结论的」可以直接翻回去。
+      </div>`}
   </div>`;
 }
 
@@ -2283,7 +3107,7 @@ function projMine() {
     const ts = DATA.tasks.filter(t => t.proj === p.n && t.kind === S.mode);
     return `<div class="card ecard2" data-act="proj" data-v="${p.n}">
       <div class="ecard2-h">
-        <span class="sk-ico" style="background:var(--cat1-bg);color:var(--cat1-fg)">${ic('folder', 17)}</span>
+        <span class="sk-ico neutral">${ic('folder', 17)}</span>
         <div style="flex:1;min-width:0">
           <div class="t-h14" style="display:flex;align-items:center;gap:6px">${esc(p.label)}${p.pin ? '<span class="tag">常用</span>' : ''}</div>
           <div class="t-11 ter mono" style="margin-top:3px;display:flex;align-items:center;gap:5px">
@@ -2318,7 +3142,7 @@ function projTpl() {
   <div class="cards2">${PROJ_TPL[S.mode].map(([n, d, i, c, tags]) => `
     <div class="card ecard2" data-act="toast" data-v="已用模板「${n}」创建项目：搭档、产物形态与验收条件已按模板预置，可再改">
       <div class="ecard2-h">
-        <span class="sk-ico" style="background:var(--${c}-bg);color:var(--${c}-fg)">${ic(i, 17)}</span>
+        <span class="sk-ico neutral">${ic(i, 17)}</span>
         <div style="flex:1;min-width:0"><div class="t-h14">${n}</div></div>
         <button class="iconbtn" data-act="toast" data-v="已用模板「${n}」创建项目">${ic('plus', 15)}</button>
       </div>
@@ -2335,7 +3159,7 @@ const SK_CATS = ['全部', '配置', '脚手架', '元技能', '开发者工具'
 const SK_TONE = ['c1', 'c2', 'c3', 'c4'];
 
 function pExpert() {
-  const tabs = [['expert', '专家', DATA.experts.length], ['skill', '技能', DATA.skills.length], ['conn', '连接器', DATA.conns.length]];
+  const tabs = [['expert', '专家', DATA.experts.length], ['skill', '技能', DATA.skills.length], ['conn', '连接器', DATA.connGroups.reduce((a, g) => a + g[1].length, 0)]];
   const sub = { expert: '会做事的角色：接任务、产出可评审的结果', skill: '可被多个专家复用的做事方法，不单独接任务', conn: '外部系统的读写通道：仓库、流水线、需求、IM' }[S.expertTab];
   const cats = S.expertTab === 'expert' ? EX_CATS : S.expertTab === 'skill' ? SK_CATS : null;
   const cf = S.expertTab === 'expert' ? S.exCat : S.skCat;
@@ -2354,7 +3178,7 @@ function pExpert() {
     ${cats ? `<div class="pills">${cats.map(c => {
       const n = c === '全部' ? (S.expertTab === 'expert' ? DATA.experts.length : DATA.skills.length)
         : (S.expertTab === 'expert' ? DATA.experts : DATA.skills).filter(x => x.cat === c).length;
-      return `<button class="pill ${cf === c ? 'on' : ''}" data-act="${S.expertTab === 'expert' ? 'exCat' : 'skCat'}" data-v="${c}">${c}<span class="n">${n}</span></button>`;
+      return `<button class="pill ${cf === c ? 'on' : ''}" data-act="${S.expertTab === 'expert' ? 'exCat' : 'skCat'}" data-v="${c}">${c}<span class="cn">${n}</span></button>`;
     }).join('')}</div>` : ''}
   </div>
   <div class="pbody scroll">${S.expertTab === 'expert' ? exGrid() : S.expertTab === 'skill' ? skGrid() : connGrid()}</div>`;
@@ -2390,7 +3214,7 @@ function skGrid() {
   return `<div class="cards2">${list.map((x, i) => `
     <div class="card ecard2" data-act="toast" data-v="已添加技能「${esc(x.n)}」，可被任意专家引用">
       <div class="ecard2-h">
-        <span class="sk-ico" style="background:var(--${SK_TONE[i % 4]}-bg);color:var(--${SK_TONE[i % 4]}-fg)">${ic('spark', 17)}</span>
+        <span class="sk-ico neutral">${ic('spark', 17)}</span>
         <div style="flex:1;min-width:0">
           <div class="t-h14" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.n)}</div>
           <div class="t-11 ter" style="margin-top:2px">${esc(x.cat)}</div>
@@ -2402,26 +3226,34 @@ function skGrid() {
 }
 
 function connGrid() {
+  const err = DATA.connGroups.flatMap(g => g[1]).filter(c => c.st === 'err');
   return `
-  ${DATA.conns.some(c => c.st === 'err') ? `
-    <div class="banner wait" style="margin-bottom:14px">${ic('alert', 16)}
-      <div style="flex:1"><div class="t-13" style="font-weight:600">1 个连接器异常，已影响 1 条自动化</div>
-      <div class="t-12" style="opacity:.86;margin-top:2px">CodeArts 流水线鉴权过期 —— A-04 的最近一次运行因此停在「拉取构建记录」。</div></div>
+  ${err.length ? `
+    <div class="banner wait" style="margin-bottom:16px">${ic('alert', 16)}
+      <div style="flex:1"><div class="t-13" style="font-weight:600">${err.length} 个连接器异常，已影响 1 条自动化</div>
+      <div class="t-12" style="opacity:.86;margin-top:2px">${esc(err[0].n)} 鉴权过期 —— A-04 的最近一次运行因此停在「拉取构建记录」。</div></div>
       <button class="btn sm sec" data-act="page" data-v="auto">看受影响的自动化</button>
     </div>` : ''}
-  <div class="cards2">${DATA.conns.map(x => `
-    <div class="card ecard2" data-act="toast" data-v="${esc(x.n)} — ${esc(x.d)}">
-      <div class="ecard2-h">
-        <span class="sk-ico" style="background:var(--${x.c}-bg);color:var(--${x.c}-fg)">${ic(x.ico, 17)}</span>
-        <div style="flex:1;min-width:0">
-          <div class="t-h14">${esc(x.n)}</div>
-          <div class="t-11 ter" style="margin-top:2px">${esc(x.meta)}</div>
-        </div>
-        <span class="chip ${x.st === 'ok' ? 'done' : x.st === 'err' ? 'fail' : 'info'}"><i class="d"></i>${x.st === 'ok' ? '已连接' : x.st === 'err' ? '异常' : '未启用'}</span>
-      </div>
-      <div class="t-12 ter" style="line-height:19px">${esc(x.d)}</div>
-    </div>`).join('')}</div>`;
+  ${DATA.connGroups.map(([g, list]) => `
+    <div class="conn-g">
+      <div class="conn-gh"><span class="t-h14">${g}</span><span class="note">${list.length}</span></div>
+      <div class="cards2">${list.map(x => `
+        <div class="card conncard ${x.st === 'off' ? 'off' : ''}" data-act="toast" data-v="${esc(x.n)} — ${esc(x.d)}">
+          <div class="ecard2-h">
+            <span class="conn-ico" style="--bg:${x.tone}">${ic(x.ico, 18)}</span>
+            <div style="flex:1;min-width:0">
+              <div class="t-h14">${esc(x.n)}</div>
+              <div class="t-11 ter" style="margin-top:2px">${esc(x.meta)}</div>
+            </div>
+            ${x.st === 'ok' ? `<span class="conn-ok">${ic('check', 14)}</span>`
+              : x.st === 'err' ? '<span class="chip fail"><i class="d"></i>异常</span>'
+              : `<button class="iconbtn" data-act="toast" data-v="接入「${esc(x.n)}」">${ic('plus', 15)}</button>`}
+          </div>
+          <div class="t-12 ter" style="line-height:19px">${esc(x.d)}</div>
+        </div>`).join('')}</div>
+    </div>`).join('')}`;
 }
+
 
 /* =====================================================================
    Dialog
@@ -2531,7 +3363,6 @@ function pNew() {
   const cat = cats[S.newCat] || cats[0];
   const team = { code: [['码', 'c1', '代码实现搭档'], ['测', 'c3', '测试与验证搭档']],
                  gen: [['研', 'c2', '研究核验搭档'], ['文', 'c4', '文书成稿搭档']] }[S.mode];
-  const filled = S.newTpl !== null;
 
   return `
   <div class="newpage scroll">
@@ -2541,24 +3372,26 @@ function pNew() {
         <p class="newsub">说要什么结果，不用说怎么做 —— 剩下的过程、证据和验收，Space 替你盯着</p>
       </div>
 
-      <div class="newbox">
-        <textarea id="newGoal" placeholder="${S.mode === 'code'
+      <div class="wb-shell">
+      <div class="wb-box newbox">
+        <textarea id="newGoal" data-sync="goal" placeholder="${S.mode === 'code'
           ? '例如：把任务列表首屏偶发白屏修掉，给出复现步骤与验证证据。'
-          : '例如：把上周产品评审会的录音整理成纪要，抽出待办并落到人。'}">${filled ? esc(cat[1][S.newTpl][0]) : ''}</textarea>
-        <div class="newbox-f">
+          : '例如：把上周产品评审会的录音整理成纪要，抽出待办并落到人。'}">${esc(S.goal)}</textarea>
+        <div class="wb-box-f">
           <button class="pick" data-act="noop">${ic('att', 14)}附件</button>
           <span class="newsep"></span>
           <button class="pick" data-act="noop">${ic('folder', 14)}${S.mode === 'code' ? 'codearts-space' : 'team-workspace'}${ic('chevd', 12)}</button>
           <button class="pick" data-act="noop">${team.map(([c, k]) => av(c, k, 18)).join('')}<span style="margin-left:2px">${team.length} 位搭档</span>${ic('chevd', 12)}</button>
           <button class="pick" data-act="noop">模型：自动选择${ic('chevd', 12)}</button>
           <div style="flex:1"></div>
-          <button class="btn acc" data-act="create">${ic('branch', 14)}创建并开工作线</button>
+          <button class="wb-send" data-act="create" title="创建并开工作线" ${S.goal.trim() ? '' : 'disabled'}>${ic('up', 16)}</button>
         </div>
-        <div class="newbox-foot">
-          <span>${ic('branch', 12)}工作线自动创建 · 基于 main —— 不用先想分支名</span>
-          <div style="flex:1"></div>
-          <span>内容由 AI 生成，验收前请核对证据</span>
-        </div>
+      </div>
+      <div class="wb-foot">
+        <span>${ic('branch', 12)}工作线自动创建 · 基于 main —— 不用先想分支名</span>
+        <div style="flex:1"></div>
+        <span>内容由 AI 生成，验收前请核对证据</span>
+      </div>
       </div>
 
       <div class="newtpl">
@@ -2600,41 +3433,68 @@ function toast(msg) {
 }
 
 document.addEventListener('click', e => {
+  if (e.target.closest('.rz')) return;
   const stop = e.target.closest('[data-stop]');
   const el = e.target.closest('[data-act]');
+  const a = el ? el.dataset.act : null, v = el ? el.dataset.v : null;
+
+  // 个人中心：点面板以外的任何位置都收起（包括没有绑定动作的空白区域）
+  // 这一步必须在「无动作则 return」之前，否则点空白处永远收不起来
+  if (S.acct && a !== 'acct' && a !== 'theme' && !e.target.closest('.acctp')) {
+    S.acct = false;
+    if (!el) { render(); return; }
+  }
+  if (S.autoMenu && a !== 'amenu' && !e.target.closest('.menu')) {
+    S.autoMenu = null;
+    if (!el) { render(); return; }
+  }
   if (!el) return;
-  const a = el.dataset.act, v = el.dataset.v;
+
   // 点在弹窗内部不应触发遮罩的关闭；点 X 按钮本身则放行
   if (a === 'close' && stop && el !== e.target.closest('[data-act="close"]')) return;
   if (a === 'close' && stop && el.classList.contains('mask')) return;
-
-  if (a !== 'acct' && a !== 'theme' && S.acct && !e.target.closest('.acctp')) S.acct = false;
 
   switch (a) {
     case 'mode':
       if (S.mode === v) return;
       S.mode = v; S.projF = 'all'; S.reviewId = null;
-      S.projOpen = (modeProjects()[0] || {}).n || null;
+      S.projOpen = new Set([(modeProjects()[0] || {}).n].filter(Boolean));
       S.exCat = v === 'code' ? '软件开发' : '全部';
       S.newCat = 0; S.newTpl = null;
-      if (S.page === 'review' || S.page === 'task') S.page = 'board';
+      if (S.page === 'review' || S.page === 'task') S.page = 'home';
       break;
     case 'theme': S.theme = S.theme === 'light' ? 'dark' : 'light'; break;
     case 'toggleRail': S.railOpen = !S.railOpen; break;
-    case 'toggleR': S.rOpen = !S.rOpen; break;
+    case 'toggleR': S.rOpen = !S.rOpen; if (!S.rOpen) S.rFull = false; break;
+    case 'toggleL': S.lOpen = !S.lOpen; break;
+    case 'rfull': S.rFull = !S.rFull; break;
     case 'page': S.page = v; break;
-    case 'task': if (!v || v === '—') return; S.page = 'task'; S.taskId = v; S.rTab = 'art'; S.cmtLine = null; S.mode = T(v).kind; S.projOpen = T(v).proj; break;
+    case 'task': if (!v || v === '—') return; S.page = 'task'; S.taskId = v; S.rTab = 'art'; S.cmtLine = null; S.trStep = null; S.mode = T(v).kind; S.projOpen.add(T(v).proj); break;
     case 'bview': S.boardView = v; break;
     case 'rtab': S.rTab = v; S.cmtLine = null; break;
+    case 'trstep': S.trStep = S.trStep === +v ? null : +v; break;
+    case 'trf': S.trF = v; break;
     case 'etab': S.expertTab = v; break;
     case 'ptab': S.page = 'proj'; S.projTab = v; break;
+    case 'quick':
+      S.goal = v;
+      break;
+    case 'amenu': S.autoMenu = S.autoMenu === v ? null : v; break;
+    case 'autotab': S.autoTab = v; break;
+    case 'autotpl': S.autoTpl = !S.autoTpl; break;
     case 'exCat': S.exCat = v; break;
     case 'skCat': S.skCat = v; break;
     case 'review': S.page = 'review'; S.reviewId = v; S.revTab = 'sum'; S.cmtLine = null; break;
     case 'revF': S.revF = v; break;
-    case 'tgroup': S.taskGroup = v; break;
     case 'revTab': S.revTab = v; break;
-    case 'proj': S.page = 'board'; S.projF = v; if (v !== 'all') S.projOpen = S.projOpen === v ? null : v; break;
+    case 'proj': S.page = 'board'; S.projF = v;
+      if (v !== 'all') S.projOpen.has(v) ? S.projOpen.delete(v) : S.projOpen.add(v);
+      break;
+    case 'projAll': {
+      const all = modeProjects().map(x => x.n);
+      S.projOpen = all.every(x => S.projOpen.has(x)) ? new Set() : new Set(all);
+      break;
+    }
     case 'tl': DATA.rt.tlOpen = !DATA.rt.tlOpen; break;
     case 'grp': DATA.rt.grp[v] = !DATA.rt.grp[v]; break;
     case 'close': S.dialog = null; break;
@@ -2642,15 +3502,24 @@ document.addEventListener('click', e => {
     case 'new': S.page = 'new'; S.newTpl = null; break;
     case 'nkind':
       S.mode = v; NEW.tpl = null;
-      S.projF = 'all'; S.projOpen = (modeProjects()[0] || {}).n || null;
+      S.projF = 'all'; S.projOpen = new Set([(modeProjects()[0] || {}).n].filter(Boolean));
       S.exCat = v === 'code' ? '软件开发' : '全部';
       break;
-    case 'ncat': S.newCat = +v; S.newTpl = null; break;
-    case 'ntpl2': S.newTpl = S.newTpl === +v ? null : +v; break;
+    case 'ncat': S.newCat = +v; S.newTpl = null; S.goal = ''; break;
+    case 'ntpl2': {
+      S.newTpl = S.newTpl === +v ? null : +v;
+      S.goal = S.newTpl === null ? '' : NEW_TPL[S.mode][S.newCat][1][S.newTpl][0];
+      break;
+    }
+    case 'wbcreate': {
+      if (!S.goal.trim()) { toast('先写一句目标，或用「更多选项」从模板开始'); return; }
+      S.goal = '';
+      toast('已创建任务并开出工作线：分支、检出、终端与产物区已就绪');
+      return;
+    }
     case 'create': {
-      const ta = document.getElementById('newGoal');
-      if (ta && !ta.value.trim()) { toast('先写一句目标，或从下面挑一个常见任务'); return; }
-      S.page = 'board'; S.newTpl = null;
+      if (!S.goal.trim()) { toast('先写一句目标，或从下面挑一个常见任务'); return; }
+      S.page = 'board'; S.newTpl = null; S.goal = '';
       toast('已创建任务并开出工作线：分支、检出、终端与产物区已就绪');
       return;
     }
@@ -2693,6 +3562,51 @@ document.addEventListener('click', e => {
     default: return;
   }
   render();
+});
+
+// 面板拖拽：过程中只改 DOM 宽度，松手才写回状态 —— 避免每移动一像素就整页重渲染
+document.addEventListener('pointerdown', e => {
+  const rz = e.target.closest('.rz');
+  if (!rz) return;
+  const el = document.querySelector(rz.dataset.target);
+  if (!el) return;
+  const key = rz.dataset.rz;
+  const off = +(rz.dataset.off || 0);
+  const inv = rz.dataset.inv === '1';      // 右侧面板：往左拖是变宽
+  const min = +rz.dataset.min, max = +rz.dataset.max;
+  const x0 = e.clientX, w0 = el.getBoundingClientRect().width;
+  rz.classList.add('dragging');
+  document.body.classList.add('rzing');
+  rz.setPointerCapture(e.pointerId);
+  let w = w0;
+  const move = ev => {
+    const d = (ev.clientX - x0) * (inv ? -1 : 1);
+    w = Math.max(min, Math.min(max, w0 + d));
+    el.style.flexBasis = w + 'px';
+    el.style.width = w + 'px';
+  };
+  const up = () => {
+    rz.removeEventListener('pointermove', move);
+    rz.removeEventListener('pointerup', up);
+    rz.removeEventListener('pointercancel', up);
+    rz.classList.remove('dragging');
+    document.body.classList.remove('rzing');
+    S[key] = Math.round(w - off);          // 写回状态，下次渲染沿用
+  };
+  rz.addEventListener('pointermove', move);
+  rz.addEventListener('pointerup', up);
+  rz.addEventListener('pointercancel', up);
+  e.preventDefault();
+});
+
+// 输入只写状态、不重渲染，保证任何一次重绘都不会冲掉已输入的目标
+document.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.sync;
+  if (!k) return;
+  S[k] = e.target.value;
+  // 只切按钮可用态，不重渲染 —— 否则每敲一个字都会重建 DOM、光标丢失
+  const send = document.querySelector('.wb-send');
+  if (send) send.disabled = !S.goal.trim();
 });
 
 document.addEventListener('keydown', e => {
