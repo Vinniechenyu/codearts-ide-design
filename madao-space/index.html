@@ -2310,7 +2310,7 @@ function bKanban() {
             <div class="kf">
               ${t.trigger.startsWith('自动化') ? `<span class="tag">${ic('clock', 11)}自动运行</span>` : `<span class="tag">${ic('user', 11)}你发起</span>`}
               <div style="flex:1"></div>
-              <span class="t-11 ter mono">${t.ts.replace('正在运行 · ', '')}</span>
+              <span class="t-11 ter mono">${t.ts}</span>
             </div>
           </div>`).join('') : '<div class="kb-empty">暂无任务</div>'}
       </div>
