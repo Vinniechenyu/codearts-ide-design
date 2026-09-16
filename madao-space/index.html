@@ -343,9 +343,12 @@ img.av.me{box-shadow:0 0 0 2px var(--surface-1),0 0 0 3px var(--border-strong)}
 
 /* ===== 个人工作台 ===== */
 .wb{padding:0 24px 56px}
-.wb-hero{max-width:1080px;margin:0 auto;padding:44px 0 8px;text-align:center}
-.wb-hi{margin:0;font-size:32px;line-height:40px;font-weight:600;letter-spacing:-.64px}
-.wb-sub{margin:8px 0 22px;font-size:14px;line-height:22px;color:var(--text-3)}
+.wb-hero{max-width:1080px;margin:0 auto;padding:34px 0 6px;
+  display:flex;align-items:center;gap:20px;text-align:left}
+.wb-hero-m{flex:1;min-width:0}
+@media (max-width:760px){.wb-hero{flex-direction:column;align-items:flex-start;gap:14px}}
+.wb-hi{margin:0;font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.56px}
+.wb-sub{margin:5px 0 0;font-size:14px;line-height:22px;color:var(--text-3)}
 .wb-sub b{color:var(--text-1);font-weight:600}
 /* 包围结构：外层浅底托住内层输入卡，底部信息条落在外层上 */
 .wb-shell{text-align:left;background:var(--a-100);border:1px solid var(--border-subtle);
@@ -401,6 +404,138 @@ img.av.me{box-shadow:0 0 0 2px var(--surface-1),0 0 0 3px var(--border-strong)}
 .stat-v{font-size:30px;line-height:38px;font-weight:600;letter-spacing:-.6px;margin:2px 0 1px;
   font-variant-numeric:tabular-nums}
 
+/* ── 工作台：起手区 ────────────────────────────────────── */
+.wb-start{height:38px;padding:0 18px;border-radius:var(--r-full);display:inline-flex;align-items:center;gap:8px;
+  font-size:14px;font-weight:500;background:var(--g-1000);color:var(--bg-100);
+  transition:background var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
+.wb-start:hover{background:var(--g-900);transform:translateY(-1px)}
+.lk2{display:inline-flex;align-items:center;gap:3px;color:var(--text-2);font-size:12px;
+  transition:color var(--mo-state) var(--ease)}
+.lk2:hover{color:var(--text-1)}
+
+/* ── 工作台：三个关键数字（整块可点） ─────────────────────── */
+.kstat{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:1180px){.kstat{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.kstat{grid-template-columns:1fr}}
+.kc-pct{font-family:var(--mono);font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.kc-u{font-size:15px;font-weight:500;color:var(--text-3);margin-left:2px;letter-spacing:0}
+/* 像素进度条：一格 5%，和图表同一套方块语言 */
+.pxbar{display:flex;gap:2px;margin:6px 0 7px}
+.pxbar i{flex:1 1 0;height:8px;border-radius:1px;background:var(--a-300)}
+.pxbar i.on{background:var(--run-solid)}
+.pxbar.streak i{background:var(--a-200)}
+.pxbar.streak i.on{background:var(--done-solid)}
+.kcard{display:flex;flex-direction:column;padding:14px 16px;text-align:left;
+  background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--r-lg)}
+.kcard .stat-v{margin:2px 0 0}
+.kc-h{display:flex;align-items:center;gap:8px;min-height:20px}
+.kc-b{display:flex;align-items:flex-end;gap:10px}
+.kc-go{color:var(--icon-dis);opacity:0;transform:translateX(-3px);
+  transition:opacity var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
+.kcard:hover .kc-go{opacity:1;transform:translateX(0);color:var(--icon-1)}
+
+/* ── 工作台：最近任务 ─────────────────────────────────── */
+.rt2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:1100px){.rt2{grid-template-columns:1fr}}
+.rt2-c{min-width:0}
+
+/* 最近完成：卡片 + 右侧堆叠倾斜的产物预览 */
+.dgrid{display:flex;flex-direction:column;gap:12px}
+.dcard{position:relative;display:flex;gap:12px;min-height:118px;padding:14px 16px;overflow:hidden;
+  background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--r-xl);
+  transition:border-color var(--mo-state) var(--ease),transform var(--mo-state) var(--ease)}
+.dcard:hover{border-color:var(--border-strong);transform:translateY(-1px)}
+.dc-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;position:relative;z-index:2}
+.dc-t{font-size:14px;line-height:21px;font-weight:500;color:var(--text-1);text-align:left;
+  transition:color var(--mo-state) var(--ease)}
+.dc-t:hover{color:var(--link)}
+.dc-s{font-size:12px;line-height:18px;color:var(--text-3);max-width:230px}
+.dc-f{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:8px;
+  font-size:11px;color:var(--text-3);font-family:var(--mono)}
+.dc-f svg{color:var(--icon-2)}
+
+/* 预览纸片：右侧探出一角，hover 时展开 */
+.dc-prev{position:relative;flex:0 0 166px;width:166px;align-self:stretch}
+.pv{position:absolute;width:144px;height:110px;padding:7px 8px;overflow:hidden;text-align:left;
+  display:flex;flex-direction:column;gap:5px;border-radius:var(--r-md);
+  background:var(--polaroid-inner,var(--surface-2));border:1px solid var(--border-subtle);
+  box-shadow:var(--el-2);
+  transition:transform var(--mo-ov) var(--ease),box-shadow var(--mo-state) var(--ease),
+    border-color var(--mo-state) var(--ease)}
+.pv1{top:2px;left:28px;transform:rotate(8deg);z-index:1}
+.pv0{top:16px;left:0;transform:rotate(-5deg);z-index:2}
+.dcard:hover .pv1{transform:rotate(11deg) translate(8px,-5px)}
+.dcard:hover .pv0{transform:rotate(-7deg) translate(-3px,3px)}
+.pv:hover{z-index:5!important;border-color:var(--focus);box-shadow:var(--el-3)}
+.pv-h{display:flex;align-items:center;gap:5px;min-width:0}
+.pv-h svg{flex:0 0 11px;color:var(--icon-2)}
+.pv-h b{font-size:10px;font-weight:500;color:var(--text-2);font-family:var(--mono);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pv-b{display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.pv-b span{font-family:var(--mono);font-size:8px;line-height:11px;color:var(--text-3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-none{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:var(--text-dis)}
+.rt-h{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding-left:2px;
+  font-size:12px;line-height:18px;color:var(--text-3)}
+.rt-h svg{color:var(--icon-2)}
+.rt-list{overflow:hidden}
+.rt-row{width:100%;display:flex;align-items:center;gap:11px;padding:11px 14px;text-align:left;
+  border-bottom:1px solid var(--border-subtle);transition:background var(--mo-state) var(--ease)}
+.rt-list>*:last-child{border-bottom:0}
+.rt-row:not(.done){cursor:pointer}
+.rt-row:not(.done):hover{background:var(--int-subtle)}
+.rt-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.rt-l1{display:flex;align-items:center;gap:8px;min-width:0}
+.rt-l2{display:flex;align-items:center;gap:7px;min-width:0}
+.rt-t{flex:1;min-width:0;font-size:13px;line-height:19px;font-weight:500;color:var(--text-1);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.rt-t.link{transition:color var(--mo-state) var(--ease)}
+.rt-t.link:hover{color:var(--link)}
+.rt-s{display:flex;align-items:center;gap:6px;min-width:0;
+  font-size:12px;line-height:17px;color:var(--text-3)}
+.rt-now{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:12px;line-height:17px;color:var(--text-3)}
+
+/* 来源：自动化定时 vs 你自己发起 */
+.srcico{flex:0 0 26px;width:26px;height:26px;border-radius:var(--r-sm);display:grid;place-items:center;
+  background:var(--a-100);color:var(--icon-2);box-shadow:inset 0 0 0 1px var(--border-subtle)}
+.dc-f .srcico{width:20px;height:20px;flex:0 0 20px;border-radius:4px}
+.dc-f .srcico svg{width:12px;height:12px}
+
+/* 运行位置：本地检出 / 云端沙箱 */
+.envtag{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;
+  border-radius:var(--r-sm);background:var(--a-100);border:1px solid var(--border-subtle);
+  font-size:11px;line-height:19px;color:var(--text-3);max-width:100%}
+.envtag svg{flex:0 0 11px;color:var(--icon-2)}
+.envtag.cloud svg{color:var(--link)}
+.envtag .ev-p{color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.envtag .ev-p::before{content:"·";margin-right:4px;opacity:.5}
+.dc-e{margin-top:7px}
+.rt-ts{flex:0 0 auto;font-size:11px;color:var(--text-3);font-family:var(--mono)}
+.rt-go{flex:0 0 13px;color:var(--icon-dis);opacity:0;transition:opacity var(--mo-state) var(--ease)}
+.rt-row:hover .rt-go{opacity:1}
+.rt-empty{padding:22px 14px;text-align:center;font-size:12px;color:var(--text-3)}
+
+/* 阶段进度：一个阶段一个方块，沿用图表的像素语言 */
+.pgbar{flex:0 0 auto;display:flex;gap:2px;align-items:center;margin-left:auto}
+.pg{width:7px;height:7px;border-radius:1px;background:var(--a-300)}
+.pg.done{background:var(--done-solid)}
+.pg.run{background:var(--run-solid);animation:breathe 1.6s var(--ease) infinite}
+.pg.pend{background:var(--a-300)}
+
+/* 交付件：最近完成行上直接开 */
+.rt-arts{flex:0 0 auto;display:flex;align-items:center;gap:6px;max-width:46%;overflow:hidden}
+.artchip{display:inline-flex;align-items:center;gap:5px;max-width:190px;height:26px;padding:0 9px;
+  border-radius:var(--r-sm);background:var(--a-100);border:1px solid var(--border-subtle);
+  font-size:12px;color:var(--text-2);transition:border-color var(--mo-state) var(--ease),
+    color var(--mo-state) var(--ease),background var(--mo-state) var(--ease)}
+.artchip svg{flex:0 0 12px;color:var(--icon-2)}
+.artchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:11px}
+.artchip:hover{border-color:var(--border-strong);background:var(--surface-2);color:var(--text-1)}
+.artchip:hover svg{color:var(--link)}
+/* 从工作台点进来的那一份，进面板后高亮一下 */
+.art.hit{outline:1.5px solid var(--focus);outline-offset:1px}
+
 /* 活跃日历 */
 .heat-col-wrap .heat-wrap{padding:14px;flex:1;display:flex;flex-direction:column}
 .heat-wrap{padding:16px}
@@ -422,6 +557,19 @@ img.av.me{box-shadow:0 0 0 2px var(--surface-1),0 0 0 3px var(--border-strong)}
   border-top:1px solid var(--border-subtle);font-size:12px;line-height:18px;color:var(--text-3);flex-wrap:wrap}
 .heat-foot b{color:var(--text-1);font-weight:600;font-variant-numeric:tabular-nums}
 .sepdot{opacity:.5}
+
+/* 交付分析：看板页顶部的可折叠区 */
+.anafold{border:1px solid var(--border-subtle);border-radius:var(--r-lg);background:var(--surface-1);
+  margin-bottom:14px;overflow:hidden}
+.anafold-h{width:100%;display:flex;align-items:center;gap:8px;padding:11px 14px;text-align:left;
+  transition:background var(--mo-state) var(--ease)}
+.anafold-h:hover{background:var(--int-subtle)}
+.anafold.on .anafold-h{border-bottom:1px solid var(--border-subtle)}
+.anafold-b{padding:14px}
+/* 看板页比原来的半栏宽得多，日历格子会撑成大方块 —— 给栅格封顶，
+   月份行和格子一起按比例缩放，保持原来的填充行为 */
+.anafold-b .heat-grid{max-width:640px}
+.anafold-b .heat-wrap{padding:14px}
 
 /* 交付分析 */
 .anarow{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;align-items:stretch}
@@ -1012,6 +1160,7 @@ tr:hover .nextbtn{opacity:1}
 <svg style="display:none" aria-hidden="true"><defs>
 <g id="i-plus"><path d="M8 3.3v9.4M3.3 8h9.4"/></g>
 <g id="i-board"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.2h11M6.2 6.2v7.3"/></g>
+<g id="i-cloud"><path d="M4.7 12.3h6.5a2.9 2.9 0 0 0 .35-5.78A4.05 4.05 0 0 0 4.3 6.5a2.9 2.9 0 0 0 .4 5.8z"/></g>
 <g id="i-folder"><path d="M2 4.2a1.2 1.2 0 0 1 1.2-1.2h2.6l1.4 1.6h4.6A1.2 1.2 0 0 1 13 5.8v6A1.2 1.2 0 0 1 11.8 13H3.2A1.2 1.2 0 0 1 2 11.8z"/></g>
 <g id="i-pr"><circle cx="4" cy="4" r="1.7"/><circle cx="4" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><path d="M4 5.7v4.6M12 10.3V7.2A2.2 2.2 0 0 0 9.8 5H7.4"/><path d="M9 3.2 7.2 5 9 6.8"/></g>
 <g id="i-bot"><rect x="2.6" y="4.8" width="10.8" height="8" rx="2"/><path d="M8 2v2.8M5.6 8.4v1.2M10.4 8.4v1.2"/></g>
@@ -1102,7 +1251,7 @@ const S = {
   taskId: 'T-2041', boardView: 'kanban', rTab: 'art', rOpen: true, lOpen: true, rFull: false,
   railW: 232, domLW: 296, domRW: 640,
   reviewId: null, expertTab: 'expert', dialog: null, projF: 'all', projOpen: new Set(['team-workspace']),
-  revF: 'all', revTab: 'sum', trStep: null, trF: 'all', projTab: 'mine', newCat: 0, newTpl: null, acct: false, goal: '', autoTab: 'mine', autoTpl: false, autoMenu: null, exCat: '全部', skCat: '全部',
+  revF: 'all', revTab: 'sum', trStep: null, trF: 'all', boardSt: 'all', artIdx: null, anaOpen: false, projTab: 'mine', newCat: 0, newTpl: null, acct: false, goal: '', autoTab: 'mine', autoTpl: false, autoMenu: null, exCat: '全部', skCat: '全部',
   cmtLine: null, toast: null, tlOpen: true
 };
 
@@ -1198,7 +1347,7 @@ const DATA = {
     },
     {
       proj: 'codearts-space', id: 'T-2038', kind: 'code', title: '修复：任务列表首屏偶发白屏', st: 'run',
-      branch: 'fix/board-first-paint', ts: '正在运行 · 4 分 12 秒',
+      branch: 'fix/board-first-paint', ts: '已跑 4 分 12 秒',
       now: '正在执行构建校验，已通过 3/5 项', trigger: '你于 09:41 发起',
       team: [['码','c1'],['测','c3']],
       stages: [
@@ -1246,11 +1395,29 @@ const DATA = {
       proj: 'space-docs', id: 'T-2035', kind: 'gen', title: 'PRD：变更评审卡 v2', st: 'done',
       branch: 'doc/prd-review-card-v2', ts: '昨天 18:40',
       now: '已接受并归档，衍生 2 条代码工作线', trigger: '你于昨天 14:10 发起',
-      team: [['产','c4'],['评','c2']], stages: [], arts: [], ev: []
+      team: [['产','c4'],['评','c2']], stages: [], ev: [],
+      arts: [
+        { t: 'doc', n: 'PRD-变更评审卡-v2.md', m: ['Markdown','18.2 KB','昨天 18:40'], st: 'done',
+          prev: '## 目标\n让通用任务的产物也能逐段评审：纪要、汇报、PRD 与代码走同一条验收路径。\n\n## 范围\n段落级 diff、行内评论回灌、验收条件前置…' },
+        { t: 'data', n: '验收条件清单.csv', m: ['CSV','12 行','昨天 18:38'], st: 'done',
+          prev: '条目,类型,判定方式,阻塞接受\n逐段 diff,功能,人工走查,是\n行内评论回灌,功能,端到端用例,是\n证据可回溯,质量,抽查 10 条,是…' }
+      ]
+    },
+    {
+      proj: 'codearts-space', id: 'T-2033', kind: 'code', title: '修复：评审卡长文档滚动卡顿', st: 'done',
+      branch: 'fix/review-card-scroll', ts: '昨天 20:05',
+      now: '已接受并合入 main · 流水线 #2411 通过', trigger: '你于昨天 15:30 发起',
+      team: [['码','c1'],['测','c3']], stages: [], ev: [],
+      arts: [
+        { t: 'code', n: 'ReviewCard.tsx', m: ['TypeScript','+48 −21','昨天 20:01'], st: 'done',
+          prev: 'const rows = useVirtual({ count: paras.length, estimateSize: () => 44 })\n// 长文档改虚拟滚动，只渲染视口内的段落' },
+        { t: 'doc', n: '性能对比.md', m: ['Markdown','3.1 KB','昨天 20:03'], st: 'done',
+          prev: '## 修复前后\n1200 段文档首屏：820ms → 96ms\n滚动掉帧：17 帧 → 0 帧（1440×900，6× CPU 降频）' }
+      ]
     },
     {
       proj: 'madao-agentd', id: 'T-2030', kind: 'code', title: '重构：madao-agentd 协议层抽取', st: 'run',
-      branch: 'refactor/agentd-proto', ts: '正在运行 · 1 小时 24 分',
+      branch: 'refactor/agentd-proto', ts: '已跑 1 小时 24 分',
       now: '主线运行中，2 条子工作线并行', trigger: '你于 07:55 发起',
       team: [['码','c1'],['码','c2'],['测','c3']], stages: [], arts: [], ev: []
     },
@@ -1321,7 +1488,7 @@ const DATA = {
     },
     {
       proj: 'team-workspace', id: 'T-2042', kind: 'gen', title: '供应商报价对比表 · 12 家', st: 'run',
-      branch: 'data/vendor-quote-q4', ts: '正在运行 · 6 分 03 秒',
+      branch: 'data/vendor-quote-q4', ts: '已跑 6 分 03 秒',
       now: '正在拉平 12 份报价的口径差异，已完成 8 家',
       trigger: '你于 10:12 发起', team: [['数','c3'],['核','c2']],
       stages: [
@@ -1339,7 +1506,13 @@ const DATA = {
       branch: 'doc/faq-tone-v2', ts: '昨天 16:20',
       now: '已接受并归档，已同步到客服知识库',
       trigger: '自动化 · 工单量周环比 +20% 时触发', team: [['文','c4'],['评','c2']],
-      stages: [], arts: [], ev: []
+      stages: [], ev: [],
+      arts: [
+        { t: 'doc', n: '答复口径-v2.md', m: ['Markdown','9.6 KB','昨天 16:20'], st: 'done',
+          prev: '## 退款时效\n口径：以银行到账为准，承诺 3 个工作日，不承诺具体小时数。\n\n## 发票重开\n口径：本季度内可重开，跨季度需走财务补录…' },
+        { t: 'data', n: '高频问题-TOP30.csv', m: ['CSV','30 行','昨天 16:18'], st: 'done',
+          prev: '排名,问题,本周工单数,环比,现有口径\n1,退款多久到账,412,+18%,有\n2,发票能否重开,306,+31%,缺口已补…' }
+      ]
     },
     {
       proj: 'space-docs', id: 'T-2028', kind: 'gen', title: '故障复盘：9/12 网关超时', st: 'fail',
@@ -1443,12 +1616,16 @@ const DATA = {
   ],
   projects: [
     { n: 'codearts-space', label: '码道 Space 客户端', kind: 'code', d: '码道 Space 客户端与 Web', repo: 'gitcode.com/codearts/space',
+      env: 'local', path: '~/Work/codearts-space',
       lanes: [3, 1, 1], langs: ['TypeScript','Rust'], ts: '3 分钟前', pin: true },
     { n: 'madao-agentd', label: 'Agent 内核', kind: 'code', d: 'Agent 常驻内核与协议层', repo: 'gitcode.com/codearts/agentd',
+      env: 'cloud', path: '云端沙箱 · 2 vCPU / 8G',
       lanes: [1, 0, 2], langs: ['Rust','Go'], ts: '1 小时前', pin: true },
     { n: 'team-workspace', label: '团队通用空间', kind: 'gen', d: '纪要、汇报、调研、表格 —— 无需代码仓', repo: '无代码仓 · 产物直接归档到空间',
+      env: 'local', path: '~/Documents/团队通用空间',
       lanes: [1, 1, 1], langs: ['文档','表格'], ts: '8 分钟前', pin: true },
     { n: 'space-docs', label: '产品文档空间', kind: 'gen', d: 'PRD、方案、复盘、周报', repo: 'gitcode.com/codearts/space-docs',
+      env: 'cloud', path: '云端沙箱 · 1 vCPU / 4G',
       lanes: [1, 1, 0], langs: ['Markdown'], ts: '3 分钟前', pin: false }
   ],
   // 运行期可变状态
@@ -1814,146 +1991,155 @@ function page() {
 /* =====================================================================
    页面 · 任务看板（列表 / 网格 / 依赖图）
    ===================================================================== */
+// 任务是自己发起的还是自动化定时跑的 —— 看板是模式内的，通用/编程图标在这里是废信息
+const isAuto = t => /^自动化/.test(t.trigger || '');
+const srcIco = t => isAuto(t)
+  ? `<span class="srcico auto" title="自动化定时任务 · ${esc(t.trigger)}">${ic('clock', 14)}</span>`
+  : `<span class="srcico" title="${esc(t.trigger)}">${ic('spark', 14)}</span>`;
+// 这条任务跑在哪：本地检出 / 云端沙箱
+const envTag = t => {
+  const pj = P(t.proj), cloud = pj.env === 'cloud';
+  return `<span class="envtag ${cloud ? 'cloud' : 'local'}" title="${cloud ? '云端沙箱' : '本地文件夹'} · ${esc(pj.path || '')}">
+    ${ic(cloud ? 'cloud' : 'folder', 11)}${cloud ? '云端' : '本地'}
+    <span class="ev-p">${esc(pj.label)}</span></span>`;
+};
+
 function pHome() {
-  const views = [['kanban', 'board', '看板'], ['list', 'list', '列表'], ['grid', 'grid', '并行监看'], ['graph', 'graph', '依赖图']];
   const h = new Date().getHours();
   const hello = h < 6 ? '还没睡' : h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
-  const all = DATA.tasks;
-  const waitN = all.filter(t => t.st === 'wait' || t.st === 'fail').length;
-  const verifyN = all.filter(t => t.st === 'verify').length;
-  const runN = all.filter(t => t.st === 'run').length;
-  const autoRuns = DATA.autos.reduce((a, x) => a + x.runs, 0);
+  const mine = visible();
+  const wait = mine.filter(t => t.st === 'wait' || t.st === 'fail');
+  const run = mine.filter(t => t.st === 'run');
+  const ver = mine.filter(t => t.st === 'verify');
+  const live = [...wait, ...run, ...ver];
+  const done = mine.filter(t => t.st === 'done');
 
-  const stats = [
-    ['需要我判断', waitN, '个任务停在这里等你', 'wait', waitN ? ['去处理', 'T-2044'] : null, SERIES.wait],
-    ['正在跑', runN, '不需要你盯着', 'run', null, SERIES.run],
-    ['等待验收', verifyN, '验证过了才放开「接受」', 'verify', verifyN ? ['去验收', 'T-2043'] : null, SERIES.verify],
-    ['自动运行', autoRuns, '累计次数 · 成功率 96%', 'done', null, SERIES.auto]
-  ];
-  const endOk = SERIES.ok.reduce((a, b) => a + b, 0);
-  const endBack = SERIES.back.reduce((a, b) => a + b, 0);
-  const endFail = 4;
-  const endTotal = endOk + endBack + endFail;
+  // 账户用量：本月配额 10w 积分，已用 7.6w
+  const CREDIT = { used: 76000, quota: 101000 };
+  const pct = Math.round(CREDIT.used / CREDIT.quota * 100);
+  const streak = 18;                               // 当前连续登录
+  const streak14 = HEAT.slice(-14).map(x => x.n);  // 近 14 天有没有产出
+
+  // 阶段进度条：用方块表达 5 个阶段的完成情况，和图表的像素语言一致
+  const stageBar = t => !t.stages ? '' : `<span class="pgbar" title="${t.stages.filter(x => x[0] === 'done').length}/${t.stages.length} 阶段已完成">
+    ${t.stages.map(x => `<i class="pg ${x[0]}"></i>`).join('')}</span>`;
 
   return `
   <div class="pbody wb scroll">
-    <!-- 欢迎语 + 输入 -->
     <section class="wb-hero">
-      <h1 class="wb-hi">${hello}，Vinnie</h1>
-      <p class="wb-sub">${waitN
-        ? `有 <b>${waitN}</b> 个任务在等你判断，其余 ${runN + verifyN} 个都在自己往前走`
-        : '今天没有需要你判断的节点，剩下的交给搭档'}</p>
-      <div class="wb-shell">
-      <div class="wb-box">
-        <textarea id="wbGoal" data-sync="goal" placeholder="${S.mode === 'code'
-          ? '交给码道一个改动：说清要什么结果，不用说怎么做…'
-          : '交给码道一件事：说清要什么结果，不用说怎么做…'}">${esc(S.goal)}</textarea>
-        <div class="wb-box-f">
-          <button class="pick" data-act="noop">${ic('att', 14)}附件</button>
-          <button class="pick" data-act="noop">${ic('folder', 14)}${S.mode === 'code' ? 'codearts-space' : 'team-workspace'}${ic('chevd', 12)}</button>
-          <button class="pick" data-act="noop">模型：自动选择${ic('chevd', 12)}</button>
-          <div style="flex:1"></div>
-          <button class="wb-send" data-act="wbcreate" title="创建任务" ${S.goal.trim() ? '' : 'disabled'}>${ic('up', 16)}</button>
+      <div class="wb-hero-m">
+        <h1 class="wb-hi">${hello}，Vinnie</h1>
+        <p class="wb-sub">${wait.length
+          ? `有 <b>${wait.length}</b> 个任务在等你判断，其余 ${run.length + ver.length} 个都在自己往前走`
+          : '今天没有需要你判断的节点，剩下的交给搭档'}</p>
+      </div>
+      <button class="wb-start" data-act="new">${ic('plus', 15)}${S.mode === 'code' ? '交给码道一个改动' : '交给码道一件事'}</button>
+    </section>
+
+    <section class="wb-sec">
+      <div class="kstat">
+        <div class="kcard">
+          <span class="kc-h"><span class="t-13 sec" style="flex:1">积分用量</span>
+            <span class="kc-pct">${pct}%</span></span>
+          <span class="stat-v">7.6<span class="kc-u">w</span></span>
+          <span class="pxbar" title="已用 ${CREDIT.used.toLocaleString()} / 配额 ${CREDIT.quota.toLocaleString()}">
+            ${Array.from({ length: 20 }, (_, i) => `<i class="${i < Math.round(pct / 5) ? 'on' : ''}"></i>`).join('')}
+          </span>
+          <span class="t-12 ter">本月配额 10.1w · 按当前速度可用到 26 号</span>
         </div>
-      </div>
-      <div class="wb-foot">
-        <span>${ic('branch', 12)}工作线自动创建 · 基于 main —— 不用先想分支名</span>
-        <div style="flex:1"></div>
-        <span>内容由 AI 生成，验收前请核对证据</span>
-      </div>
+
+        <div class="kcard">
+          <span class="kc-h"><span class="t-13 sec" style="flex:1">累计 Token</span></span>
+          <span class="kc-b">
+            <span style="flex:1;min-width:0">
+              <span class="stat-v">2.41<span class="kc-u">M</span></span>
+              <span class="t-12 ter" style="display:block">输入 1.78M · 输出 0.63M</span>
+            </span>
+            ${spark(SERIES.run, 'run')}
+          </span>
+        </div>
+
+        <div class="kcard">
+          <span class="kc-h"><span class="t-13 sec" style="flex:1">任务总数</span></span>
+          <span class="kc-b">
+            <span style="flex:1;min-width:0">
+              <span class="stat-v">1,284</span>
+              <span class="t-12 ter" style="display:block">进行中 ${live.length} · 已完成 1,271</span>
+            </span>
+            ${spark(SERIES.ok, 'done')}
+          </span>
+        </div>
+
+        <div class="kcard">
+          <span class="kc-h"><span class="t-13 sec" style="flex:1">连续登录</span></span>
+          <span class="stat-v">${streak}<span class="kc-u">天</span></span>
+          <span class="pxbar streak" title="近 14 天有产出的日子">
+            ${streak14.map(v => `<i class="${v ? 'on' : ''}"></i>`).join('')}
+          </span>
+          <span class="t-12 ter">近 14 天 · 最长连续 27 天</span>
+        </div>
       </div>
     </section>
 
-    <!-- 本周概览 + 活跃日历：一行左右分布 -->
-    <section class="wb-row">
-      <div class="wb-col">
-        <div class="wb-sec-h">
-          <span class="t-h16">本周概览</span>
-          <span class="note">含通用与编程全部任务 · 近 14 天趋势</span>
-        </div>
-        <div class="statgrid">
-          ${stats.map(([n, v, d, tone, cta, ser]) => `
-            <div class="statcard">
-              <div class="stat-h">
-                <i class="stat-dot" style="background:var(--${STATUS[tone].k}-solid)"></i>
-                <span class="t-13 sec" style="flex:1">${n}</span>
-                ${cta ? `<button class="btn sm ter" data-act="task" data-v="${cta[1]}">${cta[0]}${ic('chev', 12)}</button>` : ''}
-              </div>
-              <div class="stat-b">
-                <div>
-                  <div class="stat-v">${v}</div>
-                  <div class="t-12 ter">${d}</div>
-                </div>
-                ${spark(ser, STATUS[tone].k)}
-              </div>
-            </div>`).join('')}
-        </div>
-      </div>
-
-      <div class="wb-col heat-col-wrap">
-        <div class="wb-sec-h">
-          <span class="t-h16">活跃日历</span>
-          <span class="note">近 18 周</span>
-          <div style="flex:1"></div>
-          <div class="heat-legend">
-            <span class="t-11 ter">少</span>
-            ${[0, 1, 2, 3, 4].map(l => `<i class="heat-cell" style="background:var(--heat-${l})"></i>`).join('')}
-            <span class="t-11 ter">多</span>
-          </div>
-        </div>
-        ${heatmap()}
-      </div>
-    </section>
-
-    <!-- 交付分析 -->
     <section class="wb-sec">
       <div class="wb-sec-h">
-        <span class="t-h16">交付分析</span>
-        <span class="note">近 14 天 · 已接受与退回重做的对比</span>
+        <span class="t-h16">最近任务</span>
+        <span class="note">${live.length} 个进行中 · ${done.length} 个最近完成</span>
+        <div style="flex:1"></div>
+        <button class="lk2" data-act="page" data-v="board">全部任务${ic('chev', 11)}</button>
       </div>
-      <div class="anarow">
-        <div class="card anacard">
-          <div class="ana-h">
-            <span class="t-h14" style="flex:1">交付趋势</span>
-            <span class="lg"><i style="background:var(--done-solid)"></i>已接受</span>
-            <span class="lg"><i class="dash" style="background:var(--wait-solid)"></i>退回重做</span>
-          </div>
-          ${trend(SERIES.days, SERIES.ok, SERIES.back)}
-        </div>
-        <div class="card anacard">
-          <div class="ana-h"><span class="t-h14">任务结束状态</span></div>
-          <div class="donut-row">
-            ${donut([['已接受', endOk, 'done'], ['退回重做', endBack, 'wait'], ['失败中止', endFail, 'fail']], endTotal, '个任务')}
-            <div class="donut-legend">
-              ${[['已接受', endOk, 'done'], ['退回重做', endBack, 'wait'], ['失败中止', endFail, 'fail']].map(([n, v, t]) => `
-                <div class="lgrow">
-                  <i style="background:var(--${t}-solid)"></i>
-                  <span class="lgn">${n}</span>
-                  <b>${v}</b>
-                  <span class="lgp">${Math.round(v / endTotal * 100)}%</span>
-                </div>`).join('')}
-              <div class="divider" style="margin:10px 0 8px"></div>
-              <div class="kv"><span>一次通过率</span><b>${Math.round(endOk / endTotal * 100)}%</b></div>
-              <div class="kv"><span>平均交付时长</span><b>8 分 12 秒</b></div>
-              <div class="kv"><span>平均介入次数</span><b>0.4 次</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- 看板入口 -->
-    <section class="wb-sec">
-      <button class="card wb-entry" data-act="page" data-v="board">
-        <span class="sk-ico neutral">${ic('board', 17)}</span>
-        <span style="flex:1;text-align:left">
-          <span class="t-h14" style="display:block">${KIND[S.mode][1]}任务看板</span>
-          <span class="t-12 ter" style="display:block;margin-top:2px">
-            ${visible().filter(t => t.st !== 'done').length} 个进行中 · 看板 / 列表 / 并行监看 / 依赖图 四种视图
-          </span>
-        </span>
-        ${ic('chev', 16, 'ter')}
-      </button>
+      <div class="rt2">
+      <div class="rt2-c">
+      <div class="rt-h">${ic('clock', 12)}进行中</div>
+      <div class="card rt-list">
+        ${live.length ? live.map(t => `
+          <button class="rt-row" data-act="task" data-v="${t.id}">
+            ${srcIco(t)}
+            <span class="rt-m">
+              <span class="rt-l1">
+                <span class="rt-t">${esc(t.title)}</span>
+                ${chip(t.st)}
+                <span class="rt-ts">${t.ts}</span>
+                ${ic('chev', 13, 'rt-go')}
+              </span>
+              <span class="rt-l2">
+                ${envTag(t)}
+                <span class="rt-now">${esc(t.now)}</span>
+                ${stageBar(t)}
+              </span>
+            </span>
+          </button>`).join('') : '<div class="rt-empty">没有进行中的任务</div>'}
+      </div>
+      </div>
+
+      <div class="rt2-c">
+      <div class="rt-h">${ic('check', 12)}最近完成 · 交付件可直接打开</div>
+      ${done.length ? `<div class="dgrid">
+        ${done.map(t => `
+          <div class="dcard">
+            <div class="dc-m">
+              <button class="dc-t" data-act="task" data-v="${t.id}">${esc(t.title)}</button>
+              <div class="dc-s">${esc(t.now)}</div>
+              <div class="dc-f">
+                ${srcIco(t)}<span>${t.ts}</span>
+                <span class="sepdot">·</span><span>${(t.arts || []).length} 个交付件</span>
+              </div>
+              <div class="dc-e">${envTag(t)}</div>
+            </div>
+            <div class="dc-prev">
+              ${(t.arts || []).slice(0, 2).map((x, i) => `
+                <button class="pv pv${i}" data-act="openart" data-v="${t.id}|${i}" title="打开 ${esc(x.n)}">
+                  <span class="pv-h">${ic(x.t === 'data' ? 'grid' : x.t === 'code' ? 'code' : 'doc', 11)}<b>${esc(x.n)}</b></span>
+                  <span class="pv-b">${String(x.prev || '').split('\n').filter(Boolean).slice(0, 6)
+                    .map(l => `<span>${esc(l.slice(0, 34))}</span>`).join('')}</span>
+                </button>`).join('')}
+              ${!(t.arts || []).length ? '<span class="pv-none">无交付件</span>' : ''}
+            </div>
+          </div>`).join('')}
+      </div>` : '<div class="card rt-empty">还没有完成的任务</div>'}
+      </div>
+      </div>
     </section>
   </div>`;
 }
@@ -1977,12 +2163,73 @@ function pBoard() {
         </div>
       </div>
       <div class="sp"></div>
+      ${S.boardView === 'list' && S.boardSt !== 'all'
+        ? `<button class="tag" style="height:26px;gap:6px" data-act="bst" data-v="all">${ic('x', 12)}只看「${STATUS[S.boardSt].t}」</button>` : ''}
       <div class="seg">${views.map(([v, i, n]) =>
         `<button class="${S.boardView === v ? 'on' : ''}" data-act="bview" data-v="${v}">${ic(i, 14)}${n}</button>`).join('')}</div>
       <button class="btn acc" data-act="new">${ic('plus')}新建任务</button>
     </div>
   </div>
-  <div class="pbody scroll">${S.boardView === 'kanban' ? bKanban() : S.boardView === 'list' ? bList() : S.boardView === 'grid' ? bGrid() : bGraph()}</div>`;
+  <div class="pbody scroll">
+    <div class="anafold ${S.anaOpen ? 'on' : ''}">
+      <button class="anafold-h" data-act="anaopen">
+        ${ic(S.anaOpen ? 'chevd' : 'chev', 13, 'ter')}
+        <span class="t-13">交付分析</span>
+        <span class="note">近 18 周活跃 · 近 14 天交付趋势与结束状态</span>
+      </button>
+      ${S.anaOpen ? analytics() : ''}
+    </div>
+    ${S.boardView === 'kanban' ? bKanban() : S.boardView === 'list' ? bList() : S.boardView === 'grid' ? bGrid() : bGraph()}
+  </div>`;
+}
+
+// 从工作台搬过来的三块分析：活跃日历 + 交付趋势 + 结束状态
+function analytics() {
+  const endOk = SERIES.ok.reduce((a, b) => a + b, 0);
+  const endBack = SERIES.back.reduce((a, b) => a + b, 0);
+  const endFail = 4;
+  const endTotal = endOk + endBack + endFail;
+  return `
+  <div class="anafold-b">
+    <div class="wb-sec-h" style="margin-bottom:10px">
+      <span class="t-h14">活跃日历</span><span class="note">近 18 周</span>
+      <div style="flex:1"></div>
+      <div class="heat-legend">
+        <span class="t-11 ter">少</span>
+        ${[0, 1, 2, 3, 4].map(l => `<i class="heat-cell" style="background:var(--heat-${l})"></i>`).join('')}
+        <span class="t-11 ter">多</span>
+      </div>
+    </div>
+    ${heatmap()}
+    <div class="anarow" style="margin-top:14px">
+      <div class="card anacard">
+        <div class="ana-h">
+          <span class="t-h14" style="flex:1">交付趋势</span>
+          <span class="lg"><i style="background:var(--done-solid)"></i>已接受</span>
+          <span class="lg"><i class="dash" style="background:var(--wait-solid)"></i>退回重做</span>
+        </div>
+        ${trend(SERIES.days, SERIES.ok, SERIES.back)}
+      </div>
+      <div class="card anacard">
+        <div class="ana-h"><span class="t-h14">任务结束状态</span></div>
+        <div class="donut-row">
+          ${donut([['已接受', endOk, 'done'], ['退回重做', endBack, 'wait'], ['失败中止', endFail, 'fail']], endTotal, '个任务')}
+          <div class="donut-legend">
+            ${[['已接受', endOk, 'done'], ['退回重做', endBack, 'wait'], ['失败中止', endFail, 'fail']].map(([n, v, t]) => `
+              <div class="lgrow">
+                <i style="background:var(--${t}-solid)"></i>
+                <span class="lgn">${n}</span><b>${v}</b>
+                <span class="lgp">${Math.round(v / endTotal * 100)}%</span>
+              </div>`).join('')}
+            <div class="divider" style="margin:10px 0 8px"></div>
+            <div class="kv"><span>一次通过率</span><b>${Math.round(endOk / endTotal * 100)}%</b></div>
+            <div class="kv"><span>平均交付时长</span><b>8 分 12 秒</b></div>
+            <div class="kv"><span>平均介入次数</span><b>0.4 次</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 // 快捷起手式：填进输入框即可，不跳页
@@ -2072,7 +2319,8 @@ function bKanban() {
 }
 
 function bList() {
-  const list = visible();
+  const list = visible().filter(t => S.boardSt === 'all'
+    || (S.boardSt === 'wait' ? (t.st === 'wait' || t.st === 'fail') : t.st === S.boardSt));
   return `<table class="tbl">
     <thead><tr>
       <th style="width:120px">状态</th><th>任务</th><th style="width:210px">项目空间 · 位置</th>
@@ -2464,9 +2712,9 @@ function rArt(t) {
   if (!t.arts.length) return `<div class="empty">${ic('doc', 28)}<div class="t-13">还没有产物</div>
     <div class="t-12">搭档完成当前阶段后，产物会出现在这里，并带上验证证据。</div></div>`;
   const icoOf = { doc: ['doc', 'f-doc'], data: ['board', 'f-data'], code: ['code', 'f-source'], media: ['camera', 'f-media'] };
-  return t.arts.map(a => {
+  return t.arts.map((a, ai) => {
     const [i, c] = icoOf[a.t] || ['doc', 'f-doc'];
-    return `<div class="art" data-act="rtab" data-v="${a.t === 'code' || a.t === 'doc' ? 'diff' : 'ev'}">
+    return `<div class="art ${S.artIdx === ai ? 'hit' : ''}" data-act="rtab" data-v="${a.t === 'code' || a.t === 'doc' ? 'diff' : 'ev'}">
       <div class="art-h">
         <span class="art-ico" style="color:var(--${c})">${ic(i, 18)}</span>
         <div style="flex:1;min-width:0">
@@ -3471,9 +3719,16 @@ document.addEventListener('click', e => {
     case 'page': S.page = v; break;
     case 'task': if (!v || v === '—') return; S.page = 'task'; S.taskId = v; S.rTab = 'art'; S.cmtLine = null; S.trStep = null; S.mode = T(v).kind; S.projOpen.add(T(v).proj); break;
     case 'bview': S.boardView = v; break;
-    case 'rtab': S.rTab = v; S.cmtLine = null; break;
+    case 'rtab': S.artIdx = null; S.rTab = v; S.cmtLine = null; break;
     case 'trstep': S.trStep = S.trStep === +v ? null : +v; break;
     case 'trf': S.trF = v; break;
+    // 工作台三个数字 → 列表视图 + 状态筛选（看板本就按状态分列，筛状态没意义）
+    case 'statgo': S.page = 'board'; S.boardView = 'list'; S.boardSt = v; break;
+    case 'bst': S.boardSt = v; break;
+    case 'anaopen': S.anaOpen = !S.anaOpen; break;
+    // 交付件一键打开：直接落到那条任务的产物面板
+    case 'openart': { const [tid, ai] = v.split('|'); S.page = 'task'; S.taskId = tid;
+      S.rTab = 'art'; S.artIdx = +ai; S.trStep = null; S.cmtLine = null; break; }
     case 'etab': S.expertTab = v; break;
     case 'ptab': S.page = 'proj'; S.projTab = v; break;
     case 'quick':
@@ -3605,9 +3860,9 @@ document.addEventListener('input', e => {
   if (!k) return;
   S[k] = e.target.value;
   // 只切按钮可用态，不重渲染 —— 否则每敲一个字都会重建 DOM、光标丢失
-  const send = document.querySelector('.wb-send');
-  if (send) send.disabled = !S.goal.trim();
+  document.querySelectorAll('.wb-send').forEach(b => { b.disabled = !S.goal.trim(); });
 });
+
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
