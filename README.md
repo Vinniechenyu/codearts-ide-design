@@ -38,6 +38,7 @@ CodeArts IDE / 码道代码智能体的体验设计材料集，统一托管。�
 
 | 材料 | 产品 | 链接 |
 |---|---|---|
+| CodeAgent · 研发用量驾驶舱管理台 | Space | [`codeagent-console/`](https://vinniechenyu.github.io/codearts-ide-design/codeagent-console/) |
 | CodeAgent Desktop · 任务起点首页交互原型 | Space | [`codeagent-desktop/#new-task`](https://vinniechenyu.github.io/codearts-ide-design/codeagent-desktop/#new-task) |
 | 码道CodeArts Space · 一站式工作台交互原型 | Space | [`madao-space/`](https://vinniechenyu.github.io/codearts-ide-design/madao-space/) |
 | 码道 Work 小程序设计 Demo | Work | [`madao-work-miniprogram/`](https://vinniechenyu.github.io/codearts-ide-design/madao-work-miniprogram/) |
