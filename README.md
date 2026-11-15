@@ -8,10 +8,14 @@ CodeArts IDE / 码道代码智能体的体验设计材料集，汇集业界洞�
 
 > 本仓库用于设计阅读与交互演示。原型中的任务执行、用量、权限等交互不代表已接入真实后端服务。
 
+## 聚合页预览
+
+![CodeArts IDE Design 聚合页：材料目录与交互原型](assets/preview-gallery.png)
+
 ## 快速入口
 
 - [CodeAgent 研发用量驾驶舱](https://vinniechenyu.github.io/codearts-ide-design/codeagent-console/)：部门用量、个人用量、权限管理。
-- [CodeAgent Desktop 任务起点](https://vinniechenyu.github.io/codearts-ide-design/codeagent-desktop/#new-task)：能力卡组、专家直达、Agent / Workflow 与任务提交。
+- [CodeAgent Desktop交互原型](https://vinniechenyu.github.io/codearts-ide-design/codeagent-desktop/#new-task)：能力卡组、专家直达、Agent / Workflow 与任务提交。
 - [码道 CodeArts Space 一站式工作台](https://vinniechenyu.github.io/codearts-ide-design/madao-space/)：通用 / 编程双模式、工作线、产物评审与验收。
 - [码道 Work 项目版](https://vinniechenyu.github.io/codearts-ide-design/codearts-space/project.html?v=0817a)：项目、计划、任务验收、知识与资产。
 - [生成响应体验优化专项](https://vinniechenyu.github.io/codearts-ide-design/madao-response-deck/?v=brief-0713-2)：实测证据、根因分析与响应体验方案。
@@ -26,7 +30,7 @@ CodeArts IDE / 码道代码智能体的体验设计材料集，汇集业界洞�
 | 材料 | 产品形态 | 在线预览 |
 |---|---|---|
 | CodeAgent · 研发用量驾驶舱管理台 | Space | [打开](https://vinniechenyu.github.io/codearts-ide-design/codeagent-console/) |
-| CodeAgent Desktop · 任务起点首页交互原型 | Space | [打开](https://vinniechenyu.github.io/codearts-ide-design/codeagent-desktop/#new-task) |
+| CodeAgent Desktop交互原型 | Space | [打开](https://vinniechenyu.github.io/codearts-ide-design/codeagent-desktop/#new-task) |
 | 码道CodeArts Space · 一站式工作台交互原型 | Space | [打开](https://vinniechenyu.github.io/codearts-ide-design/madao-space/) |
 | 码道 Work 小程序设计 Demo | Work | [打开](https://vinniechenyu.github.io/codearts-ide-design/madao-work-miniprogram/) |
 | 码道 Work · 交互原型 | Work | [打开](https://vinniechenyu.github.io/codearts-ide-design/codearts-space/project.html?v=0817a) |
